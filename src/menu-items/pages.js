@@ -1,34 +1,37 @@
 // assets
-import { LoginOutlined, ProfileOutlined } from '@ant-design/icons';
+import { LoginOutlined, ProfileOutlined, UserOutlined, RedoOutlined } from '@ant-design/icons';
+import { ConfigRouter } from 'config_router';
 
 // icons
 const icons = {
   LoginOutlined,
-  ProfileOutlined
+  ProfileOutlined,
+  UserOutlined,
+  RedoOutlined
 };
 
 // ==============================|| MENU ITEMS - EXTRA PAGES ||============================== //
 
 const pages = {
-  id: 'authentication',
-  title: 'Authentication',
+  id: 'pages',
+  title: 'Thông tin tài khoản',
   type: 'group',
   children: [
     {
-      id: 'login1',
-      title: 'Login',
+      id: ConfigRouter.user,
+      title: 'Người dùng',
       type: 'item',
-      url: '/login',
-      icon: icons.LoginOutlined,
-      target: true
+      url: ConfigRouter.user,
+      icon: icons.UserOutlined,
+      target: false
     },
     {
-      id: 'register1',
-      title: 'Register',
+      id: ConfigRouter.pwRecovery,
+      title: 'Lấy lại mật khẩu',
       type: 'item',
-      url: '/register',
-      icon: icons.ProfileOutlined,
-      target: true
+      url: ConfigRouter.pwRecovery,
+      icon: icons.RedoOutlined,
+      target: false
     }
   ]
 };
