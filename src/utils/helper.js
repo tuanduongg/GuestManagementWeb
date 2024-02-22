@@ -1,3 +1,5 @@
+import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds } from 'date-fns';
+
 export function generateRandomVNLicensePlate() {
   // Mã tỉnh/thành phố
   const provinceCodes = [
@@ -143,62 +145,28 @@ export const formatDateFromDB = (dateString) => {
   // Tạo chuỗi định dạng
   return addZero(hours) + ':' + addZero(minutes) + ' ' + addZero(day) + '/' + addZero(month) + '/' + year;
 };
+const shortStringNum = (num) => {
+  if (num < 1) return '';
+  return num;
+};
 export function compareDateTime(dateTimeString) {
-  let result = '';
-  // Hàm tính khoảng cách thời gian
-  function calculate() {
-    // Thời gian hiện tại
-    const now = new Date();
-    const targetDate = new Date(dateTimeString);
-
-    // Tính khoảng cách thời gian
-    const timeDiff = targetDate.getTime() - now.getTime();
-
-    // Chuyển đổi thành đơn vị thích hợp (phút, giây, millisecond)
-    const seconds = Math.floor(timeDiff / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    console.log('Khoảng cách thời gian:');
-    result = days + ' ngày, ' + (hours % 24) + ' giờ, ' + (minutes % 60) + ' phút, ' + (seconds % 60) + ' giây.';
-  }
-
-  // Gọi hàm tính toán ban đầu
-  calculate();
-
-  // Gọi hàm tính toán sau mỗi giây
-  setInterval(calculate, 59000);
-  return result;
-}
-export function CountDownTimer(dt) {
-  var end = new Date(dt);
-
-  var _second = 1000;
-  var _minute = _second * 60;
-  var _hour = _minute * 60;
-  var _day = _hour * 24;
-  var timer;
-
-  function showRemaining() {
-    var now = new Date();
-    var distance = end - now;
-    if (distance < 0) {
-      clearInterval(timer);
-      document.getElementById(id).innerHTML = 'EXPIRED!';
-      console.log('test', test);
-      return 'test  ';
+  if (!dateTimeString) return null;
+  const now = new Date();
+  const targetDate = new Date(dateTimeString);
+  const diffInDays = differenceInDays(targetDate, now);
+  const diffHours = differenceInHours(targetDate, now);
+  const diffMinus = differenceInMinutes(targetDate, now);
+  if (diffInDays < 1) {
+    if (diffHours < 1) {
+      if (diffMinus < 1) {
+        return null;
+      } else {
+        return `${diffMinus}p`;
+      }
+    } else {
+      return `${diffHours}h`;
     }
-    var days = Math.floor(distance / _day);
-    var hours = Math.floor((distance % _day) / _hour);
-    var minutes = Math.floor((distance % _hour) / _minute);
-    // var seconds = Math.floor((distance % _minute) / _second);
-
-    let text = '';
-    text = days + ' ' + hours + ':' + minutes;
-    console.log('text', text);
-    return text;
+  } else {
+    return `${diffInDays} ngày`;
   }
-  showRemaining();
-  // timer = setInterval(showRemaining, 1000);
 }

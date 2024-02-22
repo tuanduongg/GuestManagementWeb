@@ -9,3 +9,15 @@
 .ant-table-thead > tr > th {
     border: 1px solid red;
 } */
+/* .table-custom > table {
+    min-width: 1700px;
+}
+.ant-table-container {
+    min-width: 1700px;
+} */
+.ant-table-wrapper {
+    max-width: '120%';
+}
+.table-container-custom {
+    width: '100%';
+}

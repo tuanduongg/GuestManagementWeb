@@ -3,9 +3,9 @@ import { useTheme } from '@mui/material/styles';
 import { useMediaQuery, Button, Stack } from '@mui/material';
 
 // assets
-import Google from 'assets/images/icons/google.svg';
-import Twitter from 'assets/images/icons/twitter.svg';
-import Facebook from 'assets/images/icons/facebook.svg';
+// import Google from 'assets/images/icons/google.svg';
+// import Twitter from 'assets/images/icons/twitter.svg';
+// import Facebook from 'assets/images/icons/facebook.svg';
 
 // ==============================|| FIREBASE - SOCIAL BUTTON ||============================== //
 
@@ -13,17 +13,17 @@ const FirebaseSocial = () => {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const googleHandler = async () => {
-    // login || singup
-  };
+  // const googleHandler = async () => {
+  //   // login || singup
+  // };
 
-  const twitterHandler = async () => {
-    // login || singup
-  };
+  // const twitterHandler = async () => {
+  //   // login || singup
+  // };
 
-  const facebookHandler = async () => {
-    // login || singup
-  };
+  // const facebookHandler = async () => {
+  //   // login || singup
+  // };
 
   return (
     <Stack
@@ -32,7 +32,7 @@ const FirebaseSocial = () => {
       justifyContent={matchDownSM ? 'space-around' : 'space-between'}
       sx={{ '& .MuiButton-startIcon': { mr: matchDownSM ? 0 : 1, ml: matchDownSM ? 0 : -0.5 } }}
     >
-      <Button
+      {/* <Button
         variant="outlined"
         color="secondary"
         fullWidth={!matchDownSM}
@@ -58,7 +58,7 @@ const FirebaseSocial = () => {
         onClick={facebookHandler}
       >
         {!matchDownSM && 'Facebook'}
-      </Button>
+      </Button> */}
     </Stack>
   );
 };

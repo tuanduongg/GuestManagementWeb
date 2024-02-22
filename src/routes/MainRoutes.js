@@ -9,6 +9,7 @@ import { ConfigRouter } from 'config_router';
 // render - sample page
 const SamplePage = Loadable(lazy(() => import('pages/extra-pages/SamplePage')));
 const ListStruck = Loadable(lazy(() => import('pages/list-struck/ListStruck')));
+const CarRegister = Loadable(lazy(() => import('pages/car-register/CarRegister')));
 
 // render - utilities
 
@@ -21,6 +22,10 @@ const MainRoutes = {
     {
       path: ConfigRouter.listStruck,
       element: <ListStruck />
+    },
+    {
+      path: ConfigRouter.addListStruck,
+      element: <CarRegister />
     },
     {
       path: 'sample-page',
