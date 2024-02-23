@@ -1,11 +1,23 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
-import { Space, Typography, Col, Row, Table, App, Tag, Popover, Button } from 'antd';
-import { FieldTimeOutlined } from '@ant-design/icons';
+import { DatePicker, Typography, Col, Row, Table, App, Button, Empty, Input } from 'antd';
+const { Search } = Input;
 import './list-struct.css';
-import { compareDateTime, formatDateFromDB, generateRandomVNLicensePlate, statusName } from 'utils/helper';
+import {
+  formatDateFromDB,
+  generateRandomVNLicensePlate,
+  getColorChipStatus,
+  getNameStatus,
+  listNameStatus,
+  statusName
+} from 'utils/helper';
 import ModalInfoStruck from 'components/modal/modal-info-struck/ModalInfoStruck';
 const { Title } = Typography;
+const { RangePicker } = DatePicker;
+import dayjs from 'dayjs';
+import vi from 'dayjs/locale/vi'; // Import Vietnamese locale
+
+dayjs.locale(vi);
 
 const data = [];
 for (let i = 0; i < 100; i++) {
@@ -21,58 +33,17 @@ for (let i = 0; i < 100; i++) {
   });
 }
 
-const getColorChipStatus = (status, timeInExpected) => {
-  // console.log('compareDateTime(timeInExpected)', compareDateTime(timeInExpected));
-  let color = '';
-  let message = '';
-  switch (status) {
-    case statusName.NOT_IN:
-      color = 'geekblue';
-      message = 'Chưa vào';
-      break;
-    case statusName.COME_IN:
-      color = 'green';
-      message = 'Đã vào';
-      break;
-    case statusName.COME_OUT:
-      color = 'volcano';
-      message = 'Đã ra';
-      break;
-
-    default:
-      break;
-  }
-  if (status === statusName.NOT_IN) {
-    let rs = compareDateTime(timeInExpected);
-    if (rs) {
-      return (
-        <>
-          <Popover
-            placement="left"
-            title={`Thời gian dự kiến sẽ đến: ${rs} nữa`}
-            trigger={['click', 'hover']} // Trigger on both click and hover
-          >
-            <Tag color={color} key={status}>
-              <FieldTimeOutlined style={{ marginRight: '5px' }} />
-              {rs}
-            </Tag>
-          </Popover>
-        </>
-      );
-    }
-  }
-  return (
-    <Tag color={color} key={status}>
-      {message}
-    </Tag>
-  );
-};
 //2023-12-21 17:34:04.443
 
 const ListStruck = () => {
   const [tableData, setTableData] = useState(data ?? []);
   const { notification } = App.useApp();
   const [openModal, setOpenModal] = useState(false);
+  const [dataSelect, setDataSelect] = useState({});
+
+  const today = dayjs(); // Get the current date using dayjs
+
+  const [defaultDates, setDefaultDates] = useState([today, today]);
 
   const columns = [
     {
@@ -80,7 +51,6 @@ const ListStruck = () => {
       width: 70,
       key: 'stt',
       dataIndex: 'stt',
-      sorter: (a, b) => a.stt - b.stt,
       align: 'center'
     },
     {
@@ -90,27 +60,57 @@ const ListStruck = () => {
       dataIndex: 'vendor',
       width: 130,
       fixed: 'left',
-      render: (_, { vendor }) => (
+      render: (_, data) => (
         <>
           <Button
             type="link"
             onClick={() => {
+              setDataSelect(data);
               setOpenModal(true);
             }}
           >
-            {vendor}
+            {data?.vendor}
           </Button>
         </>
-      )
+      ),
+      filters: tableData
+        ? tableData.map((item) => {
+            return {
+              text: item?.vendor,
+              value: item?.vendor
+            };
+          })
+        : [],
+      // {
+      //   text: 'Category 2',
+      //   value: 'Category 2'
+      // }
+      filterMode: 'tree',
+      filterSearch: true,
+      onFilter: (value, record) => record?.vendor === value
     },
     {
       key: 'carNumber',
       title: 'Biển số',
       dataIndex: 'carNumber',
-      sorter: (a, b) => a.carNumber - b.carNumber,
       align: 'center',
       width: 130,
-      fixed: 'left'
+      fixed: 'left',
+      filters: tableData
+        ? tableData.map((item) => {
+            return {
+              text: item?.carNumber,
+              value: item?.carNumber
+            };
+          })
+        : [],
+      // {
+      //   text: 'Category 2',
+      //   value: 'Category 2'
+      // }
+      filterMode: 'tree',
+      filterSearch: true,
+      onFilter: (value, record) => record?.carNumber === value
     },
     {
       key: 'timeInExpected',
@@ -140,7 +140,11 @@ const ListStruck = () => {
       title: 'Trạng thái',
       dataIndex: 'status',
       render: (_, { status, timeInExpected }) => <>{getColorChipStatus(status, timeInExpected)}</>,
-      width: 130
+      width: 130,
+      filters: listNameStatus() ?? [],
+      filterMode: 'tree',
+      filterSearch: true,
+      onFilter: (value, record) => record?.status === value
     }
   ];
 
@@ -157,7 +161,10 @@ const ListStruck = () => {
   }, []);
   //   const { modal } = App.useApp();
   const onChange = (pagination, filters, sorter, extra) => {
-    console.log('params', pagination, filters, sorter, extra);
+    // console.log('params', pagination, filters, sorter, extra);
+  };
+  const onChangeDateRange = (date, dateString) => {
+    console.log(date, dateString);
   };
   return (
     <>
@@ -166,19 +173,26 @@ const ListStruck = () => {
           <Title level={5}>Danh sách xe đăng ký</Title>
         </Col>
       </Row>
+      <Row>
+        <Col style={{ textAlign: 'right', marginBottom: '5px' }} span={24}>
+          <RangePicker allowClear={false} defaultValue={defaultDates} format="DD/MM/YYYY" onChange={onChangeDateRange} />
+        </Col>
+      </Row>
       <Table
         className="table-custom"
         bordered
         scroll={{
           x: 'max-content',
-          y: '60vh'
+          y: '58vh'
         }}
         columns={columns}
         dataSource={tableData}
         onChange={onChange}
         pagination={false}
-      />
-      <ModalInfoStruck open={openModal} handleClose={handleCloseModal} />
+      >
+        {tableData?.length === 0 && <Empty />}
+      </Table>
+      <ModalInfoStruck dataSelect={dataSelect} open={openModal} handleClose={handleCloseModal} />
     </>
   );
 };

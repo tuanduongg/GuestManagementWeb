@@ -1,4 +1,7 @@
 import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds } from 'date-fns';
+import { Tag, Popover } from 'antd';
+import { FieldTimeOutlined } from '@ant-design/icons';
+import { message } from '../../node_modules/antd/es/index';
 
 export function generateRandomVNLicensePlate() {
   // Mã tỉnh/thành phố
@@ -169,4 +172,111 @@ export function compareDateTime(dateTimeString) {
   } else {
     return `${diffInDays} ngày`;
   }
+}
+export const listNameStatus = () => {
+  let arr = [];
+  Object.values(statusName).map((item) => {
+    let message = '';
+    if (item) {
+      switch (item) {
+        case statusName.NOT_IN:
+          message = 'Chưa vào';
+          break;
+        case statusName.COME_IN:
+          message = 'Đã vào';
+          break;
+        case statusName.COME_OUT:
+          message = 'Đã ra';
+          break;
+
+        default:
+          break;
+      }
+    }
+    arr.push({
+      text: message,
+      value: item
+    });
+  });
+  return arr;
+};
+export const getNameStatus = (status) => {
+  let message = '';
+  if (status) {
+    switch (status) {
+      case statusName.NOT_IN:
+        message = 'Chưa vào';
+        break;
+      case statusName.COME_IN:
+        message = 'Đã vào';
+        break;
+      case statusName.COME_OUT:
+        message = 'Đã ra';
+        break;
+
+      default:
+        break;
+    }
+  }
+  return message;
+};
+export const getColorChipStatus = (status, timeInExpected) => {
+  // console.log('compareDateTime(timeInExpected)', compareDateTime(timeInExpected));
+  let color = '';
+  let message = '';
+  switch (status) {
+    case statusName.NOT_IN:
+      color = 'geekblue';
+      message = 'Chưa vào';
+      break;
+    case statusName.COME_IN:
+      color = 'green';
+      message = 'Đã vào';
+      break;
+    case statusName.COME_OUT:
+      color = 'volcano';
+      message = 'Đã ra';
+      break;
+
+    default:
+      break;
+  }
+  if (status === statusName.NOT_IN) {
+    let rs = compareDateTime(timeInExpected);
+    if (rs) {
+      return (
+        <>
+          <Popover
+            placement="left"
+            title={`Thời gian dự kiến sẽ đến: ${rs} nữa`}
+            trigger={['click', 'hover']} // Trigger on both click and hover
+          >
+            <Tag color={color} key={status}>
+              <FieldTimeOutlined style={{ marginRight: '5px' }} />
+              {rs}
+            </Tag>
+          </Popover>
+        </>
+      );
+    }
+  }
+  return (
+    <Tag color={color} key={status}>
+      {message}
+    </Tag>
+  );
+};
+
+export function isMobile() {
+  if (window) {
+    return window.matchMedia(`(max-width: 767px)`).matches;
+  }
+  return false;
+}
+
+export function isMdScreen() {
+  if (window) {
+    return window.matchMedia(`(max-width: 1366px)`).matches;
+  }
+  return false;
 }

@@ -7,3 +7,12 @@
     font-style: italic;
     
 }
+.box-image {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.title-time {
+    font-weight: 500;
+    min-width: 120px;
+}

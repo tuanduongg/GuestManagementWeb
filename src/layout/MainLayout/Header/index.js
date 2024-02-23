@@ -16,6 +16,8 @@ import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 const Header = ({ open, handleDrawerToggle }) => {
   const theme = useTheme();
   const matchDownMD = useMediaQuery(theme.breakpoints.down('lg'));
+  const matchDownXS = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMdScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const iconBackColor = 'grey.100';
   const iconBackColorOpen = 'grey.200';
@@ -23,16 +25,18 @@ const Header = ({ open, handleDrawerToggle }) => {
   // common header
   const mainHeader = (
     <Toolbar>
-      <IconButton
-        disableRipple
-        aria-label="open drawer"
-        onClick={handleDrawerToggle}
-        edge="start"
-        color="secondary"
-        sx={{ color: 'text.primary', bgcolor: open ? iconBackColorOpen : iconBackColor, ml: { xs: 0, lg: -2 } }}
-      >
-        {!open ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-      </IconButton>
+      {(matchDownXS || isMdScreen) && (
+        <IconButton
+          disableRipple
+          aria-label="open drawer"
+          onClick={handleDrawerToggle}
+          edge="start"
+          color="secondary"
+          sx={{ color: 'text.primary', bgcolor: open ? iconBackColorOpen : iconBackColor, ml: { xs: 0, lg: -2 } }}
+        >
+          {!open ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+        </IconButton>
+      )}
       <HeaderContent />
     </Toolbar>
   );
