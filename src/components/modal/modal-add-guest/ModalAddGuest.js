@@ -57,7 +57,14 @@ const ModalAddGuest = ({ open, handleClose }) => {
     const arrTemp = [...arrNew];
     setArrInputName(arrTemp);
   };
-  const onChangeDatePicker = () => {};
+  const onChangeDatePicker = () => { };
+  function disabledDate(current) {
+    // Get today's date
+    const today = dayjs().startOf('day');
+    // Disable past days
+    return current && current < today;
+  }
+
 
   return (
     <>
@@ -80,9 +87,9 @@ const ModalAddGuest = ({ open, handleClose }) => {
             }}
             // fix eslintjsx-a11y/mouse-events-have-key-events
             // https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/master/docs/rules/mouse-events-have-key-events.md
-            onFocus={() => {}}
-            onBlur={() => {}}
-            // end
+            onFocus={() => { }}
+            onBlur={() => { }}
+          // end
           >
             Đăng ký khách vào
           </div>
@@ -100,6 +107,7 @@ const ModalAddGuest = ({ open, handleClose }) => {
           <Col span={24}>
             <p className="custom-label-input">Ngày vào</p>
             <DatePicker
+              disabledDate={disabledDate}
               allowClear={false}
               format="DD-MM-YYYY"
               multiple
@@ -110,11 +118,11 @@ const ModalAddGuest = ({ open, handleClose }) => {
           </Col>
           <Col span={12}>
             <p className="custom-label-input">Giờ vào</p>
-            <TimePicker format = 'HH:mm' defaultValue={defaultValueTime} size="small" />
+            <TimePicker className="full-width" format='HH:mm' defaultValue={defaultValueTime} size="small" />
           </Col>
           <Col span={12}>
             <p className="custom-label-input">Giờ ra</p>
-            <TimePicker format = 'HH:mm' defaultValue={defaultValueTime} size="small" />
+            <TimePicker className="full-width" format='HH:mm' defaultValue={defaultValueTime} size="small" />
           </Col>
           <Col span={12}>
             <p className="custom-label-input">Tên công ty</p>
@@ -151,7 +159,7 @@ const ModalAddGuest = ({ open, handleClose }) => {
           </Col>
           <Col span={24}>
             <p className="custom-label-input">Lý do</p>
-            <TextArea placeholder="Nhập lý do..." rows={4} />
+            <TextArea placeholder="Nhập lý do..." rows={2} />
           </Col>
         </Row>
       </Modal>

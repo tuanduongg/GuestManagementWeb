@@ -61,11 +61,11 @@ const ListGuest = () => {
       ),
       filters: tableData
         ? tableData.map((item) => {
-            return {
-              text: item?.nameGuest,
-              value: item?.nameGuest
-            };
-          })
+          return {
+            text: item?.nameGuest,
+            value: item?.nameGuest
+          };
+        })
         : [],
       // {
       //   text: 'Category 2',
@@ -83,11 +83,11 @@ const ListGuest = () => {
       width: 130,
       filters: tableData
         ? tableData.map((item) => {
-            return {
-              text: item?.vendor,
-              value: item?.vendor
-            };
-          })
+          return {
+            text: item?.vendor,
+            value: item?.vendor
+          };
+        })
         : [],
       // {
       //   text: 'Category 2',
@@ -105,11 +105,11 @@ const ListGuest = () => {
       width: 130,
       filters: tableData
         ? tableData.map((item) => {
-            return {
-              text: item?.carNumber,
-              value: item?.carNumber
-            };
-          })
+          return {
+            text: item?.carNumber,
+            value: item?.carNumber
+          };
+        })
         : [],
       // {
       //   text: 'Category 2',
@@ -158,10 +158,11 @@ const ListGuest = () => {
     console.log('selectedRowKeys changed: ', newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
   };
-  const onChangeDate = () => {};
+  const onChangeDate = () => { };
   const handleClickAdd = () => {
     setOpenModalAdd(true);
   };
+
   return (
     <>
       <Row>
@@ -169,14 +170,14 @@ const ListGuest = () => {
           <Title level={5}>Đăng ký khách vào công ty</Title>
         </Col>
       </Row>
-      <Row style={{ margin: '5px 0px' }}>
+      <Row style={{ margin: '5px 0px 10px 0px' }}>
         <Flex gap="small" wrap="wrap" style={{ width: '100%' }} justify="space-between">
-          <DatePicker size="small" allowClear={false} format="DD-MM-YYYY" defaultValue={defaultDatePicker} onChange={onChangeDate} />
+          <DatePicker  allowClear={false} format="DD-MM-YYYY" defaultValue={defaultDatePicker} onChange={onChangeDate} />
           <div>
-            <Button size={'small'} onClick={handleClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
+            <Button onClick={handleClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
               Đăng ký
             </Button>
-            <Button disabled={selectedRowKeys?.length === 0} size={'small'} danger icon={<DeleteOutlined />} type="primary">
+            <Button disabled={selectedRowKeys?.length === 0} danger icon={<DeleteOutlined />} type="primary">
               Xoá
             </Button>
           </div>
@@ -190,7 +191,7 @@ const ListGuest = () => {
         bordered
         scroll={{
           x: 'max-content',
-          y: '50vh'
+          y: '70vh'
         }}
         columns={columns}
         dataSource={tableData}
