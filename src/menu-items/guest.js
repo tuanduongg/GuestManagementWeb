@@ -12,28 +12,20 @@ const icons = {
 
 // ==============================|| MENU ITEMS - EXTRA PAGES ||============================== //
 
-const pages = {
-  id: 'pages',
-  title: 'Thông tin tài khoản',
+const guest = {
+  id: 'guests',
+  title: 'Thông tin đăng ký khách',
   type: 'group',
   children: [
     {
-      id: ConfigRouter.user,
-      title: 'Người dùng',
+      id: ConfigRouter.listGuest,
+      title: 'Danh sách đăng ký',
       type: 'item',
-      url: ConfigRouter.user,
-      icon: icons.ProfileOutlined,
-      target: false
-    },
-    {
-      id: ConfigRouter.pwRecovery,
-      title: 'Lấy lại mật khẩu',
-      type: 'item',
-      url: ConfigRouter.pwRecovery,
-      icon: icons.RedoOutlined,
+      url: ConfigRouter.listGuest,
+      icon: icons.UserOutlined,
       target: false
     }
   ]
 };
 
-export default pages;
+export default guest;

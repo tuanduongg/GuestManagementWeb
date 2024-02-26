@@ -1,0 +1,22 @@
+.ant-modal-title {
+    font-size: 20px;
+}
+.title-detail {
+    font-weight: 500;
+    font-size: 14px;
+    font-style: italic;
+    margin: 5px 0px;
+    
+}
+.box-image {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.title-time {
+    font-weight: 500;
+    min-width: 120px;
+}
+.min-width-50 {
+    min-width: 50px;
+}

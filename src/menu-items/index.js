@@ -1,6 +1,7 @@
 // project import
 import pages from './pages';
 import dashboard from './dashboard';
+import guest from './guest';
 // import utilities from './utilities';
 // import support from './support';
 

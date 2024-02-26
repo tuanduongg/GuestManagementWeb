@@ -1,11 +1,11 @@
 // assets
-import { CarOutlined, FormOutlined } from '@ant-design/icons';
+import { CarOutlined, FormOutlined, UserOutlined } from '@ant-design/icons';
 import { ConfigRouter } from 'config_router';
 
 // icons
 const icons = {
   CarOutlined,
-
+  UserOutlined,
   FormOutlined
 };
 
@@ -13,17 +13,25 @@ const icons = {
 
 const dashboard = {
   id: 'guest',
-  title: 'Thông tin đăng ký xe',
+  title: 'Quản lý đăng ký khách',
   type: 'group',
   children: [
     {
-      id: ConfigRouter.listStruck,
-      title: 'Danh sách đăng ký',
+      id: ConfigRouter.listGuest,
+      title: 'Danh sách đăng ký khách',
       type: 'item',
-      url: ConfigRouter.listStruck,
-      icon: icons.CarOutlined,
-      breadcrumbs: false
+      url: ConfigRouter.listGuest,
+      icon: icons.UserOutlined,
+      target: false
     },
+    // {
+    //   id: ConfigRouter.listStruck,
+    //   title: 'Danh sách đăng ký xe',
+    //   type: 'item',
+    //   url: ConfigRouter.listStruck,
+    //   icon: icons.CarOutlined,
+    //   breadcrumbs: false
+    // },
     {
       id: ConfigRouter.addListStruck,
       title: 'Đăng ký xe',

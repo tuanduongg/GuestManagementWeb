@@ -1,6 +1,7 @@
 export const ConfigRouter = {
-  listStruck: '',
+  listStruck: 'danh-sach-xe',
   addListStruck: 'dang-ky-xe',
   user: 'user',
-  pwRecovery: 'password-recovery'
+  pwRecovery: 'password-recovery',
+  listGuest: ''
 };
