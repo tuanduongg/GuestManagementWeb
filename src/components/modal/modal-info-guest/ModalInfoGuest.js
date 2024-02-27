@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Modal, Row, Col, Flex, Typography, Divider, Image, Tag } from 'antd';
-import { CaretRightOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { CaretRightOutlined, InfoCircleOutlined, EditOutlined, CloseOutlined, CheckOutlined } from '@ant-design/icons';
 const { Title, Text } = Typography;
 import './modal_info_guest.css';
 import { formatDateFromDB, getColorChipStatus, isMobile } from 'utils/helper';
@@ -52,9 +52,16 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect }) => {
         }
         onCancel={handleCancel}
         cancelText="Đóng"
+        okText="Chỉnh sửa"
         autoFocusButton="cancel"
-        footer={(_, { CancelBtn }) => (
+        okButtonProps={{ icon: <EditOutlined /> }}
+        cancelButtonProps={{ icon: <CloseOutlined /> }}
+        footer={(_, { OkBtn, CancelBtn }) => (
           <>
+            <OkBtn icon={<EditOutlined />} />
+            <Button className="btn-success-custom" type="primary" icon={<CheckOutlined />}>
+              Đã vào
+            </Button>
             <CancelBtn />
           </>
         )}

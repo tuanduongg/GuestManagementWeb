@@ -16,7 +16,7 @@ for (let i = 0; i < 100; i++) {
     key: i,
     nameGuest: 'guest ' + i,
     vendor: 'Công ty  ' + i,
-    status: Object.values(statusName)[Math.floor(Math.random() * 3)],
+    status: Object.values(statusName)[Math.floor(Math.random() * 2)],
     carNumber: generateRandomVNLicensePlate(),
     timeOutExpected: '2024-02-22T01:27:47.974Z',
     timeInExpected: '2024-02-22T04:27:47.974Z',
@@ -61,11 +61,11 @@ const ListGuest = () => {
       ),
       filters: tableData
         ? tableData.map((item) => {
-          return {
-            text: item?.nameGuest,
-            value: item?.nameGuest
-          };
-        })
+            return {
+              text: item?.nameGuest,
+              value: item?.nameGuest
+            };
+          })
         : [],
       // {
       //   text: 'Category 2',
@@ -83,11 +83,11 @@ const ListGuest = () => {
       width: 130,
       filters: tableData
         ? tableData.map((item) => {
-          return {
-            text: item?.vendor,
-            value: item?.vendor
-          };
-        })
+            return {
+              text: item?.vendor,
+              value: item?.vendor
+            };
+          })
         : [],
       // {
       //   text: 'Category 2',
@@ -105,11 +105,11 @@ const ListGuest = () => {
       width: 130,
       filters: tableData
         ? tableData.map((item) => {
-          return {
-            text: item?.carNumber,
-            value: item?.carNumber
-          };
-        })
+            return {
+              text: item?.carNumber,
+              value: item?.carNumber
+            };
+          })
         : [],
       // {
       //   text: 'Category 2',
@@ -158,7 +158,7 @@ const ListGuest = () => {
     console.log('selectedRowKeys changed: ', newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
   };
-  const onChangeDate = () => { };
+  const onChangeDate = () => {};
   const handleClickAdd = () => {
     setOpenModalAdd(true);
   };
@@ -172,7 +172,7 @@ const ListGuest = () => {
       </Row>
       <Row style={{ margin: '5px 0px 10px 0px' }}>
         <Flex gap="small" wrap="wrap" style={{ width: '100%' }} justify="space-between">
-          <DatePicker  allowClear={false} format="DD-MM-YYYY" defaultValue={defaultDatePicker} onChange={onChangeDate} />
+          <DatePicker allowClear={false} format="DD-MM-YYYY" defaultValue={defaultDatePicker} onChange={onChangeDate} />
           <div>
             <Button onClick={handleClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
               Đăng ký

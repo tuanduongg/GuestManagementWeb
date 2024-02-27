@@ -124,8 +124,7 @@ export function generateRandomVNLicensePlate() {
 }
 export const statusName = {
   NOT_IN: 'NOT_IN',
-  COME_IN: 'COME_IN',
-  COME_OUT: 'COME_OUT'
+  COME_IN: 'COME_IN'
 };
 export function addZero(num) {
   return (num < 10 ? '0' : '') + num;
@@ -280,3 +279,33 @@ export function isMdScreen() {
   }
   return false;
 }
+
+export const ROLE_ACC = {
+  ADMIN: 'ADMIN',
+  USER: 'USER',
+  SECURITY: 'SECURITY'
+};
+export const STATUS_ACC = {
+  ACTIVE: 'ACTIVE',
+  BLOCK: 'BLOCK'
+};
+export const getChipStatusAcc = (status) => {
+  if (!status) return;
+  // console.log('compareDateTime(timeInExpected)', compareDateTime(timeInExpected));
+  let color = '';
+  switch (status) {
+    case STATUS_ACC.ACTIVE:
+      color = 'green';
+      break;
+    case STATUS_ACC.BLOCK:
+      color = 'volcano';
+      break;
+    default:
+      break;
+  }
+  return (
+    <Tag color={color} key={status}>
+      {status}
+    </Tag>
+  );
+};

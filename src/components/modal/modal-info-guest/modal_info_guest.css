@@ -20,3 +20,22 @@
 .min-width-50 {
     min-width: 50px;
 }
+
+/* .btn-success-custom> .bg-primary {
+    background-color: #4190F7;
+  }
+   */
+.btn-success-custom{
+background-color: #1b5e20;
+}
+.btn-success-custom:hover{
+    background: #1b5e20cf !important;
+}
+  
+  /* .btn-success-custom> .bg-warning {
+    background-color: #EFAF41;
+  }
+  
+  .btn-success-custom> .bg-danger {
+    background-color: #E23C39;
+  } */

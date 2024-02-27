@@ -19,7 +19,7 @@ const pages = {
   children: [
     {
       id: ConfigRouter.user,
-      title: 'Người dùng',
+      title: 'Tài khoản',
       type: 'item',
       url: ConfigRouter.user,
       icon: icons.ProfileOutlined,

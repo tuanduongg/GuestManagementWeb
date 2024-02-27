@@ -11,6 +11,7 @@ const SamplePage = Loadable(lazy(() => import('pages/extra-pages/SamplePage')));
 const ListStruck = Loadable(lazy(() => import('pages/list-struck/ListStruck')));
 const CarRegister = Loadable(lazy(() => import('pages/car-register/CarRegister')));
 const ListGuest = Loadable(lazy(() => import('pages/list-guest/ListGuest')));
+const Account = Loadable(lazy(() => import('pages/account/Account')));
 
 // render - utilities
 
@@ -31,6 +32,10 @@ const MainRoutes = {
     {
       path: ConfigRouter.addListStruck,
       element: <CarRegister />
+    },
+    {
+      path: ConfigRouter.user,
+      element: <Account />
     },
     {
       path: 'sample-page',

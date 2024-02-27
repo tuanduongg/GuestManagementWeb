@@ -1,31 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
-import { Input, Modal, App, Row, Col, Tag, Tooltip, Popconfirm, Button, DatePicker, TimePicker, Space } from 'antd';
-import './modal_add_guest.css';
+import { Input, Modal, App, Row, Col, DatePicker, Select } from 'antd';
 import dayjs from 'dayjs';
 const { TextArea } = Input;
 
 // assets
 import { PlusOutlined, InfoCircleOutlined } from '@ant-design/icons';
-const initInputName = {
-  value: '',
-  error: false,
-  message: ''
-};
-const defaultValueDate = [dayjs()];
-const defaultValueTime = dayjs();
+import { ROLE_ACC } from 'utils/helper';
 
-const tagInputStyle = {
-  width: 64,
-  height: 30,
-  marginInlineEnd: 8,
-  verticalAlign: 'top'
-};
-
-const ModalAddGuest = ({ open, handleClose }) => {
+const ModalAccount = ({ open, handleClose }) => {
   const { modal } = App.useApp();
   const [disabled, setDisabled] = useState(true);
-  const [arrInputName, setArrInputName] = useState([initInputName]);
   const [bounds, setBounds] = useState({
     left: 0,
     top: 0,
@@ -35,13 +20,7 @@ const ModalAddGuest = ({ open, handleClose }) => {
   const [names, setNames] = useState([]);
   const [errorEditTag, setErrorEditTag] = useState(false);
 
-  const [timeIn, setTimeIn] = useState(defaultValueTime);
-  const [errorTimeIn, setErrorTimeIn] = useState(false);
-
-  const [timeOut, setTimeOut] = useState(defaultValueTime);
-  const [errorTimeOut, setErrorTimeOut] = useState(false);
-
-  const [date, setDate] = useState(defaultValueDate);
+  const [date, setDate] = useState('');
   const [errorDate, setErrorDate] = useState(false);
 
   const [company, setCompany] = useState('');
@@ -58,25 +37,10 @@ const ModalAddGuest = ({ open, handleClose }) => {
   const [department, setDepartment] = useState('');
   const [errorDepartment, setErrorDepartment] = useState(false);
 
-  const [openPopConfirm, setOpenPopConfirm] = useState(false);
-
   const [inputVisible, setInputVisible] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-  const [editInputIndex, setEditInputIndex] = useState(-1);
   const [editInputValue, setEditInputValue] = useState('');
   const inputRef = useRef(null);
   const editInputRef = useRef(null);
-
-  const tagPlusStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    height: 30,
-    background: '#ddd',
-    borderStyle: 'dashed',
-    color: errorEditTag ? 'red' : '',
-    borderColor: errorEditTag ? 'red' : ''
-  };
-
   useEffect(() => {
     if (inputVisible) {
       inputRef.current?.focus();
@@ -85,39 +49,7 @@ const ModalAddGuest = ({ open, handleClose }) => {
   useEffect(() => {
     editInputRef.current?.focus();
   }, [editInputValue]);
-  const handleClearTag = (removedTag) => {
-    const newTags = names.filter((tag) => tag !== removedTag);
-    setNames(newTags);
-  };
-  const showInput = () => {
-    if (errorEditTag) {
-      setErrorEditTag(false);
-    }
-    setInputVisible(true);
-  };
-  const handleInputChange = (e) => {
-    setInputValue(e.target.value);
-  };
-  const handleInputConfirm = () => {
-    if (inputValue && !names.includes(inputValue)) {
-      setNames([...names, inputValue]);
-    }
-    setInputVisible(false);
-    setInputValue('');
-  };
-  const handleEditInputChange = (e) => {
-    setEditInputValue(e.target.value);
-  };
-  const handleEditInputConfirm = () => {
-    const newTags = [...names];
-    newTags[editInputIndex] = editInputValue;
-    if (editInputValue?.trim() === '') {
-      newTags.splice(editInputIndex, 1);
-    }
-    setNames(newTags);
-    setEditInputIndex(-1);
-    setEditInputValue('');
-  };
+
   const draggleRef = useRef(null);
   const handleOk = (e) => {
     let check = false;
@@ -204,19 +136,6 @@ const ModalAddGuest = ({ open, handleClose }) => {
     });
   };
 
-  const handleChangeName = (e, index) => {
-    const { value } = e.target;
-    const newArr = [...arrInputName];
-    newArr[index].value = value;
-    const arrTemp = [...newArr];
-    setArrInputName(arrTemp);
-  };
-  const onClickAddInput = (index) => {
-    const arrNew = [...arrInputName];
-    arrNew.splice(index + 1, 0, initInputName);
-    const arrTemp = [...arrNew];
-    setArrInputName(arrTemp);
-  };
   const onChangeDatePicker = (date, dateString) => {
     if (errorDate) {
       setErrorDate(false);
@@ -301,7 +220,6 @@ const ModalAddGuest = ({ open, handleClose }) => {
   return (
     <>
       <Modal
-        width={700}
         okText="Lưu thông tin"
         cancelText="Đóng"
         zIndex={1300}
@@ -326,28 +244,12 @@ const ModalAddGuest = ({ open, handleClose }) => {
             onBlur={() => {}}
             // end
           >
-            Đăng ký khách vào
+            Thông tin tài khoản
           </div>
         }
         open={open}
         onOk={handleOk}
         onCancel={onClickCancel}
-        // footer={(_, { OkBtn, CancelBtn }) => (
-        //   <>
-        //     <Popconfirm
-        //       open={openPopConfirm}
-        //       title="Thông báo"
-        //       description="Dữ liệu chưa được lưu, bạn chắc chắn muốn đóng?"
-        //       onConfirm={() => {}}
-        //       onCancel={() => {}}
-        //       okText="Yes"
-        //       cancelText="No"
-        //     >
-        //       <CancelBtn />
-        //     </Popconfirm>
-        //     <OkBtn />
-        //   </>-
-        // )}
         modalRender={(modal) => (
           <Draggable disabled={disabled} bounds={bounds} nodeRef={draggleRef} onStart={(event, uiData) => onStart(event, uiData)}>
             <div ref={draggleRef}>{modal}</div>
@@ -355,127 +257,34 @@ const ModalAddGuest = ({ open, handleClose }) => {
         )}
       >
         <Row gutter={16}>
-          <Col span={24}>
+          <Col xs={24} sm={24}>
             <p className="custom-label-input">
-              Tên khách(<span className="color-red">*</span>)
+              Tên tài khoản(<span className="color-red">*</span>)
             </p>
-            <Space style={{ margin: '5px 0px' }} size={[0, 8]} wrap>
-              {names.map((tag, index) => {
-                if (editInputIndex === index) {
-                  return (
-                    <Input
-                      ref={editInputRef}
-                      key={tag}
-                      style={tagInputStyle}
-                      value={editInputValue}
-                      onChange={handleEditInputChange}
-                      onBlur={handleEditInputConfirm}
-                      onPressEnter={handleEditInputConfirm}
-                    />
-                  );
-                }
-                const isLongTag = tag.length > 20;
-                const tagElem = (
-                  <Tag
-                    key={tag}
-                    closable={index !== -1}
-                    style={{
-                      userSelect: 'none'
-                    }}
-                    onClose={() => handleClearTag(tag)}
-                  >
-                    <span
-                      onDoubleClick={(e) => {
-                        setEditInputIndex(index);
-                        setEditInputValue(tag);
-                        e.preventDefault();
-                      }}
-                    >
-                      {isLongTag ? `${tag.slice(0, 20)}...` : tag}
-                    </span>
-                  </Tag>
-                );
-                return isLongTag ? (
-                  <Tooltip title={tag} key={tag}>
-                    {tagElem}
-                  </Tooltip>
-                ) : (
-                  tagElem
-                );
-              })}
-              {inputVisible ? (
-                <Input
-                  ref={inputRef}
-                  type="text"
-                  size="small"
-                  style={tagInputStyle}
-                  value={inputValue}
-                  onChange={handleInputChange}
-                  onBlur={handleInputConfirm}
-                  onPressEnter={handleInputConfirm}
-                />
-              ) : (
-                <Tag style={tagPlusStyle} icon={<PlusOutlined />} onClick={showInput}>
-                  Nhập tên khách
-                </Tag>
-              )}
-            </Space>
-          </Col>
-          <Col xs={12} sm={4}>
-            <p className="custom-label-input">
-              Giờ đến(<span className="color-red">*</span>)
-            </p>
-            <TimePicker
-              value={timeIn}
-              onChange={(time, timeString) => {
-                setTimeIn(time);
-              }}
-              status={errorTimeIn ? 'error' : ''}
-              allowClear={false}
-              className="full-width"
-              format="HH:mm"
-            />
-          </Col>
-          <Col xs={12} sm={4}>
-            <p className="custom-label-input">
-              Giờ về(<span className="color-red">*</span>)
-            </p>
-            <TimePicker
-              value={timeOut}
-              onChange={(time, timeString) => {
-                setTimeOut(time);
-              }}
-              status={errorTimeOut ? 'error' : ''}
-              allowClear={false}
-              className="full-width"
-              format="HH:mm"
-            />
-          </Col>
-          <Col xs={24} sm={16}>
-            <p className="custom-label-input">
-              Ngày vào(<span className="color-red">*</span>)
-            </p>
-            <DatePicker
-              status={errorDate ? 'error' : ''}
-              value={date}
-              disabledDate={disabledDate}
-              allowClear={false}
-              format="DD-MM-YYYY"
-              multiple
-              onChange={onChangeDatePicker}
-              maxTagCount="responsive"
+            <Input
+              //   status={errorCompany ? 'error' : ''}
+              //   value={company}
+              name={'company'}
+              onChange={onChangeInput}
+              placeholder="Nhập tên tài khoản..."
             />
           </Col>
           <Col span={12}>
             <p className="custom-label-input">
-              Công ty(<span className="color-red">*</span>)
+              Quyền(<span className="color-red">*</span>)
             </p>
-            <Input
-              status={errorCompany ? 'error' : ''}
-              value={company}
-              name={'company'}
-              onChange={onChangeInput}
-              placeholder="Nhập tên công ty..."
+            <Select
+              defaultValue="lucy"
+              style={{
+                width: '100%'
+              }}
+              onChange={() => {}}
+              options={Object.values(ROLE_ACC)?.map((item) => {
+                return {
+                  value: item,
+                  label: item
+                };
+              })}
             />
           </Col>
           <Col span={12}>
@@ -524,4 +333,4 @@ const ModalAddGuest = ({ open, handleClose }) => {
     </>
   );
 };
-export default ModalAddGuest;
+export default ModalAccount;
