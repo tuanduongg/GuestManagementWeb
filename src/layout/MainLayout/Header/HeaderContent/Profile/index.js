@@ -27,6 +27,7 @@ import SettingTab from './SettingTab';
 
 // assets
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { logout } from 'utils/helper';
 
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
@@ -50,13 +51,22 @@ function a11yProps(index) {
   };
 }
 
+const getDataUser = () => {
+  const dataString = localStorage.getItem('DATA_USER');
+  if (dataString) {
+    const dataObj = JSON.parse(dataString);
+    return dataObj;
+  }
+  return {};
+};
+
 // ==============================|| HEADER CONTENT - PROFILE ||============================== //
 
 const Profile = () => {
   const theme = useTheme();
 
   const handleLogout = async () => {
-    // logout
+    logout();
   };
 
   const anchorRef = useRef(null);
@@ -66,13 +76,14 @@ const Profile = () => {
   };
 
   const handleClose = (event) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+    if (anchorRef?.current && anchorRef?.current?.contains(event?.target)) {
       return;
     }
     setOpen(false);
   };
 
   const [value, setValue] = useState(0);
+  const [dataUser, setDataUser] = useState(getDataUser());
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -97,9 +108,9 @@ const Profile = () => {
       >
         <Stack direction="row" spacing={2} alignItems="center" sx={{ p: 0.5 }}>
           <Avatar alt="profile user" sx={{ width: 32, height: 32 }}>
-            A
+            {dataUser?.username ? dataUser?.username[0] : ''}
           </Avatar>
-          <Typography variant="subtitle1">Admin</Typography>
+          <Typography variant="subtitle1">{dataUser?.username}</Typography>
         </Stack>
       </ButtonBase>
       <Popper
@@ -141,12 +152,12 @@ const Profile = () => {
                         <Grid item>
                           <Stack direction="row" spacing={1.25} alignItems="center">
                             <Avatar alt="profile user" sx={{ width: 32, height: 32 }}>
-                              A
+                              {dataUser?.username ? dataUser?.username[0] : ''}
                             </Avatar>
                             <Stack>
-                              <Typography variant="h6">Admin</Typography>
+                              <Typography variant="h6">{dataUser?.username}</Typography>
                               <Typography variant="body2" color="textSecondary">
-                                UI/UX Designer
+                                {dataUser?.role}
                               </Typography>
                             </Stack>
                           </Stack>

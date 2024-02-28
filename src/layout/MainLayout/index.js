@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 // material-ui
@@ -12,6 +12,9 @@ import Header from './Header';
 
 // types
 import { openDrawer } from 'store/reducers/menu';
+import restApi from 'utils/restAPI';
+import { RouterAPI } from 'utils/routerAPI';
+import { ConfigRouter } from 'config_router';
 
 // ==============================|| MAIN LAYOUT ||============================== //
 
@@ -27,6 +30,17 @@ const MainLayout = () => {
   const handleDrawerToggle = () => {
     setOpen(!open);
     dispatch(openDrawer({ drawerOpen: !open }));
+  };
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    checkProfile();
+  }, []);
+  const checkProfile = async () => {
+    const rest = await restApi.get(RouterAPI.profile);
+    if (rest?.status !== 200) {
+      navigate(ConfigRouter.login);
+    }
   };
 
   // set media wise responsive drawer

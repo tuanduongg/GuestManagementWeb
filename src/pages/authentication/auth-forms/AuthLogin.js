@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
 // material-ui
@@ -24,15 +24,21 @@ import { Formik } from 'formik';
 
 // project import
 import AnimateButton from 'components/@extended/AnimateButton';
+import { Modal } from 'antd';
 
 // assets
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import restApi from 'utils/restAPI';
+import { RouterAPI } from 'utils/routerAPI';
+import { setCookie } from 'utils/helper';
+import { useNavigate } from 'react-router-dom';
+import { ConfigRouter } from 'config_router';
 
 // ============================|| FIREBASE - LOGIN ||============================ //
 
 const AuthLogin = () => {
   const [checked, setChecked] = React.useState(false);
-
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -58,6 +64,20 @@ const AuthLogin = () => {
           try {
             setStatus({ success: false });
             setSubmitting(false);
+            const res = await restApi.post(RouterAPI.login, values);
+            if (res?.status === 200) {
+              const data = res?.data;
+              setCookie('ASSET_TOKEN', data?.accessToken, 1);
+              localStorage.setItem('DATA_USER', JSON.stringify(data?.user));
+              location.href = ConfigRouter.listGuest;
+            } else {
+              Modal.error({
+                title: 'Thông báo',
+                content: 'Tên tài khoản hoặc mật khẩu không đúng!',
+                centered: true,
+                okText: 'Đóng'
+              });
+            }
           } catch (err) {
             setStatus({ success: false });
             setErrors({ submit: err.message });

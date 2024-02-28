@@ -1,31 +1,38 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Row, Col, Typography, App, Empty, Button, Flex, DatePicker } from 'antd';
 import { formatDateFromDB, generateRandomVNLicensePlate, getColorChipStatus, listNameStatus, statusName } from 'utils/helper';
 const { Title } = Typography;
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import './list-guest.css';
 import dayjs from 'dayjs';
 import ModalInfoGuest from 'components/modal/modal-info-guest/ModalInfoGuest';
 import ModalAddGuest from 'components/modal/modal-add-guest/ModalAddGuest';
+import restApi from 'utils/restAPI';
+import { RouterAPI } from 'utils/routerAPI';
 const today = dayjs(); // Get the current date using dayjs
-
-const data = [];
-for (let i = 0; i < 100; i++) {
-  data.push({
-    stt: i,
-    key: i,
-    nameGuest: 'guest ' + i,
-    vendor: 'Công ty  ' + i,
-    status: Object.values(statusName)[Math.floor(Math.random() * 2)],
-    carNumber: generateRandomVNLicensePlate(),
-    timeOutExpected: '2024-02-22T01:27:47.974Z',
-    timeInExpected: '2024-02-22T04:27:47.974Z',
-    guardian: 'guardian ' + i
-  });
-}
+// [
+//   {
+//       "NAME_ID": "4C267BA9-19D6-EE11-A1CF-04D9F5C9D2EB",
+//       "FULL_NAME": "Nguyễn Anh Tuấn"
+//   }
+// ]
+const concatGuestInfo = (arr) => {
+  if (arr) {
+    let result = '';
+    arr.map((item, index) => {
+      if (index !== arr.length - 1) {
+        result += item?.FULL_NAME + ',';
+      } else {
+        result += item?.FULL_NAME;
+      }
+    });
+    return result;
+  }
+  return '';
+};
 
 const ListGuest = () => {
-  const [tableData, setTableData] = useState(data ?? []);
+  const [tableData, setTableData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [openModalAdd, setOpenModalAdd] = useState(false);
   const [dataSelect, setDataSelect] = useState({});
@@ -38,12 +45,23 @@ const ListGuest = () => {
     setOpenModalAdd(false);
   };
 
+  const getData = async () => {
+    const rest = await restApi.get(RouterAPI.allGuest);
+    console.log('rest', rest);
+    if (rest?.status === 200) {
+      setTableData(rest?.data);
+    }
+  };
+  useEffect(() => {
+    getData();
+  }, []);
+
   const columns = [
     {
       align: 'left',
-      key: 'nameGuest',
+      key: 'guest_info',
       title: 'Tên khách',
-      dataIndex: 'nameGuest',
+      dataIndex: 'guest_info',
       width: 130,
       fixed: 'left',
       render: (_, data) => (
@@ -55,15 +73,15 @@ const ListGuest = () => {
               setOpenModal(true);
             }}
           >
-            {data?.nameGuest}
+            {concatGuestInfo(data?.guest_info)}
           </Button>
         </>
       ),
       filters: tableData
         ? tableData.map((item) => {
             return {
-              text: item?.nameGuest,
-              value: item?.nameGuest
+              text: item?.guest_info?.FULL_NAME,
+              value: item?.guest_info?.FULL_NAME
             };
           })
         : [],
@@ -73,19 +91,19 @@ const ListGuest = () => {
       // }
       filterMode: 'tree',
       filterSearch: true,
-      onFilter: (value, record) => record?.nameGuest === value
+      onFilter: (value, record) => record?.guest_info?.FULL_NAME === value
     },
     {
       align: 'left',
-      key: 'vendor',
+      key: 'COMPANY',
       title: 'Công ty',
-      dataIndex: 'vendor',
+      dataIndex: 'COMPANY',
       width: 130,
       filters: tableData
         ? tableData.map((item) => {
             return {
-              text: item?.vendor,
-              value: item?.vendor
+              text: item?.COMPANY,
+              value: item?.COMPANY
             };
           })
         : [],
@@ -95,19 +113,19 @@ const ListGuest = () => {
       // }
       filterMode: 'tree',
       filterSearch: true,
-      onFilter: (value, record) => record?.vendor === value
+      onFilter: (value, record) => record?.COMPANY === value
     },
     {
-      key: 'carNumber',
+      key: 'CAR_NUMBER',
       title: 'Biển số',
-      dataIndex: 'carNumber',
+      dataIndex: 'CAR_NUMBER',
       align: 'center',
       width: 130,
       filters: tableData
         ? tableData.map((item) => {
             return {
-              text: item?.carNumber,
-              value: item?.carNumber
+              text: item?.CAR_NUMBER,
+              value: item?.CAR_NUMBER
             };
           })
         : [],
@@ -117,45 +135,62 @@ const ListGuest = () => {
       // }
       filterMode: 'tree',
       filterSearch: true,
-      onFilter: (value, record) => record?.carNumber === value
+      onFilter: (value, record) => record?.CAR_NUMBER === value
     },
     {
-      key: 'timeInExpected',
+      key: 'TIME_IN',
       title: 'Giờ vào\n(dự kiến)',
-      dataIndex: 'timeInExpected',
+      dataIndex: 'TIME_IN',
       align: 'center',
-      render: (_, { timeInExpected }) => <>{formatDateFromDB(timeInExpected)}</>,
-      width: 130
+      // render: (_, { timeInExpected }) => <>{formatDateFromDB(timeInExpected)}</>,
+      width: 100
     },
     {
-      key: 'timeOutExpected',
+      key: 'TIME_OUT',
       title: ['Giờ ra', '(dự kiến)'],
-      dataIndex: 'timeOutExpected',
+      dataIndex: 'TIME_OUT',
       align: 'center',
-      render: (_, { timeOutExpected }) => <>{formatDateFromDB(timeOutExpected)}</>,
-      width: 130
+      // render: (_, { timeOutExpected }) => <>{formatDateFromDB(timeOutExpected)}</>,
+      width: 110
     },
     {
-      key: 'Guardian',
+      key: 'PERSON_SEOWON',
       title: 'Người bảo lãnh',
-      dataIndex: 'guardian',
-      width: 130
+      dataIndex: 'PERSON_SEOWON',
+      width: 150
     },
     {
-      key: 'status',
+      key: 'STATUS',
       align: 'center',
       title: 'Trạng thái',
-      dataIndex: 'status',
-      render: (_, { status, timeInExpected }) => <>{getColorChipStatus(status, timeInExpected)}</>,
+      dataIndex: 'STATUS',
+      render: (_, { STATUS, TIME_IN }) => <>{getColorChipStatus(STATUS, TIME_IN)}</>,
       width: 130,
       filters: listNameStatus() ?? [],
       filterMode: 'tree',
       filterSearch: true,
-      onFilter: (value, record) => record?.status === value
+      onFilter: (value, record) => record?.STATUS === value
+    },
+    {
+      key: 'ACTION',
+      align: 'center',
+      title: '',
+      render: (_, { data }) => (
+        <>
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            onClick={() => {
+              alert('edit');
+            }}
+          />
+        </>
+      ),
+      width: 30
     }
   ];
   const onSelectChange = (newSelectedRowKeys) => {
-    console.log('selectedRowKeys changed: ', newSelectedRowKeys);
+    console.log('newSelectedRowKeys', newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
   };
   const onChangeDate = () => {};
@@ -184,6 +219,7 @@ const ListGuest = () => {
         </Flex>
       </Row>
       <Table
+        rowKey="GUEST_ID"
         rowSelection={{
           selectedRowKeys,
           onChange: onSelectChange

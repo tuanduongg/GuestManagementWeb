@@ -1,7 +1,7 @@
 import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds } from 'date-fns';
-import { Tag, Popover } from 'antd';
+import { Tag, Popover, Modal } from 'antd';
 import { FieldTimeOutlined } from '@ant-design/icons';
-import { message } from '../../node_modules/antd/es/index';
+import { ConfigRouter } from 'config_router';
 
 export function generateRandomVNLicensePlate() {
   // Mã tỉnh/thành phố
@@ -219,6 +219,30 @@ export const getNameStatus = (status) => {
   }
   return message;
 };
+function tinhKhoangCachDenThoiGian(chuoiThoiGian) {
+  // Lấy thời gian hiện tại
+  var thoiGianHienTai = new Date();
+
+  // Chuyển đổi chuỗi thời gian đầu vào thành một đối tượng Date
+  var thoiGianCanTinh = new Date();
+  var gioPhut = chuoiThoiGian.split(':');
+  thoiGianCanTinh.setHours(parseInt(gioPhut[0], 10));
+  thoiGianCanTinh.setMinutes(parseInt(gioPhut[1], 10));
+  thoiGianCanTinh.setSeconds(0); // Đặt giây là 0 để tránh sai số
+
+  // Tính khoảng cách thời gian
+  var khoangCach = thoiGianCanTinh.getTime() - thoiGianHienTai.getTime();
+
+  var gio = Math.floor(khoangCach / (1000 * 60 * 60));
+
+  // Tính số phút còn lại sau khi đã tính số giờ
+  var phut = Math.floor((khoangCach % (1000 * 60 * 60)) / (1000 * 60));
+  if (gio <= 0 && phut <= 0) {
+    return null;
+  }
+
+  return `${gio}-${phut}`;
+}
 export const getColorChipStatus = (status, timeInExpected) => {
   // console.log('compareDateTime(timeInExpected)', compareDateTime(timeInExpected));
   let color = '';
@@ -241,7 +265,7 @@ export const getColorChipStatus = (status, timeInExpected) => {
       break;
   }
   if (status === statusName.NOT_IN) {
-    let rs = compareDateTime(timeInExpected);
+    let rs = tinhKhoangCachDenThoiGian(timeInExpected);
     if (rs) {
       return (
         <>
@@ -309,3 +333,46 @@ export const getChipStatusAcc = (status) => {
     </Tag>
   );
 };
+
+export function getCookie(name) {
+  var nameEQ = name + '=';
+  var ca = document.cookie.split(';');
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+  }
+  return null;
+}
+export function eraseCookie(name) {
+  document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}
+
+const delete_cookie = (name) => {
+  document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+};
+
+export const logout = () => {
+  Modal.confirm({
+    okText: 'Đăng xuất',
+    cancelText: 'Đóng',
+    centered: true,
+    title: 'Thông báo',
+    content: 'Bạn chắc chắn muốn đăng xuất?',
+    onOk: () => {
+      delete_cookie('ASSET_TOKEN');
+      setCookie('ASSET_TOKEN', '', 1);
+      location.href = ConfigRouter.login;
+    }
+  });
+};
+
+export function setCookie(name, value, days) {
+  var expires = '';
+  if (days) {
+    var date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    expires = '; expires=' + date.toUTCString();
+  }
+  document.cookie = name + '=' + (value || '') + expires + '; path=/';
+}

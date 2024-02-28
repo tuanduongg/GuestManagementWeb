@@ -10,7 +10,7 @@ for (let i = 0; i < 100; i++) {
   data.push({
     stt: i + 1,
     username: 'username ' + i,
-    created_at: '2024-02-22T01:27:47.974Z',
+    created_at: '2024-02-29T06:33:07.000Z',
     role: Object.values(ROLE_ACC)[Math.floor(Math.random() * 3)],
     status: Object.values(STATUS_ACC)[Math.floor(Math.random() * 2)]
   });
@@ -19,9 +19,10 @@ for (let i = 0; i < 100; i++) {
 const Account = () => {
   const [tableData, setTableData] = useState(data ?? []);
   const [openModal, setOpenModal] = useState(false);
+  const [typeModal, setTypeModal] = useState('');
   const columns = [
     {
-      align: 'left',
+      align: 'center',
       key: 'stt',
       title: 'STT',
       dataIndex: 'stt',
@@ -39,6 +40,7 @@ const Account = () => {
           <Button
             type="link"
             onClick={() => {
+              setTypeModal('EDIT');
               setOpenModal(true);
             }}
           >
@@ -47,14 +49,7 @@ const Account = () => {
         </>
       )
     },
-    {
-      key: 'created_at',
-      title: 'Ngày tạo',
-      dataIndex: 'created_at',
-      align: 'center',
-      width: 130,
-      render: (_, { created_at }) => <>{formatDateFromDB(created_at)}</>
-    },
+
     {
       key: 'role',
       title: 'Quyền',
@@ -69,6 +64,14 @@ const Account = () => {
       dataIndex: 'status',
       width: 130,
       render: (_, { status }) => <>{getChipStatusAcc(status)}</>
+    },
+    {
+      key: 'created_at',
+      title: 'Ngày tạo',
+      dataIndex: 'created_at',
+      align: 'center',
+      width: 130,
+      render: (_, { created_at }) => <>{formatDateFromDB(created_at)}</>
     }
   ];
   const onCloseModal = () => {
@@ -84,7 +87,15 @@ const Account = () => {
       <Row style={{ margin: '5px 0px 10px 0px' }}>
         <Flex gap="small" wrap="wrap" style={{ width: '100%' }} justify="end">
           <div>
-            <Button style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
+            <Button
+              style={{ marginRight: '5px' }}
+              onClick={() => {
+                setTypeModal('ADD');
+                setOpenModal(true);
+              }}
+              icon={<PlusOutlined />}
+              type="primary"
+            >
               Thêm mới
             </Button>
             <Button danger icon={<DeleteOutlined />} type="primary">
@@ -105,7 +116,7 @@ const Account = () => {
       >
         {tableData?.length === 0 && <Empty />}
       </Table>
-      <ModalAccount open={openModal} handleClose={onCloseModal} />
+      <ModalAccount typeModal={typeModal} open={openModal} handleClose={onCloseModal} />
     </>
   );
 };

@@ -1,0 +1,13 @@
+.color-red {
+    color: red;
+}
+.message-err {
+    color:red;
+    margin:0px;
+    font-size: 12px;
+    padding: 3px 0px 0px 5px;
+
+}
+.custom-label-input > .required {
+    color: red;
+}

@@ -3,5 +3,6 @@ export const ConfigRouter = {
   addListStruck: 'dang-ky-xe',
   user: 'user',
   pwRecovery: 'password-recovery',
-  listGuest: ''
+  listGuest: '/',
+  login: 'login'
 };

@@ -6,9 +6,12 @@ const { TextArea } = Input;
 
 // assets
 import { PlusOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { ROLE_ACC } from 'utils/helper';
+import { ROLE_ACC, STATUS_ACC } from 'utils/helper';
+import './modal-account.css';
 
-const ModalAccount = ({ open, handleClose }) => {
+const initialValidate = { error: false, message: '' };
+
+const ModalAccount = ({ open, handleClose, typeModal }) => {
   const { modal } = App.useApp();
   const [disabled, setDisabled] = useState(true);
   const [bounds, setBounds] = useState({
@@ -17,73 +20,54 @@ const ModalAccount = ({ open, handleClose }) => {
     bottom: 0,
     right: 0
   });
-  const [names, setNames] = useState([]);
-  const [errorEditTag, setErrorEditTag] = useState(false);
 
-  const [date, setDate] = useState('');
-  const [errorDate, setErrorDate] = useState(false);
+  const [username, setUsername] = useState('');
+  const [validateUsername, setValidateUsername] = useState(initialValidate);
 
-  const [company, setCompany] = useState('');
-  const [errorCompany, setErrorCompany] = useState(false);
+  const [password, setPassword] = useState('');
+  const [validatePassword, setValidatePassword] = useState(initialValidate);
 
-  const [carNumber, setCarNumber] = useState('');
+  const [status, setStatus] = useState(STATUS_ACC.ACTIVE);
+  const [validateStatus, setValidateStatus] = useState(initialValidate);
 
-  const [personSeowon, setPersonSeowon] = useState('');
-  const [errorPersonSeowon, setErrorPersonSeowon] = useState(false);
-
-  const [reason, setReason] = useState('');
-  const [errReason, setErrReason] = useState(false);
-
-  const [department, setDepartment] = useState('');
-  const [errorDepartment, setErrorDepartment] = useState(false);
-
-  const [inputVisible, setInputVisible] = useState(false);
-  const [editInputValue, setEditInputValue] = useState('');
-  const inputRef = useRef(null);
-  const editInputRef = useRef(null);
-  useEffect(() => {
-    if (inputVisible) {
-      inputRef.current?.focus();
-    }
-  }, [inputVisible]);
-  useEffect(() => {
-    editInputRef.current?.focus();
-  }, [editInputValue]);
+  const [role, setRole] = useState(ROLE_ACC.USER);
 
   const draggleRef = useRef(null);
   const handleOk = (e) => {
     let check = false;
-    if (names?.length === 0) {
+    if (username?.trim() === '') {
       check = true;
-      setErrorEditTag(true);
+      setValidateUsername({ error: true, message: 'Bắt buộc nhập tên tài khoản' });
     }
-    if (date?.length === 0) {
+    if (username?.includes(' ')) {
       check = true;
-      setErrorDate(true);
+      setValidateUsername({ error: true, message: 'Tên tài khoản không chứa ký tự khoảng trắng' });
     }
-    if (!timeIn) {
-      check = true;
-      setErrorTimeIn(true);
-    }
-    if (!timeOut) {
-      check = true;
-      setErrorTimeOut(true);
-    }
-    if (company?.trim() === '') {
-      check = true;
-      setErrorCompany(true);
-    }
-    if (personSeowon?.trim() === '') {
-      check = true;
-      setErrorPersonSeowon(true);
-    }
-    if (department?.trim() === '') {
-      check = true;
-      setErrorDepartment(true);
-    }
-    if (reason?.trim() === '') {
-      check = true;
-      setErrReason(true);
+    if (typeModal !== 'EDIT') {
+      // modal add
+      if (password?.trim() === '') {
+        check = true;
+        setValidatePassword({ error: true, message: 'Bắt buộc nhập mật khẩu' });
+      }
+      if (password.includes(' ')) {
+        check = true;
+        setValidatePassword({ error: true, message: 'Mật khẩu không được chứa ký tự khoảng trắng' });
+      }
+      if (password.length < 4) {
+        check = true;
+        setValidatePassword({ error: true, message: 'Mật khẩu chứa ít nhất 4 ký tự' });
+      }
+    } else {
+      if (password?.trim() !== '') {
+        if (password.includes(' ')) {
+          check = true;
+          setValidatePassword({ error: true, message: 'Mật khẩu không được chứa ký tự khoảng trắng' });
+        }
+        if (password.length < 4) {
+          check = true;
+          setValidatePassword({ error: true, message: 'Mật khẩu chứa ít nhất 4 ký tự' });
+        }
+      }
     }
     if (!check) {
       Modal.confirm({
@@ -100,26 +84,13 @@ const ModalAccount = ({ open, handleClose }) => {
     }
   };
   const handleCancel = (e) => {
-    setErrorEditTag(false);
-    setErrorEditTag(false);
-    setErrorDate(false);
-    setErrorTimeIn(false);
-    setErrorTimeOut(false);
-    setErrorCompany(false);
-    setErrorPersonSeowon(false);
-    setErrorDepartment(false);
-    setErrReason(false);
-
-    setNames([]);
-    setTimeIn(defaultValueTime);
-    setTimeOut(defaultValueTime);
-    setDate(defaultValueDate);
-    setCompany('');
-    setCarNumber('');
-    setPersonSeowon('');
-    setReason('');
-    setDepartment('');
-
+    setUsername('');
+    setPassword('');
+    setRole(ROLE_ACC.USER);
+    setStatus(STATUS_ACC.ACTIVE);
+    setValidateUsername(initialValidate);
+    setValidatePassword(initialValidate);
+    setValidateStatus(initialValidate);
     handleClose();
   };
   const onStart = (_event, uiData) => {
@@ -136,47 +107,20 @@ const ModalAccount = ({ open, handleClose }) => {
     });
   };
 
-  const onChangeDatePicker = (date, dateString) => {
-    if (errorDate) {
-      setErrorDate(false);
-    }
-    setDate(date);
-  };
-  function disabledDate(current) {
-    // Get today's date
-    const today = dayjs().startOf('day');
-    // Disable past days
-    return current && current < today;
-  }
   const onChangeInput = (e) => {
     const { value, name } = e.target;
     switch (name) {
-      case 'company':
-        if (errorCompany) {
-          setErrorCompany(false);
+      case 'password':
+        if (validatePassword?.error) {
+          setValidatePassword(initialValidate);
         }
-        setCompany(value);
+        setPassword(value);
         break;
-      case 'personInSeowon':
-        if (errorPersonSeowon) {
-          setErrorPersonSeowon(false);
+      case 'username':
+        if (validateUsername?.error) {
+          setValidateUsername(initialValidate);
         }
-        setPersonSeowon(value);
-        break;
-      case 'department':
-        if (errorDepartment) {
-          setErrorDepartment(false);
-        }
-        setDepartment(value);
-        break;
-      case 'reason':
-        if (errReason) {
-          setErrReason(false);
-        }
-        setReason(value);
-        break;
-      case 'carNumber':
-        setCarNumber(value);
+        setUsername(value);
         break;
 
       default:
@@ -186,19 +130,10 @@ const ModalAccount = ({ open, handleClose }) => {
 
   const onClickCancel = () => {
     let check = false;
-    if (names?.length !== 0) {
+    if (username?.trim() !== '') {
       check = true;
     }
-    if (company?.trim() !== '') {
-      check = true;
-    }
-    if (personSeowon?.trim() !== '') {
-      check = true;
-    }
-    if (department?.trim() !== '') {
-      check = true;
-    }
-    if (reason?.trim() !== '') {
+    if (password?.trim() !== '') {
       check = true;
     }
     if (check) {
@@ -244,7 +179,7 @@ const ModalAccount = ({ open, handleClose }) => {
             onBlur={() => {}}
             // end
           >
-            Thông tin tài khoản
+            {typeModal === 'EDIT' ? 'Thông tin tài khoản' : 'Thêm mới tài khoản'}
           </div>
         }
         open={open}
@@ -262,23 +197,26 @@ const ModalAccount = ({ open, handleClose }) => {
               Tên tài khoản(<span className="color-red">*</span>)
             </p>
             <Input
-              //   status={errorCompany ? 'error' : ''}
-              //   value={company}
-              name={'company'}
+              value={username}
+              name={'username'}
+              status={validateUsername.error ? 'error' : ''}
               onChange={onChangeInput}
               placeholder="Nhập tên tài khoản..."
             />
+            {validateUsername.error && <p className="message-err">(*){validateUsername.message}</p>}
           </Col>
           <Col span={12}>
             <p className="custom-label-input">
               Quyền(<span className="color-red">*</span>)
             </p>
             <Select
-              defaultValue="lucy"
+              value={role}
               style={{
                 width: '100%'
               }}
-              onChange={() => {}}
+              onChange={(value) => {
+                setRole(value);
+              }}
               options={Object.values(ROLE_ACC)?.map((item) => {
                 return {
                   value: item,
@@ -288,45 +226,41 @@ const ModalAccount = ({ open, handleClose }) => {
             />
           </Col>
           <Col span={12}>
-            <p className="custom-label-input">Biển số xe</p>
-            <Input name="carNumber" value={carNumber} onChange={onChangeInput} placeholder="Nhập biển số xe..." />
-          </Col>
-          <Col span={12}>
             <p className="custom-label-input">
-              Người bảo lãnh(<span className="color-red">*</span>)
+              Trạng thái(<span className="color-red">*</span>)
             </p>
-            <Input
-              name="personInSeowon"
-              value={personSeowon}
-              onChange={onChangeInput}
-              status={errorPersonSeowon ? 'error' : ''}
-              placeholder="Nhập tên người bảo lãnh..."
-            />
-          </Col>
-          <Col span={12}>
-            <p className="custom-label-input">
-              Bộ phận(<span className="color-red">*</span>)
-            </p>
-            <Input
-              name="department"
-              value={department}
-              onChange={onChangeInput}
-              status={errorDepartment ? 'error' : ''}
-              placeholder="Nhập bộ phận..."
+            <Select
+              value={status}
+              style={{
+                width: '100%'
+              }}
+              onChange={(value) => {
+                setStatus(value);
+              }}
+              options={Object.values(STATUS_ACC)?.map((item) => {
+                return {
+                  value: item,
+                  label: item
+                };
+              })}
             />
           </Col>
           <Col span={24}>
-            <p className="custom-label-input">
-              Lý do(<span className="color-red">*</span>)
-            </p>
-            <TextArea
-              name="reason"
-              value={reason}
+            {typeModal === 'EDIT' ? (
+              <p className="custom-label-input">Đổi mật khẩu</p>
+            ) : (
+              <p className="custom-label-input">
+                Mật khẩu(<span className="color-red">*</span>)
+              </p>
+            )}
+            <Input
+              name="password"
+              value={password}
               onChange={onChangeInput}
-              status={errReason ? 'error' : ''}
-              placeholder="Nhập lý do..."
-              rows={2}
+              status={validatePassword.error ? 'error' : ''}
+              placeholder="Nhập mật khẩu..."
             />
+            {validatePassword.error && <p className="message-err">(*){validatePassword.message}</p>}
           </Col>
         </Row>
       </Modal>
