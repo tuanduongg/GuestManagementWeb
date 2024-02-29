@@ -8,8 +8,10 @@ const config = {
   container: true,
   mode: 'light',
   presetColor: 'default',
-  themeDirection: 'ltr'
+  themeDirection: 'ltr',
+  dateFormat: 'DD/MM/YYYY',
+  hourFormat: 'HH:mm',
 };
 
 export default config;
-export const drawerWidth = 240;
+export const drawerWidth = 250;

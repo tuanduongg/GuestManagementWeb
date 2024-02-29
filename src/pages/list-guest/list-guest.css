@@ -1,3 +1,9 @@
 .ant-dropdown .ant-dropdown-menu {
     max-height: 200px !important;
 }
+.date-picker-custom > .ant-picker-selection-item-remove {
+    display: none !important;
+}
+.ant-table-cell {
+    padding: 10px !important;
+}

@@ -13,11 +13,13 @@ for (let i = 0; i < 100; i++) {
     vendor: 'vendor ' + i,
     status: Object.values(statusName)[Math.floor(Math.random() * 3)],
     carNumber: generateRandomVNLicensePlate(),
-    timeOutExpected: '2024-02-22T01:27:47.974Z',
-    timeInExpected: '2024-02-22T04:27:47.974Z',
+    timeOutExpected: '2024-02-29T03:02:32.701Z',
+    timeInExpected: '2024-02-29T17:00:00.000Z',
     reason: 'reason ' + i
   });
 }
+
+
 
 const CarRegister = () => {
   const [tableData, setTableData] = useState(data ?? []);

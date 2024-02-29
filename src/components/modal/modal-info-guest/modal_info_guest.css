@@ -2,11 +2,16 @@
     font-size: 20px;
 }
 .title-detail {
-    font-weight: 500;
+    /* font-weight: 500; */
+    text-decoration: underline;
     font-size: 14px;
-    font-style: italic;
+    /* font-style: italic; */
     margin: 5px 0px;
-    
+}
+.title-name-custom {
+    font-weight: 500;
+    margin-right: 3px;
+     
 }
 .box-image {
     max-height: 200px;
@@ -30,6 +35,9 @@ background-color: #1b5e20;
 }
 .btn-success-custom:hover{
     background: #1b5e20cf !important;
+}
+.font-bold {
+    font-weight: 500;
 }
   
   /* .btn-success-custom> .bg-warning {

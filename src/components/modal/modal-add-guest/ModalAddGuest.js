@@ -1,12 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
-import { Input, Modal, App, Row, Col, Tag, Tooltip, Popconfirm, Button, DatePicker, TimePicker, Space } from 'antd';
+import { Input, Modal, App, Row, Col, Tag, Tooltip, message, Popconfirm, Button, DatePicker, TimePicker, Space } from 'antd';
 import './modal_add_guest.css';
 import dayjs from 'dayjs';
 const { TextArea } = Input;
 
 // assets
 import { PlusOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import restApi from 'utils/restAPI';
+import { RouterAPI } from 'utils/routerAPI';
+import { formatArrDate } from 'utils/helper';
+import config from 'config';
 const initInputName = {
   value: '',
   error: false,
@@ -14,15 +18,13 @@ const initInputName = {
 };
 const defaultValueDate = [dayjs()];
 const defaultValueTime = dayjs();
-
 const tagInputStyle = {
-  width: 64,
+  width: 150,
   height: 30,
   marginInlineEnd: 8,
   verticalAlign: 'top'
 };
-
-const ModalAddGuest = ({ open, handleClose }) => {
+const ModalAddGuest = ({ open, handleClose, afterSave }) => {
   const { modal } = App.useApp();
   const [disabled, setDisabled] = useState(true);
   const [arrInputName, setArrInputName] = useState([initInputName]);
@@ -76,7 +78,6 @@ const ModalAddGuest = ({ open, handleClose }) => {
     color: errorEditTag ? 'red' : '',
     borderColor: errorEditTag ? 'red' : ''
   };
-
   useEffect(() => {
     if (inputVisible) {
       inputRef.current?.focus();
@@ -117,6 +118,22 @@ const ModalAddGuest = ({ open, handleClose }) => {
     setNames(newTags);
     setEditInputIndex(-1);
     setEditInputValue('');
+  };
+
+  const handleSaveGuest = async () => {
+    const data = {
+      company,
+      carNumber,
+      personSeowon,
+      department,
+      reason,
+      timeIn,
+      timeOut,
+      date: formatArrDate(date),
+      names
+    };
+    const rest = await restApi.post(RouterAPI.addGuest, data);
+    afterSave(rest);
   };
   const draggleRef = useRef(null);
   const handleOk = (e) => {
@@ -162,7 +179,7 @@ const ModalAddGuest = ({ open, handleClose }) => {
         centered: true,
         icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
         onOk: () => {
-          alert('pass');
+          handleSaveGuest();
         }
       });
     }
@@ -301,7 +318,7 @@ const ModalAddGuest = ({ open, handleClose }) => {
   return (
     <>
       <Modal
-        width={700}
+        width={600}
         okText="Lưu thông tin"
         cancelText="Đóng"
         zIndex={1300}
@@ -460,7 +477,7 @@ const ModalAddGuest = ({ open, handleClose }) => {
               value={date}
               disabledDate={disabledDate}
               allowClear={false}
-              format="DD-MM-YYYY"
+              format={config.dateFormat}
               multiple
               onChange={onChangeDatePicker}
               maxTagCount="responsive"

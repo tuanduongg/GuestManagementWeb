@@ -1,7 +1,9 @@
 import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds } from 'date-fns';
-import { Tag, Popover, Modal } from 'antd';
+import { Tag, Popover, Modal,Badge } from 'antd';
 import { FieldTimeOutlined } from '@ant-design/icons';
 import { ConfigRouter } from 'config_router';
+import dayjs from 'dayjs';
+import config from 'config';
 
 export function generateRandomVNLicensePlate() {
   // Mã tỉnh/thành phố
@@ -179,7 +181,7 @@ export const listNameStatus = () => {
     if (item) {
       switch (item) {
         case statusName.NOT_IN:
-          message = 'Chưa vào';
+          message = 'Mới';
           break;
         case statusName.COME_IN:
           message = 'Đã vào';
@@ -240,8 +242,11 @@ function tinhKhoangCachDenThoiGian(chuoiThoiGian) {
   if (gio <= 0 && phut <= 0) {
     return null;
   }
-
-  return `${gio}-${phut}`;
+  if (gio > 0) {
+    return `${gio}h`;
+  } else {
+    return `${phut}p`;
+  }
 }
 export const getColorChipStatus = (status, timeInExpected) => {
   // console.log('compareDateTime(timeInExpected)', compareDateTime(timeInExpected));
@@ -249,11 +254,11 @@ export const getColorChipStatus = (status, timeInExpected) => {
   let message = '';
   switch (status) {
     case statusName.NOT_IN:
-      color = 'geekblue';
-      message = 'Chưa vào';
+      color = '#007E33';
+      message = 'Mới';
       break;
     case statusName.COME_IN:
-      color = 'green';
+      color = 'geekblue';
       message = 'Đã vào';
       break;
     case statusName.COME_OUT:
@@ -264,30 +269,12 @@ export const getColorChipStatus = (status, timeInExpected) => {
     default:
       break;
   }
-  if (status === statusName.NOT_IN) {
-    let rs = tinhKhoangCachDenThoiGian(timeInExpected);
-    if (rs) {
-      return (
-        <>
-          <Popover
-            placement="left"
-            title={`Thời gian dự kiến sẽ đến: ${rs} nữa`}
-            trigger={['click', 'hover']} // Trigger on both click and hover
-          >
-            <Tag color={color} key={status}>
-              <FieldTimeOutlined style={{ marginRight: '5px' }} />
-              {rs}
-            </Tag>
-          </Popover>
-        </>
-      );
-    }
-  }
-  return (
-    <Tag color={color} key={status}>
-      {message}
-    </Tag>
-  );
+  return <Badge color={color} count={message} />;
+  // return (
+  //   <Tag color={color} key={status}>
+  //     {message}
+  //   </Tag>
+  // );
 };
 
 export function isMobile() {
@@ -376,3 +363,26 @@ export function setCookie(name, value, days) {
   }
   document.cookie = name + '=' + (value || '') + expires + '; path=/';
 }
+export const formatDateDayjs = (date) => {
+  if (date) {
+    return dayjs(date).format(config?.dateFormat);
+  }
+  return '';
+};
+
+export const formatArrDate = (arr = []) => {
+  if (arr && arr?.length > 0) {
+    const result = arr.map((item, index) => {
+      return formatDateDayjs(item);
+    });
+    return result;
+  }
+  return [];
+};
+
+export const formatHourMinus = (date) => {
+  if (date) {
+    return dayjs(date).format(config?.hourFormat);
+  }
+  return '';
+};

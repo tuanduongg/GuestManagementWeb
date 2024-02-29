@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Modal, Row, Col, Flex, Typography, Divider, Image, Tag } from 'antd';
+import { Button, Modal, Row, Col, Flex, Typography, Spin } from 'antd';
 import { CaretRightOutlined, InfoCircleOutlined, EditOutlined, CloseOutlined, CheckOutlined } from '@ant-design/icons';
 const { Title, Text } = Typography;
 import './modal_info_guest.css';
-import { formatDateFromDB, getColorChipStatus, isMobile } from 'utils/helper';
+import { formatDateFromDB, formatHourMinus, getColorChipStatus, isMobile } from 'utils/helper';
+import restApi from 'utils/restAPI';
+import { RouterAPI } from 'utils/routerAPI';
 
 const ModalInfoGuest = ({ open, handleClose, dataSelect }) => {
   const [widthBoxImage, setWidthBoxImage] = useState(100);
@@ -23,6 +25,7 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect }) => {
   //     "reason": "reason 4"
   // }
   // useEffect will run on stageCanvasRef value assignment
+  
   useEffect(() => {
     if (open) {
       var element = document.getElementById('div-image');
@@ -36,10 +39,23 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect }) => {
     }
   }, [open]);
 
+  const concatDateString = (arr = []) => {
+    let text = '';
+    if (arr && arr?.length > 0) {
+      arr.map((item, index) => {
+        if (index === arr?.length - 1) {
+          text += item?.DATE;
+        } else {
+          text += item?.DATE + ', ';
+        }
+      });
+    }
+    return text;
+  };
   return (
     <>
       <Modal
-        width={'700px'}
+        width={'600px'}
         titleFontSize={20}
         centered
         zIndex={1300}
@@ -59,10 +75,11 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect }) => {
         footer={(_, { OkBtn, CancelBtn }) => (
           <>
             {/* <OkBtn icon={<EditOutlined />} /> */}
-            <Button className="btn-success-custom" type="primary" icon={<CheckOutlined />}>
+            <CancelBtn />
+            {/* /className="btn-success-custom" */}
+            <Button type="primary" icon={<CheckOutlined />}>
               Đã vào
             </Button>
-            <CancelBtn />
           </>
         )}
       >
@@ -80,20 +97,20 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect }) => {
               <Text className="min-width-50" style={{ marginRight: '5px', fontWeight: 500 }}>
                 Công ty:
               </Text>
-              <Text>{dataSelect?.COMPANY}</Text>
+              <Text>{dataSelect?.COMPANY ? dataSelect?.COMPANY : 'Chưa cập nhật'}</Text>
             </Flex>
             <Flex direction="row">
               <Text className="min-width-50" style={{ marginRight: '5px', fontWeight: 500 }}>
                 Biển số xe:
               </Text>
-              <Text>{dataSelect?.CAR_NUMBER}</Text>
+              <Text>{dataSelect?.CAR_NUMBER ? dataSelect?.CAR_NUMBER : 'Chưa cập nhật'}</Text>
             </Flex>
           </Col>
           <Col xs={24} sm={12}>
             <p className="title-detail">Thời gian</p>
             <Flex direction="row">
               <Text className="title-time">Giờ vào(dự kiến):</Text>
-              <Text>{dataSelect?.TIME_IN ? dataSelect?.TIME_IN : ''}</Text>
+              <Text>{dataSelect?.TIME_IN ? formatHourMinus(dataSelect?.TIME_IN) : ''}</Text>
             </Flex>
             <Flex direction="row">
               <Text className="title-time">Giờ vào(thực tế):</Text>
@@ -101,7 +118,11 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect }) => {
             </Flex>
             <Flex direction="row">
               <Text className="title-time">Giờ ra(dự kiến):</Text>
-              <Text>{dataSelect?.TIME_OUT ?? ''}</Text>
+              <Text>{dataSelect?.TIME_OUT ? formatHourMinus(dataSelect?.TIME_OUT) : ''}</Text>
+            </Flex>
+            <Flex direction="row">
+              <Text className="title-name-custom">Ngày:</Text>
+              <Text>{dataSelect?.guest_date ? concatDateString(dataSelect?.guest_date) : 'Chưa cập nhật'}</Text>
             </Flex>
           </Col>
           {/* ==================== */}
@@ -110,8 +131,8 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect }) => {
             <p className="title-detail">Thông tin khách</p>
             <Row>
               {dataSelect?.guest_info?.map((item, index) => (
-                <Col key={index} span={12}>
-                  <Text>{`${index + 1}.${item?.FULL_NAME}`}</Text>
+                <Col key={index} span={24}>
+                  <Text className="font-bold">{`${index + 1}.${item?.FULL_NAME}`}</Text>
                 </Col>
               ))}
             </Row>
