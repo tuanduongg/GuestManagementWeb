@@ -6,8 +6,9 @@ import './modal_info_guest.css';
 import { formatDateFromDB, formatHourMinus, getColorChipStatus, isMobile } from 'utils/helper';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
+import { concatDateString } from './modal_info_guest.service';
 
-const ModalInfoGuest = ({ open, handleClose, dataSelect }) => {
+const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit }) => {
   const [widthBoxImage, setWidthBoxImage] = useState(100);
 
   const handleCancel = () => {
@@ -25,7 +26,7 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect }) => {
   //     "reason": "reason 4"
   // }
   // useEffect will run on stageCanvasRef value assignment
-  
+
   useEffect(() => {
     if (open) {
       var element = document.getElementById('div-image');
@@ -39,19 +40,6 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect }) => {
     }
   }, [open]);
 
-  const concatDateString = (arr = []) => {
-    let text = '';
-    if (arr && arr?.length > 0) {
-      arr.map((item, index) => {
-        if (index === arr?.length - 1) {
-          text += item?.DATE;
-        } else {
-          text += item?.DATE + ', ';
-        }
-      });
-    }
-    return text;
-  };
   return (
     <>
       <Modal
@@ -70,16 +58,29 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect }) => {
         cancelText="Đóng"
         okText="Chỉnh sửa"
         autoFocusButton="cancel"
-        okButtonProps={{ icon: <EditOutlined /> }}
+        // okButtonProps={{ icon: <EditOutlined /> }}
         cancelButtonProps={{ icon: <CloseOutlined /> }}
         footer={(_, { OkBtn, CancelBtn }) => (
           <>
-            {/* <OkBtn icon={<EditOutlined />} /> */}
-            <CancelBtn />
-            {/* /className="btn-success-custom" */}
-            <Button type="primary" icon={<CheckOutlined />}>
-              Đã vào
-            </Button>
+            <div className="footer-modal">
+              <Button
+                type="link"
+                onClick={() => {
+                  onClickEdit(dataSelect);
+                }}
+                icon={<EditOutlined />}
+              >
+                Chỉnh sửa
+              </Button>
+              <div>
+                {/* <OkBtn icon={<EditOutlined />} /> */}
+                {!isMobile() && <CancelBtn />}
+                {/* /className="btn-success-custom" */}
+                <Button type="primary" style={{ marginLeft: '10px' }} icon={<CheckOutlined />}>
+                  Đã vào
+                </Button>
+              </div>
+            </div>
           </>
         )}
       >

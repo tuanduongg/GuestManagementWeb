@@ -1,5 +1,5 @@
 import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds } from 'date-fns';
-import { Tag, Popover, Modal,Badge } from 'antd';
+import { Tag, Popover, Modal, Badge } from 'antd';
 import { FieldTimeOutlined } from '@ant-design/icons';
 import { ConfigRouter } from 'config_router';
 import dayjs from 'dayjs';
@@ -125,7 +125,8 @@ export function generateRandomVNLicensePlate() {
   return licensePlate;
 }
 export const statusName = {
-  NOT_IN: 'NOT_IN',
+  NEW: 'NEW',
+  ACCEPT: 'ACCEPT',
   COME_IN: 'COME_IN'
 };
 export function addZero(num) {
@@ -180,8 +181,11 @@ export const listNameStatus = () => {
     let message = '';
     if (item) {
       switch (item) {
-        case statusName.NOT_IN:
+        case statusName.NEW:
           message = 'Mới';
+          break;
+        case statusName.ACCEPT:
+          message = 'Đã duyệt';
           break;
         case statusName.COME_IN:
           message = 'Đã vào';
@@ -205,8 +209,11 @@ export const getNameStatus = (status) => {
   let message = '';
   if (status) {
     switch (status) {
-      case statusName.NOT_IN:
-        message = 'Chưa vào';
+      case statusName.NEW:
+        message = 'Mới';
+        break;
+      case statusName.ACCEPT:
+        message = 'Đã duyệt';
         break;
       case statusName.COME_IN:
         message = 'Đã vào';
@@ -253,16 +260,21 @@ export const getColorChipStatus = (status, timeInExpected) => {
   let color = '';
   let message = '';
   switch (status) {
-    case statusName.NOT_IN:
-      color = '#007E33';
+    case statusName.NEW:
+      color = '#16a34a';
       message = 'Mới';
       break;
+    case statusName.ACCEPT:
+      color = '#0ea5e9';
+      message = 'Đã duyệt';
+      break;
     case statusName.COME_IN:
-      color = 'geekblue';
+      color = '#1e3a8a';
+      // color = 'geekblue';
       message = 'Đã vào';
       break;
     case statusName.COME_OUT:
-      color = 'volcano';
+      color = '#44403c';
       message = 'Đã ra';
       break;
 

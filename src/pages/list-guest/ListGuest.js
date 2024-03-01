@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Row, Col, Typography, App, Empty, Select, Button, Flex, DatePicker, message } from 'antd';
+import { Table, Row, Col, Typography, App, Popconfirm, Button, Flex, DatePicker, message } from 'antd';
+import { isMobile } from 'react-device-detect';
 
 import {
   formatArrDate,
@@ -8,7 +9,6 @@ import {
   formatHourMinus,
   generateRandomVNLicensePlate,
   getColorChipStatus,
-  isMobile,
   listNameStatus,
   statusName
 } from 'utils/helper';
@@ -26,18 +26,20 @@ const today = dayjs(); // Get the current date using dayjs
 
 const ListGuest = () => {
   const [tableData, setTableData] = useState([]);
-  const [openModal, setOpenModal] = useState(false);
+  const [openModalInfo, setOpenModalInfo] = useState(false);
   const [openModalAdd, setOpenModalAdd] = useState(false);
+  const [typeModalAdd, setTypeModalAdd] = useState('');
   const [dataSelect, setDataSelect] = useState({});
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [dateSelect, setDateSelect] = useState([today]);
   const [messageApi, contextHolder] = message.useMessage();
   const [selectData, setSelectData] = message.useMessage([statusName.NOT_IN]);
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
+  const handleCloseModalInfo = () => {
+    setOpenModalInfo(false);
   };
   const handleCloseModalAdd = () => {
+    setDataSelect({});
     setOpenModalAdd(false);
   };
 
@@ -52,6 +54,13 @@ const ListGuest = () => {
     getData();
   }, [dateSelect]);
 
+  const onClickEditOnModal = (DATA) => {
+    setTypeModalAdd('EDIT');
+    handleCloseModalInfo();
+    setDataSelect(DATA);
+    setOpenModalAdd(true);
+  };
+
   const findByID = async (id) => {
     if (id) {
       const rest = await restApi.post(RouterAPI.findByIdGuest, {
@@ -59,7 +68,7 @@ const ListGuest = () => {
       });
       if (rest?.status === 200) {
         setDataSelect(rest?.data);
-        setOpenModal(true);
+        setOpenModalInfo(true);
         return;
       }
     }
@@ -68,15 +77,15 @@ const ListGuest = () => {
       content: 'không có dữ liệu!'
     });
   };
-
   const columns = [
     {
       align: 'left',
       key: 'guest_info',
       title: 'Tên khách',
       dataIndex: 'guest_info',
-      width: 150,
+      width: isMobile ? 150 : '19%',
       fixed: 'left',
+
       render: (_, data) => (
         <>
           <Link
@@ -90,7 +99,7 @@ const ListGuest = () => {
             type="link"
             onClick={() => {
               setDataSelect(data);
-              setOpenModal(true);
+              setOpenModalInfo(true);
             }}
           >
             {concatGuestInfo(data?.guest_info)}
@@ -119,7 +128,7 @@ const ListGuest = () => {
       key: 'COMPANY',
       title: 'Công ty',
       dataIndex: 'COMPANY',
-      width: 130,
+      width: isMobile ? 130 : '11%',
       filters: tableData
         ? tableData.map((item) => {
             return {
@@ -141,7 +150,7 @@ const ListGuest = () => {
       title: 'Biển số',
       dataIndex: 'CAR_NUMBER',
       align: 'center',
-      width: 130,
+      width: isMobile ? 130 : '11%',
       filters: tableData
         ? tableData.map((item) => {
             return {
@@ -160,25 +169,25 @@ const ListGuest = () => {
     },
     {
       key: 'TIME_IN',
-      title: 'Giờ vào\n(dự kiến)',
+      title: 'Giờ vào',
       dataIndex: 'TIME_IN',
       align: 'center',
       render: (_, { TIME_IN }) => <>{formatHourMinus(TIME_IN)}</>,
-      width: 100
+      width: isMobile ? 100 : '9%'
     },
     {
       key: 'TIME_OUT',
-      title: ['Giờ ra', '(dự kiến)'],
+      title: ['Giờ ra'],
       dataIndex: 'TIME_OUT',
       align: 'center',
       render: (_, { TIME_OUT }) => <>{formatHourMinus(TIME_OUT)}</>,
-      width: 110
+      width: isMobile ? 100 : '9%'
     },
     {
       key: 'PERSON_SEOWON',
       title: 'Người bảo lãnh',
       dataIndex: 'PERSON_SEOWON',
-      width: 150
+      width: isMobile ? 150 : '15%'
     },
     {
       key: 'STATUS',
@@ -186,16 +195,18 @@ const ListGuest = () => {
       title: 'Trạng thái',
       dataIndex: 'STATUS',
       render: (_, { STATUS, TIME_IN }) => <>{getColorChipStatus(STATUS, TIME_IN)}</>,
-      width: 100,
+      width: isMobile ? 100 : '11%',
       filters: listNameStatus() ?? [],
       filterMode: 'tree',
       filterSearch: true,
+      defaultFilteredValue: [statusName.NEW],
       onFilter: (value, record) => record?.STATUS === value
     },
     {
       key: 'ACTION',
       align: 'center',
       title: 'Duyệt',
+      fixed: 'right',
       render: (_, { data }) => (
         <>
           <div style={{ display: 'flex' }}>
@@ -216,7 +227,7 @@ const ListGuest = () => {
           </div>
         </>
       ),
-      width: 60
+      width: isMobile ? 60 : '6%'
     }
   ];
   const onSelectChange = (newSelectedRowKeys) => {
@@ -230,6 +241,7 @@ const ListGuest = () => {
     }
   };
   const handleClickAdd = () => {
+    setTypeModalAdd('ADD');
     setOpenModalAdd(true);
   };
 
@@ -250,6 +262,22 @@ const ListGuest = () => {
   };
 
   const handleChangeStatus = (value) => {};
+  const handleDelete = async () => {
+    const rest = await restApi.post(RouterAPI.deleteGuest, { data: selectedRowKeys });
+    console.log('rest', rest);
+    if (rest?.status === 200) {
+      messageApi.open({
+        type: 'success',
+        content: 'Xoá thành công!'
+      });
+      getData();
+    } else {
+      messageApi.open({
+        type: 'warning',
+        content: rest?.data?.message ?? 'Xoá thất bại!'
+      });
+    }
+  };
 
   return (
     <>
@@ -264,14 +292,14 @@ const ListGuest = () => {
           <DatePicker
             className="date-picker-custom"
             multiple
-            maxTagCount={isMobile() ? 2 : 1}
-            style={{ width: isMobile() ? '100%' : '200px' }}
+            maxTagCount={isMobile ? 2 : 1}
+            style={{ width: isMobile ? '100%' : '200px' }}
             allowClear={false}
             format={config.dateFormat}
             value={dateSelect}
             onChange={onChangeDate}
           />
-          <Select
+          {/* <Select
             mode="multiple"
             allowClear={false}
             style={{
@@ -280,18 +308,22 @@ const ListGuest = () => {
             placeholder="Trạng thái"
             onChange={handleChangeStatus}
             options={optionsSelect}
-          />
-          <div style={{ display: 'flex', justifyContent: 'end', width: isMobile() ? '100%' : '' }}>
+          /> */}
+          <div style={{ display: 'flex', justifyContent: 'end', width: isMobile ? '100%' : '' }}>
             <Button onClick={handleClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
               Đăng ký
             </Button>
-            <Button disabled={selectedRowKeys?.length === 0} danger icon={<DeleteOutlined />} type="primary">
-              Xoá
-            </Button>
+            <Popconfirm onConfirm={handleDelete} title="Thông báo" description="Bạn chắc chắn muốn xoá?" okText="Có" cancelText="đóng">
+              <Button disabled={selectedRowKeys?.length === 0} danger icon={<DeleteOutlined />} type="primary">
+                Xoá
+              </Button>
+            </Popconfirm>
           </div>
         </Flex>
       </Row>
       <Table
+        // tableLayout={'auto'}
+        // tableLayout={tableData?.length !== 0 ? 'fixed' : 'auto'}
         rowKey="GUEST_ID"
         rowSelection={{
           selectedRowKeys,
@@ -299,17 +331,21 @@ const ListGuest = () => {
         }}
         bordered
         scroll={{
-          x: 'max-content',
+          x: 'max',
           y: '70vh'
         }}
         columns={columns}
         dataSource={tableData}
         pagination={false}
-      >
-        {tableData?.length === 0 && <Empty />}
-      </Table>
-      <ModalInfoGuest dataSelect={dataSelect} open={openModal} handleClose={handleCloseModal} />
-      <ModalAddGuest afterSave={onAfterSave} open={openModalAdd} handleClose={handleCloseModalAdd} />
+      ></Table>
+      <ModalInfoGuest dataSelect={dataSelect} onClickEdit={onClickEditOnModal} open={openModalInfo} handleClose={handleCloseModalInfo} />
+      <ModalAddGuest
+        typeModal={typeModalAdd}
+        afterSave={onAfterSave}
+        dataSelect={dataSelect}
+        open={openModalAdd}
+        handleClose={handleCloseModalAdd}
+      />
     </>
   );
 };

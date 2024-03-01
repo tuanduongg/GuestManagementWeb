@@ -1,19 +1,22 @@
 import { listNameStatus, statusName } from 'utils/helper';
 
-export const optionsSelect = listNameStatus().map((item, index) => {
-  return {
-    value: item?.value,
-    label: item?.text
-  };
-});
+// export const optionsSelect = listNameStatus().map((item, index) => {
+//   return {
+//     value: item?.value,
+//     label: item?.text
+//   };
+// });
 
 export const concatGuestInfo = (arr) => {
   if (arr) {
     let result = '';
-    if (arr?.length > 2) {
+    let lengthArr = arr?.length;
+    if (lengthArr > 2) {
       result += arr[0]?.FULL_NAME + ',' + arr[1]?.FULL_NAME + '...';
-    } else {
+    } else if (lengthArr === 2) {
       result += arr[0]?.FULL_NAME + ',' + arr[1]?.FULL_NAME;
+    } else if (lengthArr === 1) {
+      result += arr[0]?.FULL_NAME;
     }
     return result;
   }

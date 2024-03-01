@@ -1,16 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
-import { Input, Modal, App, Row, Col, Tag, Tooltip, message, Popconfirm, Button, DatePicker, TimePicker, Space } from 'antd';
+import { Input, Modal, App, Row, Col, message, Tooltip, Popconfirm, Button, DatePicker, TimePicker, Space } from 'antd';
 import './modal_add_guest.css';
 import dayjs from 'dayjs';
 const { TextArea } = Input;
 
 // assets
-import { PlusOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, InfoCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import { formatArrDate } from 'utils/helper';
 import config from 'config';
+import { isMobile } from 'react-device-detect';
 const initInputName = {
   value: '',
   error: false,
@@ -19,22 +20,23 @@ const initInputName = {
 const defaultValueDate = [dayjs()];
 const defaultValueTime = dayjs();
 const tagInputStyle = {
-  width: 150,
+  width: 130,
   height: 30,
   marginInlineEnd: 8,
   verticalAlign: 'top'
 };
-const ModalAddGuest = ({ open, handleClose, afterSave }) => {
-  const { modal } = App.useApp();
+const initialValiateName = { FULL_NAME: '', NAME_ID: '' };
+const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) => {
   const [disabled, setDisabled] = useState(true);
   const [arrInputName, setArrInputName] = useState([initInputName]);
+  const [messageApi, contextHolder] = message.useMessage();
   const [bounds, setBounds] = useState({
     left: 0,
     top: 0,
     bottom: 0,
     right: 0
   });
-  const [names, setNames] = useState([]);
+  const [names, setNames] = useState(isMobile ? [initialValiateName] : [initialValiateName, initialValiateName]);
   const [errorEditTag, setErrorEditTag] = useState(false);
 
   const [timeIn, setTimeIn] = useState(defaultValueTime);
@@ -59,15 +61,39 @@ const ModalAddGuest = ({ open, handleClose, afterSave }) => {
 
   const [department, setDepartment] = useState('');
   const [errorDepartment, setErrorDepartment] = useState(false);
-
-  const [openPopConfirm, setOpenPopConfirm] = useState(false);
-
-  const [inputVisible, setInputVisible] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-  const [editInputIndex, setEditInputIndex] = useState(-1);
-  const [editInputValue, setEditInputValue] = useState('');
   const inputRef = useRef(null);
   const editInputRef = useRef(null);
+  //  [
+  //     {
+  //         "NAME_ID": "1AABA74A-E3D6-EE11-A1CF-04D9F5C9D2EB",
+  //         "FULL_NAME": "KO DEOK JUN ABC"
+  //     }
+  // ]
+  useEffect(() => {
+    if (dataSelect && open && typeModal === 'EDIT') {
+      setNames(
+        dataSelect?.guest_info.map((item) => {
+          return {
+            NAME_ID: item?.NAME_ID,
+            FULL_NAME: item?.FULL_NAME,
+            ERROR: false
+          };
+        })
+      );
+      setTimeIn(dataSelect?.TIME_IN ? dayjs(dataSelect?.TIME_IN) : '');
+      setTimeOut(dataSelect?.TIME_OUT ? dayjs(dataSelect?.TIME_OUT) : '');
+      setCompany(dataSelect?.COMPANY);
+      setCarNumber(dataSelect?.CAR_NUMBER);
+      setPersonSeowon(dataSelect?.PERSON_SEOWON);
+      setReason(dataSelect?.REASON);
+      setDepartment(dataSelect?.DEPARTMENT);
+      setDate(
+        dataSelect?.guest_date?.map((item) => {
+          return dayjs(item.DATE);
+        })
+      );
+    }
+  }, [open]);
 
   const tagPlusStyle = {
     display: 'flex',
@@ -78,48 +104,34 @@ const ModalAddGuest = ({ open, handleClose, afterSave }) => {
     color: errorEditTag ? 'red' : '',
     borderColor: errorEditTag ? 'red' : ''
   };
-  useEffect(() => {
-    if (inputVisible) {
-      inputRef.current?.focus();
+  const handleClearTag = (index, tagProp) => {
+    if (typeModal === 'EDIT') {
+      const arrNew = [...names];
+      setNames(arrNew);
+      Modal.confirm({
+        title: 'Thông báo',
+        content: 'Bạn chắc chắn muốn xoá?',
+        okText: 'Yes',
+        cancelText: 'No',
+        centered: true,
+        onOk: async () => {
+          const rest = await restApi.post(RouterAPI.deleteGuestInfo, {
+            NAME_ID: tagProp?.NAME_ID
+          });
+          if (rest?.status !== 200) {
+            alert('Delete Fail!');
+          } else {
+            const newTags = names.filter((tag, i) => index !== i);
+            setNames(newTags);
+          }
+          console.log('rest', rest);
+        }
+      });
+    } else {
+      const newTags = names.filter((tag, i) => index !== i);
+      setNames(newTags);
     }
-  }, [inputVisible]);
-  useEffect(() => {
-    editInputRef.current?.focus();
-  }, [editInputValue]);
-  const handleClearTag = (removedTag) => {
-    const newTags = names.filter((tag) => tag !== removedTag);
-    setNames(newTags);
   };
-  const showInput = () => {
-    if (errorEditTag) {
-      setErrorEditTag(false);
-    }
-    setInputVisible(true);
-  };
-  const handleInputChange = (e) => {
-    setInputValue(e.target.value);
-  };
-  const handleInputConfirm = () => {
-    if (inputValue && !names.includes(inputValue)) {
-      setNames([...names, inputValue]);
-    }
-    setInputVisible(false);
-    setInputValue('');
-  };
-  const handleEditInputChange = (e) => {
-    setEditInputValue(e.target.value);
-  };
-  const handleEditInputConfirm = () => {
-    const newTags = [...names];
-    newTags[editInputIndex] = editInputValue;
-    if (editInputValue?.trim() === '') {
-      newTags.splice(editInputIndex, 1);
-    }
-    setNames(newTags);
-    setEditInputIndex(-1);
-    setEditInputValue('');
-  };
-
   const handleSaveGuest = async () => {
     const data = {
       company,
@@ -130,7 +142,11 @@ const ModalAddGuest = ({ open, handleClose, afterSave }) => {
       timeIn,
       timeOut,
       date: formatArrDate(date),
-      names
+      names: names.map((item) => {
+        if (item?.FULL_NAME?.trim() !== '') {
+          return item.FULL_NAME;
+        }
+      })
     };
     const rest = await restApi.post(RouterAPI.addGuest, data);
     afterSave(rest);
@@ -138,10 +154,28 @@ const ModalAddGuest = ({ open, handleClose, afterSave }) => {
   const draggleRef = useRef(null);
   const handleOk = (e) => {
     let check = false;
+
     if (names?.length === 0) {
       check = true;
-      setErrorEditTag(true);
+      messageApi.open({
+        type: 'error',
+        content: 'Vui lòng điền thông tin tên khách!'
+      });
+    } else {
+      check = true;
+      names.map((item, index) => {
+        if (item?.FULL_NAME?.trim() !== '') {
+          check = false;
+        }
+      });
+      if (check) {
+        messageApi.open({
+          type: 'error',
+          content: 'Vui lòng điền thông tin tên khách!'
+        });
+      }
     }
+
     if (date?.length === 0) {
       check = true;
       setErrorDate(true);
@@ -195,7 +229,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave }) => {
     setErrorDepartment(false);
     setErrReason(false);
 
-    setNames([]);
+    setNames(isMobile ? [initialValiateName] : [initialValiateName, initialValiateName]);
     setTimeIn(defaultValueTime);
     setTimeOut(defaultValueTime);
     setDate(defaultValueDate);
@@ -282,6 +316,15 @@ const ModalAddGuest = ({ open, handleClose, afterSave }) => {
     }
   };
 
+  // useEffect(() => {
+  //   if (names && names.length === 0) {
+  //     setNames([
+  //       { FULL_NAME: '', NAME_ID: '' },
+  //       { FULL_NAME: '', NAME_ID: '' }
+  //     ]);
+  //   }
+  // }, [names]);
+
   const onClickCancel = () => {
     let check = false;
     if (names?.length !== 0) {
@@ -302,7 +345,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave }) => {
     if (check) {
       Modal.confirm({
         title: `Thông báo`,
-        content: 'Dữ liệu chưa được lưu, bạn chắc chắn muốn đóng?',
+        content: 'Bạn chắc chắn muốn đóng?',
         okText: 'Yes',
         cancelText: 'No',
         centered: true,
@@ -314,9 +357,25 @@ const ModalAddGuest = ({ open, handleClose, afterSave }) => {
       handleCancel();
     }
   };
+  const onChangeInputName = (e, index) => {
+    const { value } = e.target;
+    const updatedNames = names.map((item, idx) => {
+      if (idx === index) {
+        return { ...item, FULL_NAME: value, ERROR: false };
+      }
+      return item;
+    });
+    setNames(updatedNames);
+  };
+  const onClearInput = (index) => {
+    const data = [...names];
+    data.splice(index, 1);
+    setNames(data);
+  };
 
   return (
     <>
+      {contextHolder}
       <Modal
         width={600}
         okText="Lưu thông tin"
@@ -343,7 +402,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave }) => {
             onBlur={() => {}}
             // end
           >
-            Đăng ký khách vào
+            {typeModal === 'EDIT' ? 'Chỉnh sửa thông tin' : 'Đăng ký khách vào'}
           </div>
         }
         open={open}
@@ -376,67 +435,49 @@ const ModalAddGuest = ({ open, handleClose, afterSave }) => {
             <p className="custom-label-input">
               Tên khách(<span className="color-red">*</span>)
             </p>
-            <Space style={{ margin: '5px 0px' }} size={[0, 8]} wrap>
-              {names.map((tag, index) => {
-                if (editInputIndex === index) {
-                  return (
-                    <Input
-                      ref={editInputRef}
-                      key={tag}
-                      style={tagInputStyle}
-                      value={editInputValue}
-                      onChange={handleEditInputChange}
-                      onBlur={handleEditInputConfirm}
-                      onPressEnter={handleEditInputConfirm}
-                    />
-                  );
-                }
-                const isLongTag = tag.length > 20;
-                const tagElem = (
-                  <Tag
-                    key={tag}
-                    closable={index !== -1}
-                    style={{
-                      userSelect: 'none'
-                    }}
-                    onClose={() => handleClearTag(tag)}
-                  >
-                    <span
-                      onDoubleClick={(e) => {
-                        setEditInputIndex(index);
-                        setEditInputValue(tag);
-                        e.preventDefault();
-                      }}
-                    >
-                      {isLongTag ? `${tag.slice(0, 20)}...` : tag}
-                    </span>
-                  </Tag>
-                );
-                return isLongTag ? (
-                  <Tooltip title={tag} key={tag}>
-                    {tagElem}
-                  </Tooltip>
-                ) : (
-                  tagElem
-                );
-              })}
-              {inputVisible ? (
+          </Col>
+
+          {names?.map((item, index) => (
+            <Col key={index} span={isMobile ? 24 : 12} style={{ marginTop: '5px' }}>
+              <div style={{ display: 'flex' }}>
                 <Input
-                  ref={inputRef}
-                  type="text"
-                  size="small"
-                  style={tagInputStyle}
-                  value={inputValue}
-                  onChange={handleInputChange}
-                  onBlur={handleInputConfirm}
-                  onPressEnter={handleInputConfirm}
+                  name="carNumber"
+                  value={names[index]?.FULL_NAME}
+                  onChange={(e) => {
+                    onChangeInputName(e, index);
+                  }}
+                  placeholder="Nhập tên khách..."
                 />
-              ) : (
-                <Tag style={tagPlusStyle} icon={<PlusOutlined />} onClick={showInput}>
-                  Nhập tên khách
-                </Tag>
-              )}
-            </Space>
+                <Popconfirm
+                  title="Thông báo"
+                  description="Bạn chắc chắn muốn xoá?"
+                  onConfirm={() => {
+                    onClearInput(index);
+                  }}
+                  okText="Có"
+                  cancelText="Đóng"
+                  placement="left"
+                >
+                  <Button disabled={names?.length === 1} danger icon={<DeleteOutlined />} type="link"></Button>
+                </Popconfirm>
+              </div>
+            </Col>
+          ))}
+          <Col xs={24} style={{ textAlign: 'right' }}>
+            <Button
+              type="link"
+              onClick={() => {
+                const data = names.map((item) => {
+                  return { ...item };
+                });
+                console.log('data', data);
+                data.push(initialValiateName);
+                setNames(data);
+                // setNames([...names, initialValiateName]);
+              }}
+            >
+              Thêm
+            </Button>
           </Col>
           <Col xs={12} sm={4}>
             <p className="custom-label-input">
@@ -475,7 +516,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave }) => {
             <DatePicker
               status={errorDate ? 'error' : ''}
               value={date}
-              disabledDate={disabledDate}
+              disabledDate={typeModal !== 'EDIT' ? disabledDate : false}
               allowClear={false}
               format={config.dateFormat}
               multiple

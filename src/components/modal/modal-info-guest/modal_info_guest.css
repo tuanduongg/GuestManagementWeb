@@ -47,3 +47,8 @@ background-color: #1b5e20;
   .btn-success-custom> .bg-danger {
     background-color: #E23C39;
   } */
+
+.footer-modal {
+    display: flex;
+    justify-content: space-between;
+}
