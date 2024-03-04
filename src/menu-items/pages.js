@@ -25,14 +25,14 @@ const pages = {
       icon: icons.ProfileOutlined,
       target: false
     },
-    {
-      id: ConfigRouter.pwRecovery,
-      title: 'Lấy lại mật khẩu',
-      type: 'item',
-      url: ConfigRouter.pwRecovery,
-      icon: icons.RedoOutlined,
-      target: false
-    }
+    // {
+    //   id: ConfigRouter.pwRecovery,
+    //   title: 'Lấy lại mật khẩu',
+    //   type: 'item',
+    //   url: ConfigRouter.pwRecovery,
+    //   icon: icons.RedoOutlined,
+    //   target: false
+    // }
   ]
 };
 

@@ -9,7 +9,7 @@ import { RouterAPI } from 'utils/routerAPI';
 import { concatDateString } from './modal_info_guest.service';
 import config from 'config';
 
-const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit }) => {
+const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role }) => {
   const [widthBoxImage, setWidthBoxImage] = useState(100);
 
   const handleCancel = () => {
@@ -63,24 +63,19 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit }) => {
         cancelButtonProps={{ icon: <CloseOutlined /> }}
         footer={(_, { OkBtn, CancelBtn }) => (
           <>
-            <div className="footer-modal">
-              <Button
-                type="link"
-                onClick={() => {
-                  onClickEdit(dataSelect);
-                }}
-                icon={<EditOutlined />}
-              >
-                Chỉnh sửa
-              </Button>
-              <div>
-                {/* <OkBtn icon={<EditOutlined />} /> */}
-                {!isMobile() && <CancelBtn />}
-                {/* /className="btn-success-custom" */}
-                <Button type="primary" style={{ marginLeft: '10px' }} icon={<CheckOutlined />}>
-                  Đã vào
+            <div className={!role?.IS_UPDATE ? 'footer-modal-right' : 'footer-modal'}>
+              <CancelBtn />
+              {role?.IS_UPDATE && (
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    onClickEdit(dataSelect);
+                  }}
+                  icon={<EditOutlined />}
+                >
+                  Chỉnh sửa
                 </Button>
-              </div>
+              )}
             </div>
           </>
         )}
@@ -106,6 +101,12 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit }) => {
                 Biển số xe:
               </Text>
               <Text>{dataSelect?.CAR_NUMBER ? dataSelect?.CAR_NUMBER : 'Chưa cập nhật'}</Text>
+            </Flex>
+            <Flex direction="row">
+              <Text className="min-width-50" style={{ marginRight: '5px', fontWeight: 500 }}>
+                Thời gian tạo:
+              </Text>
+              <Text>{dataSelect?.CREATE_AT ? formatDateFromDB(dataSelect?.CREATE_AT) : 'Chưa cập nhật'}</Text>
             </Flex>
           </Col>
           <Col xs={24} sm={12}>

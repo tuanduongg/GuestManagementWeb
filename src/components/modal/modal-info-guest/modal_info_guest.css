@@ -52,3 +52,7 @@ background-color: #1b5e20;
     display: flex;
     justify-content: space-between;
 }
+.footer-modal-right {
+    display: flex;
+    justify-content: right;
+}

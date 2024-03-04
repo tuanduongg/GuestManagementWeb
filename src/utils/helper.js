@@ -408,6 +408,14 @@ export const getMenuAlias = () => {
     } else {
       return currentPath === item.path;
     }
-  })
+  });
   return menu?.alias ?? '';
-}
+};
+
+export const getDataUserFromLocal = () => {
+  let dataString = localStorage.getItem('DATA_USER');
+  if (dataString) {
+    return JSON.parse(dataString);
+  }
+  return {};
+};

@@ -32,14 +32,14 @@ const dashboard = {
     //   icon: icons.CarOutlined,
     //   breadcrumbs: false
     // },
-    {
-      id: ConfigRouter.addListStruck,
-      title: 'Đăng ký xe',
-      type: 'item',
-      url: ConfigRouter.addListStruck,
-      icon: icons.FormOutlined,
-      breadcrumbs: false
-    }
+    // {
+    //   id: ConfigRouter.addListStruck,
+    //   title: 'Đăng ký xe',
+    //   type: 'item',
+    //   url: ConfigRouter.addListStruck,
+    //   icon: icons.FormOutlined,
+    //   breadcrumbs: false
+    // }
   ]
 };
 

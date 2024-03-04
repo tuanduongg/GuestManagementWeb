@@ -9,4 +9,5 @@ export const RouterAPI = {
   updateGuestInfo: 'guest-info/update',
   deleteGuestInfo: 'guest-info/delete',
   checkRole: 'role/check',
+  changeStatusGuest: 'guest/change-status',
 };

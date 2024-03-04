@@ -29,17 +29,13 @@ const MainRoutes = {
       path: ConfigRouter.listGuest,
       element: <ListGuest />
     },
-    {
-      path: ConfigRouter.addListStruck,
-      element: <CarRegister />
-    },
+    // {
+    //   path: ConfigRouter.addListStruck,
+    //   element: <CarRegister />
+    // },
     {
       path: ConfigRouter.user,
       element: <Account />
-    },
-    {
-      path: 'sample-page',
-      element: <SamplePage />
     }
     // {
     //   path: 'dashboard',

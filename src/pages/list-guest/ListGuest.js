@@ -9,6 +9,7 @@ import {
   formatHourMinus,
   generateRandomVNLicensePlate,
   getColorChipStatus,
+  getDataUserFromLocal,
   listNameStatus,
   statusName
 } from 'utils/helper';
@@ -21,7 +22,7 @@ import ModalAddGuest from 'components/modal/modal-add-guest/ModalAddGuest';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import config from 'config';
-import { concatGuestInfo, filterName, optionsSelect } from './list-guest.service';
+import { concatGuestInfo, filterName, initialFilterStatus, optionsSelect } from './list-guest.service';
 import ForbidenPage from 'components/403/ForbidenPage';
 const today = dayjs(); // Get the current date using dayjs
 
@@ -33,6 +34,7 @@ const ListGuest = () => {
   const [dataSelect, setDataSelect] = useState({});
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [dateSelect, setDateSelect] = useState([today]);
+  const [dataUser, setDateUser] = useState(getDataUserFromLocal());
   const [role, setRole] = useState(null);
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -86,6 +88,19 @@ const ListGuest = () => {
       type: 'warning',
       content: 'không có dữ liệu!'
     });
+  };
+  const onAccept = async (GUEST_ID) => {
+    if (GUEST_ID) {
+      const rest = await restApi.post(RouterAPI.changeStatusGuest, { GUEST_ID });
+      if (rest?.status === 200) {
+        getData();
+      } else {
+        messageApi.open({
+          type: 'warning',
+          content: rest?.data?.message ?? 'Cannot accept!'
+        });
+      }
+    }
   };
   const columns = [
     {
@@ -200,7 +215,7 @@ const ListGuest = () => {
       filters: listNameStatus() ?? [],
       filterMode: 'tree',
       filterSearch: true,
-      defaultFilteredValue: [statusName.NEW],
+      defaultFilteredValue: initialFilterStatus(dataUser?.role?.ROLE_NAME),
       onFilter: (value, record) => record?.STATUS === value
     },
     {
@@ -208,28 +223,26 @@ const ListGuest = () => {
       align: 'center',
       title: 'Duyệt',
       fixed: 'right',
-      render: (_, data) => (
-        <>
-          {data?.STATUS === statusName.NEW && (
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              {/* <Button
-              type="link"
-              icon={<EditOutlined />}
-              onClick={() => {
-                alert('edit');
-              }}
-            /> */}
-              <Button
-                type="link"
-                icon={<CheckOutlined />}
-                onClick={() => {
-                  alert('edit');
-                }}
-              />
-            </div>
-          )}
-        </>
-      ),
+      render: (_, data) => {
+        if (
+          (role?.IS_ACCEPT && data?.STATUS === statusName.NEW && dataUser?.role?.ROLE_NAME === 'ADMIN') ||
+          (role?.IS_ACCEPT && data?.STATUS === statusName.ACCEPT && dataUser?.role?.ROLE_NAME === 'SECURITY')
+        ) {
+          return (
+            <>
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <Button
+                  type="link"
+                  icon={<CheckOutlined />}
+                  onClick={() => {
+                    onAccept(data?.GUEST_ID);
+                  }}
+                />
+              </div>
+            </>
+          );
+        }
+      },
       width: isMobile ? 60 : '6%'
     }
   ];
@@ -314,14 +327,18 @@ const ListGuest = () => {
             options={optionsSelect}
           /> */}
           <div style={{ display: 'flex', justifyContent: 'end', width: isMobile ? '100%' : '' }}>
-            <Button onClick={handleClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
-              Đăng ký
-            </Button>
-            <Popconfirm onConfirm={handleDelete} title="Thông báo" description="Bạn chắc chắn muốn xoá?" okText="Có" cancelText="đóng">
-              <Button disabled={selectedRowKeys?.length === 0} danger icon={<DeleteOutlined />} type="primary">
-                Xoá
+            {role?.IS_CREATE && (
+              <Button onClick={handleClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
+                Đăng ký
               </Button>
-            </Popconfirm>
+            )}
+            {role?.IS_DELETE && (
+              <Popconfirm onConfirm={handleDelete} title="Thông báo" description="Bạn chắc chắn muốn xoá?" okText="Có" cancelText="đóng">
+                <Button disabled={selectedRowKeys?.length === 0} danger icon={<DeleteOutlined />} type="primary">
+                  Xoá
+                </Button>
+              </Popconfirm>
+            )}
           </div>
         </Flex>
       </Row>
@@ -342,7 +359,13 @@ const ListGuest = () => {
         dataSource={tableData}
         pagination={false}
       ></Table>
-      <ModalInfoGuest dataSelect={dataSelect} onClickEdit={onClickEditOnModal} open={openModalInfo} handleClose={handleCloseModalInfo} />
+      <ModalInfoGuest
+        role={role}
+        dataSelect={dataSelect}
+        onClickEdit={onClickEditOnModal}
+        open={openModalInfo}
+        handleClose={handleCloseModalInfo}
+      />
       <ModalAddGuest
         typeModal={typeModalAdd}
         afterSave={onAfterSave}

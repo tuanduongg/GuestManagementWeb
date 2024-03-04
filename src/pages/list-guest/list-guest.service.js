@@ -39,3 +39,17 @@ export const filterName = (tableData) => {
   }
   return [];
 };
+export const initialFilterStatus = (role) => {
+  if (role) {
+    switch (role) {
+      case 'ADMIN':
+        return [statusName.NEW];
+      case 'SECURITY':
+        return [statusName.ACCEPT];
+
+      default:
+        return [];
+    }
+  }
+  return [];
+};
