@@ -1,7 +1,7 @@
 // import axios from 'axios';
 // import { ASSET_TOKEN } from './constant';
 import axios from 'axios';
-import { getCookie } from './helper';
+import { getCookie, getMenuAlias, logout } from './helper';
 
 const restApi = axios.create({
   baseURL: process.env.REACT_APP_URL_API // Thay thế bằng URL API thực tế của bạn
@@ -11,9 +11,11 @@ const restApi = axios.create({
 const assToken = getCookie('ASSET_TOKEN');
 restApi.interceptors.request.use(
   async (confi) => {
+    let menu = getMenuAlias();
     confi.headers = {
       Authorization: `Bearer ${assToken}`,
-      Accept: 'application/json'
+      Accept: 'application/json',
+      VIEWPAGE: menu
     };
     return confi;
   },

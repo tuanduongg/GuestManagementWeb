@@ -10,7 +10,7 @@ const config = {
   presetColor: 'default',
   themeDirection: 'ltr',
   dateFormat: 'DD/MM/YYYY',
-  hourFormat: 'HH:mm',
+  hourFormat: 'HH:mm'
 };
 
 export default config;

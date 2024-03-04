@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import { Table, Row, Col, Typography, App, Empty, Button, Flex } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Table, Row, Col, Typography, App, Empty, Button, Flex, Result } from 'antd';
 import { formatDateFromDB, generateRandomVNLicensePlate, getColorChipStatus, listNameStatus, statusName } from 'utils/helper';
 const { Title } = Typography;
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import ModalInfoStruck from 'components/modal/modal-info-struck/ModalInfoStruck';
+import { RouterAPI } from 'utils/routerAPI';
+import restApi from 'utils/restAPI';
+import ForbidenPage from 'components/403/ForbidenPage';
 
 const data = [];
 for (let i = 0; i < 100; i++) {
@@ -19,17 +22,26 @@ for (let i = 0; i < 100; i++) {
   });
 }
 
-
-
 const CarRegister = () => {
   const [tableData, setTableData] = useState(data ?? []);
   const [openModal, setOpenModal] = useState(false);
   const [dataSelect, setDataSelect] = useState({});
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [role, setRole] = useState(null);
 
   const handleCloseModal = () => {
     setOpenModal(false);
   };
+
+  const checkRole = async () => {
+    const rest = await restApi.get(RouterAPI.checkRole);
+    if (rest?.status === 200) {
+      setRole(rest?.data);
+    }
+  };
+  useEffect(() => {
+    checkRole();
+  }, []);
 
   const columns = [
     {
@@ -127,9 +139,11 @@ const CarRegister = () => {
     }
   ];
   const onSelectChange = (newSelectedRowKeys) => {
-    console.log('selectedRowKeys changed: ', newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
   };
+  if (!role) {
+    return <ForbidenPage />;
+  }
   return (
     <>
       <Row>

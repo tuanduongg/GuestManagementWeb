@@ -4,6 +4,7 @@ import { FieldTimeOutlined } from '@ant-design/icons';
 import { ConfigRouter } from 'config_router';
 import dayjs from 'dayjs';
 import config from 'config';
+import { ConfigMenuAlias } from 'ConfigMenuAlias';
 
 export function generateRandomVNLicensePlate() {
   // Mã tỉnh/thành phố
@@ -398,3 +399,15 @@ export const formatHourMinus = (date) => {
   }
   return '';
 };
+export const getMenuAlias = () => {
+  const currentPath = window.location.pathname;
+  const menu = ConfigMenuAlias.find((item) => {
+    if (currentPath.length > item.path.length) {
+      let path = currentPath.slice(0, -1);
+      return path === item.path;
+    } else {
+      return currentPath === item.path;
+    }
+  })
+  return menu?.alias ?? '';
+}

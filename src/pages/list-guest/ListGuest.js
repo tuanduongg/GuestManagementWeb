@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Row, Col, Typography, App, Popconfirm, Button, Flex, DatePicker, message } from 'antd';
+import { Table, Row, Col, Typography, App, Popconfirm, Button, Flex, DatePicker, message, Result } from 'antd';
 import { isMobile } from 'react-device-detect';
 
 import {
@@ -22,6 +22,7 @@ import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import config from 'config';
 import { concatGuestInfo, filterName, optionsSelect } from './list-guest.service';
+import ForbidenPage from 'components/403/ForbidenPage';
 const today = dayjs(); // Get the current date using dayjs
 
 const ListGuest = () => {
@@ -32,8 +33,8 @@ const ListGuest = () => {
   const [dataSelect, setDataSelect] = useState({});
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [dateSelect, setDateSelect] = useState([today]);
+  const [role, setRole] = useState(null);
   const [messageApi, contextHolder] = message.useMessage();
-  const [selectData, setSelectData] = message.useMessage([statusName.NOT_IN]);
 
   const handleCloseModalInfo = () => {
     setOpenModalInfo(false);
@@ -50,6 +51,15 @@ const ListGuest = () => {
       setTableData(rest?.data);
     }
   };
+  const checkRole = async () => {
+    const rest = await restApi.get(RouterAPI.checkRole);
+    if (rest?.status === 200) {
+      setRole(rest?.data);
+    }
+  };
+  useEffect(() => {
+    checkRole();
+  }, []);
   useEffect(() => {
     getData();
   }, [dateSelect]);
@@ -95,15 +105,6 @@ const ListGuest = () => {
           >
             {concatGuestInfo(data?.guest_info)}
           </Link>
-          {/* <Button
-            type="link"
-            onClick={() => {
-              setDataSelect(data);
-              setOpenModalInfo(true);
-            }}
-          >
-            {concatGuestInfo(data?.guest_info)}
-          </Button> */}
         </>
       ),
       filters: filterName(tableData),
@@ -207,24 +208,26 @@ const ListGuest = () => {
       align: 'center',
       title: 'Duyệt',
       fixed: 'right',
-      render: (_, { data }) => (
+      render: (_, data) => (
         <>
-          <div style={{ display: 'flex' }}>
-            {/* <Button
+          {data?.STATUS === statusName.NEW && (
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              {/* <Button
               type="link"
               icon={<EditOutlined />}
               onClick={() => {
                 alert('edit');
               }}
             /> */}
-            <Button
-              type="link"
-              icon={<CheckOutlined />}
-              onClick={() => {
-                alert('edit');
-              }}
-            />
-          </div>
+              <Button
+                type="link"
+                icon={<CheckOutlined />}
+                onClick={() => {
+                  alert('edit');
+                }}
+              />
+            </div>
+          )}
         </>
       ),
       width: isMobile ? 60 : '6%'
@@ -247,11 +250,12 @@ const ListGuest = () => {
 
   const onAfterSave = (rest) => {
     if (rest?.status === 200) {
-      handleCloseModalAdd();
+      let text = typeModalAdd === 'EDIT' ? 'Cập nhật thông tin thành công!' : 'Thêm mới thành công!';
       messageApi.open({
         type: 'success',
-        content: 'Thêm mới thành công!'
+        content: text
       });
+      handleCloseModalAdd();
       getData();
     } else {
       messageApi.open({
@@ -261,10 +265,8 @@ const ListGuest = () => {
     }
   };
 
-  const handleChangeStatus = (value) => {};
   const handleDelete = async () => {
     const rest = await restApi.post(RouterAPI.deleteGuest, { data: selectedRowKeys });
-    console.log('rest', rest);
     if (rest?.status === 200) {
       messageApi.open({
         type: 'success',
@@ -278,7 +280,9 @@ const ListGuest = () => {
       });
     }
   };
-
+  if (!role) {
+    return <ForbidenPage />;
+  }
   return (
     <>
       {contextHolder}

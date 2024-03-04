@@ -7,6 +7,7 @@ import { formatDateFromDB, formatHourMinus, getColorChipStatus, isMobile } from 
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import { concatDateString } from './modal_info_guest.service';
+import config from 'config';
 
 const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit }) => {
   const [widthBoxImage, setWidthBoxImage] = useState(100);
@@ -122,7 +123,9 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit }) => {
               <Text>{dataSelect?.TIME_OUT ? formatHourMinus(dataSelect?.TIME_OUT) : ''}</Text>
             </Flex>
             <Flex direction="row">
-              <Text className="title-name-custom">Ngày:</Text>
+              <Text className="title-name-custom" style={{ minWidth: '40px' }}>
+                Ngày:
+              </Text>
               <Text>{dataSelect?.guest_date ? concatDateString(dataSelect?.guest_date) : 'Chưa cập nhật'}</Text>
             </Flex>
           </Col>

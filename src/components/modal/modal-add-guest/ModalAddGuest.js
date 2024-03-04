@@ -25,7 +25,7 @@ const tagInputStyle = {
   marginInlineEnd: 8,
   verticalAlign: 'top'
 };
-const initialValiateName = { FULL_NAME: '', NAME_ID: '' };
+const initialValiateName = { FULL_NAME: '', NAME_ID: '', isShow: true };
 const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) => {
   const [disabled, setDisabled] = useState(true);
   const [arrInputName, setArrInputName] = useState([initInputName]);
@@ -76,7 +76,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
           return {
             NAME_ID: item?.NAME_ID,
             FULL_NAME: item?.FULL_NAME,
-            ERROR: false
+            isShow: true
           };
         })
       );
@@ -89,7 +89,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
       setDepartment(dataSelect?.DEPARTMENT);
       setDate(
         dataSelect?.guest_date?.map((item) => {
-          return dayjs(item.DATE);
+          return dayjs(item.DATE, config.dateFormat);
         })
       );
     }
@@ -104,36 +104,10 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
     color: errorEditTag ? 'red' : '',
     borderColor: errorEditTag ? 'red' : ''
   };
-  const handleClearTag = (index, tagProp) => {
-    if (typeModal === 'EDIT') {
-      const arrNew = [...names];
-      setNames(arrNew);
-      Modal.confirm({
-        title: 'Thông báo',
-        content: 'Bạn chắc chắn muốn xoá?',
-        okText: 'Yes',
-        cancelText: 'No',
-        centered: true,
-        onOk: async () => {
-          const rest = await restApi.post(RouterAPI.deleteGuestInfo, {
-            NAME_ID: tagProp?.NAME_ID
-          });
-          if (rest?.status !== 200) {
-            alert('Delete Fail!');
-          } else {
-            const newTags = names.filter((tag, i) => index !== i);
-            setNames(newTags);
-          }
-          console.log('rest', rest);
-        }
-      });
-    } else {
-      const newTags = names.filter((tag, i) => index !== i);
-      setNames(newTags);
-    }
-  };
   const handleSaveGuest = async () => {
+    let url = typeModal === 'EDIT' ? RouterAPI.updateGuest : RouterAPI.addGuest;
     const data = {
+      id: dataSelect?.GUEST_ID,
       company,
       carNumber,
       personSeowon,
@@ -142,13 +116,9 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
       timeIn,
       timeOut,
       date: formatArrDate(date),
-      names: names.map((item) => {
-        if (item?.FULL_NAME?.trim() !== '') {
-          return item.FULL_NAME;
-        }
-      })
+      names
     };
-    const rest = await restApi.post(RouterAPI.addGuest, data);
+    const rest = await restApi.post(url, data);
     afterSave(rest);
   };
   const draggleRef = useRef(null);
@@ -361,18 +331,21 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
     const { value } = e.target;
     const updatedNames = names.map((item, idx) => {
       if (idx === index) {
-        return { ...item, FULL_NAME: value, ERROR: false };
+        return { ...item, FULL_NAME: value };
       }
       return item;
     });
     setNames(updatedNames);
   };
   const onClearInput = (index) => {
-    const data = [...names];
-    data.splice(index, 1);
-    setNames(data);
+    const updatedNames = names.map((item, idx) => {
+      if (idx === index) {
+        return { ...item, isShow: false };
+      }
+      return item;
+    });
+    setNames(updatedNames);
   };
-
   return (
     <>
       {contextHolder}
@@ -437,32 +410,37 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
             </p>
           </Col>
 
-          {names?.map((item, index) => (
-            <Col key={index} span={isMobile ? 24 : 12} style={{ marginTop: '5px' }}>
-              <div style={{ display: 'flex' }}>
-                <Input
-                  name="carNumber"
-                  value={names[index]?.FULL_NAME}
-                  onChange={(e) => {
-                    onChangeInputName(e, index);
-                  }}
-                  placeholder="Nhập tên khách..."
-                />
-                <Popconfirm
-                  title="Thông báo"
-                  description="Bạn chắc chắn muốn xoá?"
-                  onConfirm={() => {
-                    onClearInput(index);
-                  }}
-                  okText="Có"
-                  cancelText="Đóng"
-                  placement="left"
-                >
-                  <Button disabled={names?.length === 1} danger icon={<DeleteOutlined />} type="link"></Button>
-                </Popconfirm>
-              </div>
-            </Col>
-          ))}
+          {names?.map((item, index) => {
+            if (item?.isShow) {
+              return (
+                <Col key={index} span={isMobile ? 24 : 12} style={{ marginTop: '5px' }}>
+                  <div style={{ display: 'flex' }}>
+                    <Input
+                      name="carNumber"
+                      value={names[index]?.FULL_NAME}
+                      onChange={(e) => {
+                        onChangeInputName(e, index);
+                      }}
+                      placeholder="Nhập tên khách..."
+                    />
+                    <Popconfirm
+                      title="Thông báo"
+                      description="Bạn chắc chắn muốn xoá?"
+                      onConfirm={() => {
+                        onClearInput(index);
+                      }}
+                      okText="Có"
+                      cancelText="Đóng"
+                      placement="left"
+                    >
+                      <Button disabled={names?.length === 1} danger icon={<DeleteOutlined />} type="link"></Button>
+                    </Popconfirm>
+                  </div>
+                </Col>
+              );
+            }
+            return null;
+          })}
           <Col xs={24} style={{ textAlign: 'right' }}>
             <Button
               type="link"
@@ -470,10 +448,8 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
                 const data = names.map((item) => {
                   return { ...item };
                 });
-                console.log('data', data);
                 data.push(initialValiateName);
                 setNames(data);
-                // setNames([...names, initialValiateName]);
               }}
             >
               Thêm
