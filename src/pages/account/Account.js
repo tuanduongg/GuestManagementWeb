@@ -74,6 +74,27 @@ const Account = () => {
       render: (_, { created_at }) => <>{formatDateFromDB(created_at)}</>
     }
   ];
+
+  const onClickBlock = () => {
+    console.log('vaooo');
+    browserNotification('title', 'this is my body');
+  };
+  const browserNotification = (title, body, options) => {
+    // Kiểm tra xem trình duyệt có hỗ trợ Notification không
+    if ('Notification' in window) {
+      // Hỏi người dùng cho phép hiển thị thông báo
+      Notification.requestPermission().then(function (permission) {
+        if (permission === 'granted') {
+          // Tạo một thông báo
+          var notification = new Notification('Thông báo từ localhost', {
+            body: 'Đây là một thông báo từ localhost.'
+          });
+        }
+      });
+    } else {
+      alert('Trình duyệt của bạn không hỗ trợ Notification.');
+    }
+  };
   const onCloseModal = () => {
     setOpenModal(false);
   };
@@ -98,7 +119,7 @@ const Account = () => {
             >
               Thêm mới
             </Button>
-            <Button danger icon={<DeleteOutlined />} type="primary">
+            <Button danger onClick={onClickBlock} icon={<DeleteOutlined />} type="primary">
               Block
             </Button>
           </div>
