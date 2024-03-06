@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Row, Col, Typography, App, Popconfirm, Button, Flex, DatePicker, message, Result } from 'antd';
-import { isMobile } from 'react-device-detect';
-
+import io from 'socket.io-client';
 import {
   formatArrDate,
   formatDateDayjs,
@@ -10,6 +9,7 @@ import {
   generateRandomVNLicensePlate,
   getColorChipStatus,
   getDataUserFromLocal,
+  isMobile,
   listNameStatus,
   statusName
 } from 'utils/helper';
@@ -24,7 +24,12 @@ import { RouterAPI } from 'utils/routerAPI';
 import config from 'config';
 import { concatGuestInfo, filterName, initialFilterStatus, optionsSelect } from './list-guest.service';
 import ForbidenPage from 'components/403/ForbidenPage';
+import ICON from '../../assets/images/logo/favilogo.png';
+
 const today = dayjs(); // Get the current date using dayjs
+let urlSocket = process.env.REACT_APP_URL_SOCKET;
+const socket = io(urlSocket);
+console.log('socket:', socket);
 
 const ListGuest = () => {
   const [tableData, setTableData] = useState([]);
@@ -63,8 +68,42 @@ const ListGuest = () => {
     checkRole();
   }, []);
   useEffect(() => {
-    getData();
+    if (dataSelect) {
+      getData();
+    }
   }, [dateSelect]);
+
+  useEffect(() => {
+    if (role) {
+      socket.on('newguest', (data) => {
+        if (data) {
+          //nếu là người duyệt(quyền duyệt,không là người tạo)
+          if (dataUser?.username !== data?.CREATE_BY && dataUser?.role?.ROLE_NAME !== 'SECURITY' && role?.IS_ACCEPT) {
+            if (Notification.permission === 'granted') {
+              var notification = new Notification('Đăng ký khách mới', {
+                icon: ICON,
+                body: `- ${formatHourMinus(data?.TIME_IN)}-${formatHourMinus(data?.TIME_OUT)}\n- ${concatGuestInfo(data?.guest_info)}\n- ${data?.PERSON_SEOWON}`
+              });
+              notification.onclick = function () {
+                window.open(process.env.REACT_APP_URL);
+              };
+            } else {
+              Notification.requestPermission();
+            }
+            getData();
+          }
+        }
+      });
+      socket.on('acceptguest', (data) => {
+        getData();
+      });
+
+      return () => {
+        socket.off('newguest');
+        socket.off('acceptguest');
+      };
+    }
+  }, [role]);
 
   const onClickEditOnModal = (DATA) => {
     setTypeModalAdd('EDIT');
@@ -93,7 +132,7 @@ const ListGuest = () => {
     if (GUEST_ID) {
       const rest = await restApi.post(RouterAPI.changeStatusGuest, { GUEST_ID });
       if (rest?.status === 200) {
-        getData();
+        // getData();
       } else {
         messageApi.open({
           type: 'warning',
@@ -108,7 +147,7 @@ const ListGuest = () => {
       key: 'guest_info',
       title: 'Tên khách',
       dataIndex: 'guest_info',
-      width: isMobile ? 150 : '19%',
+      width: isMobile() ? 150 : '19%',
       fixed: 'left',
 
       render: (_, data) => (
@@ -144,7 +183,7 @@ const ListGuest = () => {
       key: 'COMPANY',
       title: 'Công ty',
       dataIndex: 'COMPANY',
-      width: isMobile ? 130 : '11%',
+      width: isMobile() ? 130 : '11%',
       filters: tableData
         ? tableData.map((item) => {
             return {
@@ -166,7 +205,7 @@ const ListGuest = () => {
       title: 'Biển số',
       dataIndex: 'CAR_NUMBER',
       align: 'center',
-      width: isMobile ? 130 : '11%',
+      width: isMobile() ? 130 : '11%',
       filters: tableData
         ? tableData.map((item) => {
             return {
@@ -189,7 +228,7 @@ const ListGuest = () => {
       dataIndex: 'TIME_IN',
       align: 'center',
       render: (_, { TIME_IN }) => <>{formatHourMinus(TIME_IN)}</>,
-      width: isMobile ? 100 : '9%'
+      width: isMobile() ? 100 : '9%'
     },
     {
       key: 'TIME_OUT',
@@ -197,13 +236,13 @@ const ListGuest = () => {
       dataIndex: 'TIME_OUT',
       align: 'center',
       render: (_, { TIME_OUT }) => <>{formatHourMinus(TIME_OUT)}</>,
-      width: isMobile ? 100 : '9%'
+      width: isMobile() ? 100 : '9%'
     },
     {
       key: 'PERSON_SEOWON',
       title: 'Người bảo lãnh',
       dataIndex: 'PERSON_SEOWON',
-      width: isMobile ? 150 : '15%'
+      width: isMobile() ? 150 : '15%'
     },
     {
       key: 'STATUS',
@@ -211,7 +250,7 @@ const ListGuest = () => {
       title: 'Trạng thái',
       dataIndex: 'STATUS',
       render: (_, { STATUS, TIME_IN }) => <>{getColorChipStatus(STATUS, TIME_IN)}</>,
-      width: isMobile ? 100 : '11%',
+      width: isMobile() ? 100 : '11%',
       filters: listNameStatus() ?? [],
       filterMode: 'tree',
       filterSearch: true,
@@ -243,7 +282,7 @@ const ListGuest = () => {
           );
         }
       },
-      width: isMobile ? 60 : '6%'
+      width: isMobile() ? 60 : '6%'
     }
   ];
   const onSelectChange = (newSelectedRowKeys) => {
@@ -263,7 +302,7 @@ const ListGuest = () => {
 
   const onAfterSave = (rest) => {
     if (rest?.status === 200) {
-      let text = typeModalAdd === 'EDIT' ? 'Cập nhật thông tin thành công!' : 'Thêm mới thành công!';
+      let text = typeModalAdd === 'EDIT' ? 'Cập nhật thông tin thành công!' : 'Đăng ký thành công!';
       messageApi.open({
         type: 'success',
         content: text
@@ -309,8 +348,8 @@ const ListGuest = () => {
           <DatePicker
             className="date-picker-custom"
             multiple
-            maxTagCount={isMobile ? 2 : 1}
-            style={{ width: isMobile ? '100%' : '200px' }}
+            maxTagCount={isMobile() ? 2 : 1}
+            style={{ width: isMobile() ? '100%' : '200px' }}
             allowClear={false}
             format={config.dateFormat}
             value={dateSelect}
@@ -326,7 +365,7 @@ const ListGuest = () => {
             onChange={handleChangeStatus}
             options={optionsSelect}
           /> */}
-          <div style={{ display: 'flex', justifyContent: 'end', width: isMobile ? '100%' : '' }}>
+          <div style={{ display: 'flex', justifyContent: 'end', width: isMobile() ? '100%' : '' }}>
             {role?.IS_CREATE && (
               <Button onClick={handleClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
                 Đăng ký

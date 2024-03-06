@@ -9,9 +9,8 @@ const { TextArea } = Input;
 import { PlusOutlined, InfoCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
-import { formatArrDate } from 'utils/helper';
+import { formatArrDate, isMobile } from 'utils/helper';
 import config from 'config';
-import { isMobile } from 'react-device-detect';
 const initInputName = {
   value: '',
   error: false,
@@ -36,7 +35,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
     bottom: 0,
     right: 0
   });
-  const [names, setNames] = useState(isMobile ? [initialValiateName] : [initialValiateName, initialValiateName]);
+  const [names, setNames] = useState(isMobile() ? [initialValiateName] : [initialValiateName, initialValiateName]);
   const [errorEditTag, setErrorEditTag] = useState(false);
 
   const [timeIn, setTimeIn] = useState(defaultValueTime);
@@ -199,7 +198,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
     setErrorDepartment(false);
     setErrReason(false);
 
-    setNames(isMobile ? [initialValiateName] : [initialValiateName, initialValiateName]);
+    setNames(isMobile() ? [initialValiateName] : [initialValiateName, initialValiateName]);
     setTimeIn(defaultValueTime);
     setTimeOut(defaultValueTime);
     setDate(defaultValueDate);
@@ -413,7 +412,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
           {names?.map((item, index) => {
             if (item?.isShow) {
               return (
-                <Col key={index} span={isMobile ? 24 : 12} style={{ marginTop: '5px' }}>
+                <Col key={index} span={isMobile() ? 24 : 12} style={{ marginTop: '5px' }}>
                   <div style={{ display: 'flex' }}>
                     <Input
                       name="carNumber"
