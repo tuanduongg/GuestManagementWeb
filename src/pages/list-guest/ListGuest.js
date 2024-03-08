@@ -79,17 +79,17 @@ const ListGuest = () => {
         if (data) {
           //nếu là người duyệt(quyền duyệt,không là người tạo)
           if (dataUser?.username !== data?.CREATE_BY && dataUser?.role?.ROLE_NAME !== 'SECURITY' && role?.IS_ACCEPT) {
-            if (Notification.permission === 'granted') {
-              var notification = new Notification('Đăng ký khách mới', {
-                icon: ICON,
-                body: `- ${formatHourMinus(data?.TIME_IN)}-${formatHourMinus(data?.TIME_OUT)}\n- ${concatGuestInfo(data?.guest_info)}\n- ${data?.PERSON_SEOWON}`
-              });
-              notification.onclick = function () {
-                window.open(process.env.REACT_APP_URL);
-              };
-            } else {
-              Notification.requestPermission();
-            }
+            // if (Notification.permission === 'granted') {
+            //   var notification = new Notification('Đăng ký khách mới', {
+            //     icon: ICON,
+            //     body: `- ${formatHourMinus(data?.TIME_IN)}-${formatHourMinus(data?.TIME_OUT)}\n- ${concatGuestInfo(data?.guest_info)}\n- ${data?.PERSON_SEOWON}`
+            //   });
+            //   notification.onclick = function () {
+            //     window.open(process.env.REACT_APP_URL);
+            //   };
+            // } else {
+            //   Notification.requestPermission();
+            // }
             getData();
           }
         }
@@ -348,8 +348,8 @@ const ListGuest = () => {
           <DatePicker
             className="date-picker-custom"
             multiple
-            maxTagCount={isMobile() ? 2 : 1}
-            style={{ width: isMobile() ? '100%' : '200px' }}
+            maxTagCount={1}
+            style={{ width: '205px' }}
             allowClear={false}
             format={config.dateFormat}
             value={dateSelect}
@@ -365,7 +365,7 @@ const ListGuest = () => {
             onChange={handleChangeStatus}
             options={optionsSelect}
           /> */}
-          <div style={{ display: 'flex', justifyContent: 'end', width: isMobile() ? '100%' : '' }}>
+          <div style={{ display: 'flex', justifyContent: 'end' }}>
             {role?.IS_CREATE && (
               <Button onClick={handleClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
                 Đăng ký
@@ -374,7 +374,7 @@ const ListGuest = () => {
             {role?.IS_DELETE && (
               <Popconfirm onConfirm={handleDelete} title="Thông báo" description="Bạn chắc chắn muốn xoá?" okText="Có" cancelText="đóng">
                 <Button disabled={selectedRowKeys?.length === 0} danger icon={<DeleteOutlined />} type="primary">
-                  Xoá
+                  {isMobile() ? '' : 'Xoá'}
                 </Button>
               </Popconfirm>
             )}
