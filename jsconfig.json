@@ -4,6 +4,6 @@
     "module": "esnext",
     "baseUrl": "src"
   },
-  "include": ["src/**/*", "public/service-worker.js"],
+  "include": ["src/**/*", "service-worker.js"],
   "exclude": ["node_modules"]
 }

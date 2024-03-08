@@ -1,6 +1,8 @@
 export const RouterAPI = {
   login: 'auth/login',
   profile: 'auth/profile',
+  notifi_subscribe: 'notification/subscription',
+
   addGuest: 'guest/add',
   updateGuest: 'guest/update',
   deleteGuest: 'guest/delete',
@@ -9,5 +11,5 @@ export const RouterAPI = {
   updateGuestInfo: 'guest-info/update',
   deleteGuestInfo: 'guest-info/delete',
   checkRole: 'role/check',
-  changeStatusGuest: 'guest/change-status',
+  changeStatusGuest: 'guest/change-status'
 };

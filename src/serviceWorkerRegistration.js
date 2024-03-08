@@ -19,10 +19,12 @@ const isLocalhost = Boolean(
 );
 
 export function register(config) {
+  console.log('navigator', navigator);
   if ('serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href);
     if (publicUrl.origin !== window.location.origin) {
+      console.log('tesst');
       // Our service worker won't work if PUBLIC_URL is on a different origin
       // from what our page is served on. This might happen if a CDN is used to
       // serve assets; see https://github.com/facebook/create-react-app/issues/2374
@@ -31,9 +33,7 @@ export function register(config) {
 
     window.addEventListener('load', () => {
       const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
-      console.log('url', swUrl);
       console.log('isLocalhost', isLocalhost);
-
       if (isLocalhost) {
         // This is running on localhost. Let's check if a service worker still exists or not.
         checkValidServiceWorker(swUrl, config);
@@ -48,11 +48,12 @@ export function register(config) {
         registerValidSW(swUrl, config);
       }
     });
+  } else {
+    console.error('Service workers are not supported.');
   }
 }
 
 function registerValidSW(swUrl, config) {
-  console.log('vaooo registerValidSW')
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {
@@ -105,9 +106,7 @@ function checkValidServiceWorker(swUrl, config) {
       console.log('response', response);
       // Ensure service worker exists, and that we really are getting a JS file.
       const contentType = response.headers.get('content-type');
-      console.log('contentType', contentType);
       if (response.status === 404 || (contentType != null && contentType.indexOf('javascript') === -1)) {
-        console.log('vao iff')
         // No service worker found. Probably a different app. Reload the page.
         navigator.serviceWorker.ready.then((registration) => {
           registration.unregister().then(() => {
@@ -115,7 +114,6 @@ function checkValidServiceWorker(swUrl, config) {
           });
         });
       } else {
-        console.log('vao else')
         // Service worker found. Proceed as normal.
         registerValidSW(swUrl, config);
       }
