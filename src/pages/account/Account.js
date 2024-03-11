@@ -1,38 +1,43 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Row, Col, Typography, App, Empty, Button, Flex, DatePicker } from 'antd';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { ROLE_ACC, STATUS_ACC, formatDateFromDB, getChipStatusAcc } from 'utils/helper';
 import ModalAccount from 'components/modal/modal-account/ModalAccount';
+import restApi from 'utils/restAPI';
+import { RouterAPI } from 'utils/routerAPI';
+import ForbidenPage from 'components/403/ForbidenPage';
 const { Title } = Typography;
 
-const data = [];
-for (let i = 0; i < 100; i++) {
-  data.push({
-    stt: i + 1,
-    username: 'username ' + i,
-    created_at: '2024-02-29T06:33:07.000Z',
-    role: Object.values(ROLE_ACC)[Math.floor(Math.random() * 3)],
-    status: Object.values(STATUS_ACC)[Math.floor(Math.random() * 2)]
-  });
-}
-
 const Account = () => {
-  const [tableData, setTableData] = useState(data ?? []);
+  const [tableData, setTableData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [typeModal, setTypeModal] = useState('');
+  const [dataSelect, setDataSelect] = useState(null);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [role, setRole] = useState(null);
+
+  const handleClickEdit = (data) => {
+    setDataSelect(data);
+    setTypeModal('EDIT');
+    setOpenModal(true);
+  };
   const columns = [
     {
       align: 'center',
       key: 'stt',
       title: 'STT',
       dataIndex: 'stt',
-      width: 70
+      width: 70,
+      render: (id, record, index) => {
+        ++index;
+        return index;
+      }
     },
     {
       align: 'left',
-      key: 'username',
+      key: 'USERNAME',
       title: 'Tên tài khoản',
-      dataIndex: 'username',
+      dataIndex: 'USERNAME',
       width: 130,
       fixed: 'left',
       render: (_, data) => (
@@ -40,64 +45,90 @@ const Account = () => {
           <Button
             type="link"
             onClick={() => {
-              setTypeModal('EDIT');
+              setDataSelect(data);
+              setTypeModal('VIEW');
               setOpenModal(true);
             }}
           >
-            {data?.username}
+            {data?.USERNAME}
           </Button>
         </>
       )
     },
 
     {
-      key: 'role',
+      key: 'ROLE_NAME',
       title: 'Quyền',
-      dataIndex: 'role',
+      render: (_, { role }) => <>{role.ROLE_NAME}</>,
       align: 'center',
       width: 130
     },
     {
-      key: 'status',
+      key: 'ACTIVE',
       align: 'center',
       title: 'Trạng thái',
-      dataIndex: 'status',
+      dataIndex: 'ACTIVE',
       width: 130,
-      render: (_, { status }) => <>{getChipStatusAcc(status)}</>
+      render: (_, { ACTIVE }) => <>{getChipStatusAcc(ACTIVE)}</>
     },
     {
-      key: 'created_at',
+      key: 'CREATE_AT',
       title: 'Ngày tạo',
-      dataIndex: 'created_at',
+      dataIndex: 'CREATE_AT',
       align: 'center',
       width: 130,
-      render: (_, { created_at }) => <>{formatDateFromDB(created_at)}</>
+      render: (_, { CREATE_AT }) => <>{formatDateFromDB(CREATE_AT)}</>
+    },
+    {
+      key: 'ACTION',
+      title: 'Hành động',
+      align: 'center',
+      width: 80,
+      hidden: role?.IS_UPDATE ? false : true,
+      render: (_, data) => (
+        <>
+          <Button
+            type="link"
+            onClick={() => {
+              handleClickEdit(data);
+            }}
+            icon={<EditOutlined />}
+          ></Button>
+        </>
+      )
     }
   ];
 
-  const onClickBlock = () => {
-    console.log('vaooo');
-    browserNotification('title', 'this is my body');
-  };
-  const browserNotification = (title, body, options) => {
-    // Kiểm tra xem trình duyệt có hỗ trợ Notification không
-    if ('Notification' in window) {
-      // Hỏi người dùng cho phép hiển thị thông báo
-      Notification.requestPermission().then(function (permission) {
-        if (permission === 'granted') {
-          // Tạo một thông báo
-          var notification = new Notification('Thông báo từ localhost', {
-            body: 'Đây là một thông báo từ localhost.'
-          });
-        }
-      });
-    } else {
-      alert('Trình duyệt của bạn không hỗ trợ Notification.');
+  const checkRole = async () => {
+    const rest = await restApi.get(RouterAPI.checkRole);
+    if (rest?.status === 200) {
+      setRole(rest?.data);
     }
   };
+
+  const getData = async () => {
+    const rest = await restApi.get(RouterAPI.userAll);
+    if (rest?.status === 200) {
+      setTableData(rest?.data);
+    }
+  };
+  useEffect(() => {
+    checkRole();
+    getData();
+  }, []);
+  const onClickBlock = () => {
+    console.log('vaooo');
+  };
   const onCloseModal = () => {
+    setDataSelect(null);
     setOpenModal(false);
   };
+  const onSelectChange = (newSelectedRowKeys) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+  if (!role) {
+    return <ForbidenPage />;
+  }
   return (
     <>
       <Row>
@@ -108,36 +139,45 @@ const Account = () => {
       <Row style={{ margin: '5px 0px 10px 0px' }}>
         <Flex gap="small" wrap="wrap" style={{ width: '100%' }} justify="end">
           <div>
-            <Button
-              style={{ marginRight: '5px' }}
-              onClick={() => {
-                setTypeModal('ADD');
-                setOpenModal(true);
-              }}
-              icon={<PlusOutlined />}
-              type="primary"
-            >
-              Thêm mới
-            </Button>
-            <Button danger onClick={onClickBlock} icon={<DeleteOutlined />} type="primary">
-              Block
-            </Button>
+            {role?.IS_CREATE && (
+              <Button
+                style={{ marginRight: '5px' }}
+                onClick={() => {
+                  setTypeModal('ADD');
+                  setOpenModal(true);
+                }}
+                icon={<PlusOutlined />}
+                type="primary"
+              >
+                Thêm mới
+              </Button>
+            )}
+            {role?.IS_UPDATE && (
+              <Button danger disabled={selectedRowKeys?.length === 0} onClick={onClickBlock} icon={<DeleteOutlined />} type="primary">
+                Block
+              </Button>
+            )}
           </div>
         </Flex>
       </Row>
       <Table
+        rowKey="USER_ID"
+        rowSelection={{
+          selectedRowKeys,
+          onChange: onSelectChange
+        }}
         bordered
         scroll={{
           x: 'max-content',
           y: '70vh'
         }}
-        columns={columns}
+        columns={columns.filter((item) => !item?.hidden)}
         dataSource={tableData}
         pagination={false}
       >
         {tableData?.length === 0 && <Empty />}
       </Table>
-      <ModalAccount typeModal={typeModal} open={openModal} handleClose={onCloseModal} />
+      <ModalAccount role={role} dataSelect={dataSelect} typeModal={typeModal} open={openModal} handleClose={onCloseModal} />
     </>
   );
 };

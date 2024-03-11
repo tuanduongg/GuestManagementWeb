@@ -119,6 +119,9 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
     };
     const rest = await restApi.post(url, data);
     afterSave(rest);
+    if(rest?.status === 200) {
+      handleCancel();
+    }
   };
   const draggleRef = useRef(null);
   const handleOk = (e) => {

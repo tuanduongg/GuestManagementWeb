@@ -10,8 +10,11 @@ import { ROLE_ACC, STATUS_ACC } from 'utils/helper';
 import './modal-account.css';
 
 const initialValidate = { error: false, message: '' };
-
-const ModalAccount = ({ open, handleClose, typeModal }) => {
+const optionStatus = [
+  { value: true, label: 'Active' },
+  { value: false, label: 'Block' }
+];
+const ModalAccount = ({ open, handleClose, typeModal, dataSelect }) => {
   const { modal } = App.useApp();
   const [disabled, setDisabled] = useState(true);
   const [bounds, setBounds] = useState({
@@ -27,7 +30,7 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
   const [password, setPassword] = useState('');
   const [validatePassword, setValidatePassword] = useState(initialValidate);
 
-  const [status, setStatus] = useState(STATUS_ACC.ACTIVE);
+  const [status, setStatus] = useState(true);
   const [validateStatus, setValidateStatus] = useState(initialValidate);
 
   const [role, setRole] = useState(ROLE_ACC.USER);
@@ -83,6 +86,14 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
       });
     }
   };
+
+  useEffect(() => {
+    if (open) {
+      setUsername(dataSelect?.USERNAME);
+      setRole(dataSelect?.role?.ROLE_NAME);
+      setStatus(dataSelect?.ACTIVE ? true : false);
+    }
+  }, [dataSelect]);
   const handleCancel = (e) => {
     setUsername('');
     setPassword('');
@@ -139,7 +150,7 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
     if (check) {
       Modal.confirm({
         title: `Thông báo`,
-        content: 'Dữ liệu chưa được lưu, bạn chắc chắn muốn đóng?',
+        content: 'Bạn chắc chắn muốn đóng?',
         okText: 'Yes',
         cancelText: 'No',
         centered: true,
@@ -179,7 +190,7 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
             onBlur={() => {}}
             // end
           >
-            {typeModal === 'EDIT' ? 'Thông tin tài khoản' : 'Thêm mới tài khoản'}
+            {typeModal === 'EDIT' ? 'Thông tin tài khoản' : typeModal === 'VIEW' ? 'Thông tin tài khoản' : 'Thêm mới tài khoản'}
           </div>
         }
         open={open}
@@ -197,6 +208,7 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
               Tên tài khoản(<span className="color-red">*</span>)
             </p>
             <Input
+              disabled={typeModal === 'VIEW'}
               value={username}
               name={'username'}
               status={validateUsername.error ? 'error' : ''}
@@ -210,6 +222,7 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
               Quyền(<span className="color-red">*</span>)
             </p>
             <Select
+              disabled={typeModal === 'VIEW'}
               value={role}
               style={{
                 width: '100%'
@@ -230,6 +243,7 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
               Trạng thái(<span className="color-red">*</span>)
             </p>
             <Select
+              disabled={typeModal === 'VIEW'}
               value={status}
               style={{
                 width: '100%'
@@ -237,31 +251,28 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
               onChange={(value) => {
                 setStatus(value);
               }}
-              options={Object.values(STATUS_ACC)?.map((item) => {
-                return {
-                  value: item,
-                  label: item
-                };
-              })}
+              options={optionStatus}
             />
           </Col>
-          <Col span={24}>
-            {typeModal === 'EDIT' ? (
-              <p className="custom-label-input">Đổi mật khẩu</p>
-            ) : (
-              <p className="custom-label-input">
-                Mật khẩu(<span className="color-red">*</span>)
-              </p>
-            )}
-            <Input
-              name="password"
-              value={password}
-              onChange={onChangeInput}
-              status={validatePassword.error ? 'error' : ''}
-              placeholder="Nhập mật khẩu..."
-            />
-            {validatePassword.error && <p className="message-err">(*){validatePassword.message}</p>}
-          </Col>
+          {typeModal !== 'VIEW' && (
+            <Col span={24}>
+              {typeModal === 'EDIT' ? (
+                <p className="custom-label-input">Đổi mật khẩu</p>
+              ) : (
+                <p className="custom-label-input">
+                  Mật khẩu(<span className="color-red">*</span>)
+                </p>
+              )}
+              <Input
+                name="password"
+                value={password}
+                onChange={onChangeInput}
+                status={validatePassword.error ? 'error' : ''}
+                placeholder="Nhập mật khẩu..."
+              />
+              {validatePassword.error && <p className="message-err">(*){validatePassword.message}</p>}
+            </Col>
+          )}
         </Row>
       </Modal>
     </>
