@@ -7,6 +7,22 @@ import config from 'config';
 import { ConfigMenuAlias } from 'ConfigMenuAlias';
 import restApi from './restAPI';
 import { RouterAPI } from './routerAPI';
+import { initializeApp } from 'firebase/app';
+import '@firebase/messaging';
+import { getMessaging, getToken } from 'firebase/messaging';
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyC3iYWOHZIiz2VGiuzS8ye6SQ7p0XQDR4c',
+  authDomain: 'push-message-seowon.firebaseapp.com',
+  databaseURL: 'https://push-message-seowon-default-rtdb.asia-southeast1.firebasedatabase.app',
+  projectId: 'push-message-seowon',
+  storageBucket: 'push-message-seowon.appspot.com',
+  messagingSenderId: '282049744676',
+  appId: '1:282049744676:web:da36cd0754756f4ac5edb1',
+  measurementId: 'G-SV1WK7XPN9'
+};
+
+const app = initializeApp(firebaseConfig);
 
 export function generateRandomVNLicensePlate() {
   // Mã tỉnh/thành phố
@@ -437,13 +453,41 @@ function urlBase64ToUint8Array(base64String) {
 export const registerPushNotification = async () => {
   const swRegistration = await navigator?.serviceWorker?.ready;
   if (swRegistration) {
+    let vapidKey = process.env.REACT_APP_VAPID_PUBLIC_KEY;
     const subscription = await swRegistration?.pushManager?.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(process.env.REACT_APP_VAPID_PUBLIC_KEY)
     });
-    console.log('subscription', subscription);
     const rest = await restApi.post(RouterAPI.notifi_subscribe, { data: JSON.stringify(subscription) });
     console.log('resst', rest);
+  }
+};
+export const storeToken = async (key) => {
+  const rest = await restApi.post(RouterAPI.storeToken, { token: key });
+  console.log('rest', rest);
+  if (rest?.status !== 200) {
+    alert('Đăng ký nhận thông báo không thành công!');
+  }
+};
+export const registerPushNotificationFirebase = async () => {
+  const swRegistration = await navigator?.serviceWorker?.ready;
+  if (swRegistration) {
+    let vapidKey = process.env.REACT_APP_VAPID_PUBLIC_TOKEN;
+    const messaging = getMessaging(app);
+    getToken(messaging, { vapidKey })
+      .then((currentToken) => {
+        if (currentToken) {
+          storeToken(currentToken);
+        } else {
+          // Show permission request UI
+          console.log('No registration token available. Request permission to generate one.');
+          // ...
+        }
+      })
+      .catch((err) => {
+        console.log('có lỗi khi lấy token. ', err);
+        // ...
+      });
   }
 };
 export const requestPermisstionNoti = () => {
@@ -458,7 +502,7 @@ export const requestPermisstionNoti = () => {
     Notification.requestPermission().then((permission) => {
       // If the user accepts, let's create a notification
       if (permission === 'granted') {
-        registerPushNotification();
+        registerPushNotificationFirebase();
       }
     });
   }

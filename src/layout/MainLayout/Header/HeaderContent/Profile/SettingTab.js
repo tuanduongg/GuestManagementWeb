@@ -6,6 +6,7 @@ import { List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
 
 // assets
 import { CommentOutlined, LockOutlined, QuestionCircleOutlined, UserOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { requestPermisstionNoti } from 'utils/helper';
 
 // ==============================|| HEADER PROFILE - SETTING TAB ||============================== //
 
@@ -15,6 +16,9 @@ const SettingTab = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const handleListItemClick = (event, index) => {
     setSelectedIndex(index);
+    if (index === 0) {
+      requestPermisstionNoti();
+    }
   };
 
   return (
@@ -23,7 +27,7 @@ const SettingTab = () => {
         <ListItemIcon>
           <QuestionCircleOutlined />
         </ListItemIcon>
-        <ListItemText primary="Support" />
+        <ListItemText primary="Bật thông báo" />
       </ListItemButton>
       <ListItemButton selected={selectedIndex === 1} onClick={(event) => handleListItemClick(event, 1)}>
         <ListItemIcon>

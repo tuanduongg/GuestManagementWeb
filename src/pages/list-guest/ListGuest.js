@@ -27,20 +27,6 @@ import { concatGuestInfo, filterName, initialFilterStatus, optionsSelect } from 
 import ForbidenPage from 'components/403/ForbidenPage';
 import ICON from '../../assets/images/logo/favilogo.png';
 import { getMessaging } from 'firebase/messaging';
-import { initializeApp } from "firebase/app";
-
-const firebaseConfig = {
-  apiKey: 'AIzaSyC3iYWOHZIiz2VGiuzS8ye6SQ7p0XQDR4c',
-  authDomain: 'push-message-seowon.firebaseapp.com',
-  databaseURL: 'https://push-message-seowon-default-rtdb.asia-southeast1.firebasedatabase.app',
-  projectId: 'push-message-seowon',
-  storageBucket: 'push-message-seowon.appspot.com',
-  messagingSenderId: '282049744676',
-  appId: '1:282049744676:web:da36cd0754756f4ac5edb1',
-  measurementId: 'G-SV1WK7XPN9'
-};
-
-const app = initializeApp(firebaseConfig);
 
 const today = dayjs(); // Get the current date using dayjs
 let urlSocket = process.env.REACT_APP_URL_SOCKET;
@@ -83,7 +69,6 @@ const ListGuest = () => {
 
   useEffect(() => {
     checkRole();
-    requestPermisstionNoti();
   }, []);
   useEffect(() => {
     if (dataSelect) {
