@@ -10,10 +10,17 @@ export const RouterAPI = {
   allGuest: 'guest/all',
   updateGuestInfo: 'guest-info/update',
   deleteGuestInfo: 'guest-info/delete',
+
   checkRole: 'role/check',
+  allRole: 'role/all',
+
   changeStatusGuest: 'guest/change-status',
 
   userAll: 'user/all',
+  addUser: 'user/add',
+  editUser: 'user/edit',
+  changeBlockUser: 'user/change-block',
+
   getVapidKey: 'firebase/getKey',
-  storeToken: 'firebase/store-token',
+  storeToken: 'firebase/store-token'
 };

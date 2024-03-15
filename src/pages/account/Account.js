@@ -1,12 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Row, Col, Typography, App, Empty, Button, Flex, DatePicker } from 'antd';
-import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { ROLE_ACC, STATUS_ACC, formatDateFromDB, getChipStatusAcc } from 'utils/helper';
+import { Table, Row, Col, Typography, App, Empty, Button, Flex, message } from 'antd';
+import {
+  PlusOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  UserSwitchOutlined,
+  CheckOutlined,
+  StopOutlined,
+  CheckCircleOutlined
+} from '@ant-design/icons';
+import { formatDateFromDB, getChipStatusAcc } from 'utils/helper';
 import ModalAccount from 'components/modal/modal-account/ModalAccount';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import ForbidenPage from 'components/403/ForbidenPage';
+import { checkDisableBtn } from './account.service';
 const { Title } = Typography;
+import './account.css';
 
 const Account = () => {
   const [tableData, setTableData] = useState([]);
@@ -15,6 +25,9 @@ const Account = () => {
   const [dataSelect, setDataSelect] = useState(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [role, setRole] = useState(null);
+  const [typeBtn, setTypeBtn] = useState('ACTIVE');
+  const [listRole, setListRole] = useState([]);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const handleClickEdit = (data) => {
     setDataSelect(data);
@@ -99,6 +112,11 @@ const Account = () => {
     }
   ];
 
+  useEffect(() => {
+    let check = checkDisableBtn(selectedRowKeys, tableData);
+    setTypeBtn(check);
+  }, [selectedRowKeys]);
+
   const checkRole = async () => {
     const rest = await restApi.get(RouterAPI.checkRole);
     if (rest?.status === 200) {
@@ -112,12 +130,24 @@ const Account = () => {
       setTableData(rest?.data);
     }
   };
+  const getAllRole = async () => {
+    const rest = await restApi.get(RouterAPI.allRole);
+    if (rest?.status === 200) {
+      setListRole(rest?.data);
+    }
+  };
   useEffect(() => {
     checkRole();
     getData();
+    getAllRole();
   }, []);
+  const onChangeBlock = async () => {
+    const url = RouterAPI.changeBlockUser;
+    const rst = await restApi.post(url, { type: check });
+    console.log(rst);
+  };
   const onClickBlock = () => {
-    console.log('vaooo');
+    onChangeBlock();
   };
   const onCloseModal = () => {
     setDataSelect(null);
@@ -126,18 +156,39 @@ const Account = () => {
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
+  const onAfterSave = (res) => {
+    let text = typeModal === 'EDIT' ? 'Cập nhật thông tin thành công!' : 'Thêm mới thành công!';
+    if (res?.status === 200) {
+      messageApi.open({
+        type: 'success',
+        content: text
+      });
+      getData();
+    } else {
+      messageApi.open({
+        type: 'warning',
+        content: res?.data?.message ?? 'Add user fail!'
+      });
+    }
+  };
   if (!role) {
     return <ForbidenPage />;
   }
   return (
     <>
+      {contextHolder}
       <Row>
         <Col span={24}>
           <Title level={5}>Danh sách tài khoản</Title>
         </Col>
       </Row>
       <Row style={{ margin: '5px 0px 10px 0px' }}>
-        <Flex gap="small" wrap="wrap" style={{ width: '100%' }} justify="end">
+        <Flex gap="small" wrap="wrap" style={{ width: '100%' }} justify="space-between">
+          <div>
+            <Button style={{ marginRight: '5px' }} onClick={() => {}} icon={<UserSwitchOutlined />} type="primary">
+              Phân quyền
+            </Button>
+          </div>
           <div>
             {role?.IS_CREATE && (
               <Button
@@ -153,9 +204,24 @@ const Account = () => {
               </Button>
             )}
             {role?.IS_UPDATE && (
-              <Button danger disabled={selectedRowKeys?.length === 0} onClick={onClickBlock} icon={<DeleteOutlined />} type="primary">
-                Block
-              </Button>
+              <>
+                {typeBtn === 'BLOCK' && (
+                  <Button danger disabled={selectedRowKeys?.length === 0} onClick={onClickBlock} icon={<StopOutlined />} type="primary">
+                    Khoá
+                  </Button>
+                )}
+                {typeBtn === 'ACTIVE' && (
+                  <Button
+                    onClick={onClickBlock}
+                    disabled={selectedRowKeys?.length === 0}
+                    className="btn-success-custom"
+                    icon={<CheckCircleOutlined />}
+                    type="primary"
+                  >
+                    Mở khoá
+                  </Button>
+                )}
+              </>
             )}
           </div>
         </Flex>
@@ -177,7 +243,15 @@ const Account = () => {
       >
         {tableData?.length === 0 && <Empty />}
       </Table>
-      <ModalAccount role={role} dataSelect={dataSelect} typeModal={typeModal} open={openModal} handleClose={onCloseModal} />
+      <ModalAccount
+        listRole={listRole}
+        role={role}
+        dataSelect={dataSelect}
+        typeModal={typeModal}
+        open={openModal}
+        handleClose={onCloseModal}
+        afterSave={onAfterSave}
+      />
     </>
   );
 };

@@ -280,7 +280,7 @@ export const getColorChipStatus = (status, timeInExpected) => {
   let message = '';
   switch (status) {
     case statusName.NEW:
-      color = '#16a34a';
+      color = '#16a34a'; //success color
       message = 'Mới';
       break;
     case statusName.ACCEPT:
@@ -328,8 +328,8 @@ export const ROLE_ACC = {
   SECURITY: 'SECURITY'
 };
 export const STATUS_ACC = {
-  ACTIVE: 'ACTIVE',
-  BLOCK: 'BLOCK'
+  ACTIVE: true,
+  BLOCK: false
 };
 export const getChipStatusAcc = (status) => {
   let color = '';
