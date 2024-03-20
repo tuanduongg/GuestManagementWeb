@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { useRef, useState } from 'react';
+import { Cascader } from 'antd';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -16,18 +17,22 @@ import {
   Stack,
   Tab,
   Tabs,
-  Typography
+  Typography,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText
 } from '@mui/material';
 
 // project import
 import MainCard from 'components/MainCard';
 import Transitions from 'components/@extended/Transitions';
-import ProfileTab from './ProfileTab';
-import SettingTab from './SettingTab';
+import './profile.style.css';
 
 // assets
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { IdcardOutlined, LogoutOutlined, CheckOutlined, UserOutlined, RedoOutlined } from '@ant-design/icons';
 import { logout } from 'utils/helper';
+import { OPTION_LANGUAGE } from './profile.service';
 
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
@@ -84,6 +89,11 @@ const Profile = () => {
 
   const [value, setValue] = useState(0);
   const [dataUser, setDataUser] = useState(getDataUser());
+  const [itemSelect, setItemSelect] = useState('');
+
+  const handleListItemClick = (event, item) => {
+    setItemSelect(item);
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -162,16 +172,11 @@ const Profile = () => {
                             </Stack>
                           </Stack>
                         </Grid>
-                        <Grid item>
-                          <IconButton size="large" color="secondary" onClick={handleLogout}>
-                            <LogoutOutlined />
-                          </IconButton>
-                        </Grid>
                       </Grid>
                     </CardContent>
                     {open && (
                       <>
-                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                        {/* <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                           <Tabs variant="fullWidth" value={value} onChange={handleChange} aria-label="profile tabs">
                             <Tab
                               sx={{
@@ -182,7 +187,7 @@ const Profile = () => {
                                 textTransform: 'capitalize'
                               }}
                               icon={<UserOutlined style={{ marginBottom: 0, marginRight: '10px' }} />}
-                              label="Profile"
+                              label="Cá nhân"
                               {...a11yProps(0)}
                             />
                             <Tab
@@ -194,17 +199,83 @@ const Profile = () => {
                                 textTransform: 'capitalize'
                               }}
                               icon={<SettingOutlined style={{ marginBottom: 0, marginRight: '10px' }} />}
-                              label="Setting"
+                              label="Cài đặt"
                               {...a11yProps(1)}
                             />
                           </Tabs>
-                        </Box>
-                        <TabPanel value={value} index={0} dir={theme.direction}>
+                        </Box> */}
+                        <List component="nav" sx={{ p: 0, '& .MuiListItemIcon-root': { minWidth: 32, color: theme.palette.grey[500] } }}>
+                          <ListItemButton selected={itemSelect === 'profile'} onClick={(event) => handleListItemClick(event, 'profile')}>
+                            <ListItemIcon>
+                              <IdcardOutlined />
+                            </ListItemIcon>
+                            <ListItemText primary="Trang cá nhân" />
+                          </ListItemButton>
+
+                          <ListItemButton
+                            selected={itemSelect === 'changepassword'}
+                            onClick={(event) => handleListItemClick(event, 'changepassword')}
+                          >
+                            <ListItemIcon>
+                              <RedoOutlined />
+                            </ListItemIcon>
+                            <ListItemText primary="Đổi mật khẩu" />
+                          </ListItemButton>
+                          <Cascader
+                            placement={'left'}
+                            options={[
+                              {
+                                value: 'vn',
+                                label: (
+                                  <>
+                                    <CheckOutlined style={{ color: '#1677ff' }} /> Việt Nam
+                                  </>
+                                )
+                              },
+                              {
+                                value: 'ko',
+                                label: (
+                                  <>
+                                    <CheckOutlined style={{ color: '#1677ff' }} /> Korean
+                                  </>
+                                )
+                              },
+                              {
+                                value: 'en',
+                                label: (
+                                  <>
+                                    <CheckOutlined style={{ color: '#1677ff' }} /> English
+                                  </>
+                                )
+                              }
+                            ]}
+                            onChange={(_, selectedOptions) => {
+                              console.log(selectedOptions);
+                            }}
+                          >
+                            <ListItemButton
+                              selected={itemSelect === 'language'}
+                              onClick={(event) => handleListItemClick(event, 'language')}
+                            >
+                              <ListItemIcon>
+                                <RedoOutlined />
+                              </ListItemIcon>
+                              <ListItemText primary="Ngôn ngữ" />
+                            </ListItemButton>
+                          </Cascader>
+                          <ListItemButton onClick={handleLogout}>
+                            <ListItemIcon>
+                              <LogoutOutlined />
+                            </ListItemIcon>
+                            <ListItemText primary="Đăng xuất" />
+                          </ListItemButton>
+                        </List>
+                        {/* <TabPanel value={value} index={0} dir={theme.direction}>
                           <ProfileTab handleLogout={handleLogout} />
-                        </TabPanel>
-                        <TabPanel value={value} index={1} dir={theme.direction}>
+                        </TabPanel> */}
+                        {/* <TabPanel value={value} index={1} dir={theme.direction}>
                           <SettingTab />
-                        </TabPanel>
+                        </TabPanel> */}
                       </>
                     )}
                   </MainCard>

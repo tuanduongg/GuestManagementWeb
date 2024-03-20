@@ -6,7 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import { List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 
 // assets
-import { EditOutlined, ProfileOutlined, LogoutOutlined, UserOutlined, WalletOutlined } from '@ant-design/icons';
+import { LogoutOutlined, UserOutlined, RedoOutlined, IdcardOutlined } from '@ant-design/icons';
 
 // ==============================|| HEADER PROFILE - PROFILE TAB ||============================== //
 
@@ -20,36 +20,24 @@ const ProfileTab = ({ handleLogout }) => {
 
   return (
     <List component="nav" sx={{ p: 0, '& .MuiListItemIcon-root': { minWidth: 32, color: theme.palette.grey[500] } }}>
-      <ListItemButton selected={selectedIndex === 0} onClick={(event) => handleListItemClick(event, 0)}>
+      <ListItemButton selected={selectedIndex === 'profile'} onClick={(event) => handleListItemClick(event, 'profile')}>
         <ListItemIcon>
-          <EditOutlined />
+          <IdcardOutlined />
         </ListItemIcon>
-        <ListItemText primary="Edit Profile" />
-      </ListItemButton>
-      <ListItemButton selected={selectedIndex === 1} onClick={(event) => handleListItemClick(event, 1)}>
-        <ListItemIcon>
-          <UserOutlined />
-        </ListItemIcon>
-        <ListItemText primary="View Profile" />
+        <ListItemText primary="Trang cá nhân" />
       </ListItemButton>
 
-      <ListItemButton selected={selectedIndex === 3} onClick={(event) => handleListItemClick(event, 3)}>
+      <ListItemButton selected={selectedIndex === 'changepassword'} onClick={(event) => handleListItemClick(event, 'changepassword')}>
         <ListItemIcon>
-          <ProfileOutlined />
+          <RedoOutlined />
         </ListItemIcon>
-        <ListItemText primary="Social Profile" />
+        <ListItemText primary="Đổi mật khẩu" />
       </ListItemButton>
-      <ListItemButton selected={selectedIndex === 4} onClick={(event) => handleListItemClick(event, 4)}>
-        <ListItemIcon>
-          <WalletOutlined />
-        </ListItemIcon>
-        <ListItemText primary="Billing" />
-      </ListItemButton>
-      <ListItemButton selected={selectedIndex === 2} onClick={handleLogout}>
+      <ListItemButton danger selected={selectedIndex === 2} onClick={handleLogout}>
         <ListItemIcon>
           <LogoutOutlined />
         </ListItemIcon>
-        <ListItemText primary="Logout" />
+        <ListItemText primary="Đăng xuất" />
       </ListItemButton>
     </List>
   );

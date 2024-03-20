@@ -60,6 +60,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
 
   const [department, setDepartment] = useState('');
   const [errorDepartment, setErrorDepartment] = useState(false);
+  const [openPopupConfirm, setOpenPopupConfirm] = useState(false);
   const inputRef = useRef(null);
   const editInputRef = useRef(null);
   //  [
@@ -119,6 +120,9 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
     };
     const rest = await restApi.post(url, data);
     afterSave(rest);
+    if (rest?.status === 200) {
+      handleCancel();
+    }
   };
   const draggleRef = useRef(null);
   const handleOk = (e) => {
@@ -423,6 +427,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
                       placeholder="Nhập tên khách..."
                     />
                     <Popconfirm
+                      open={openPopupConfirm}
                       title="Thông báo"
                       description="Bạn chắc chắn muốn xoá?"
                       onConfirm={() => {
@@ -432,7 +437,19 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
                       cancelText="Đóng"
                       placement="left"
                     >
-                      <Button disabled={names?.length === 1} danger icon={<DeleteOutlined />} type="link"></Button>
+                      <Button
+                        disabled={names?.length === 1}
+                        onClick={() => {
+                          if (names[index]?.FULL_NAME.trim() === '') {
+                            setOpenPopupConfirm(false);
+                          } else {
+                            setOpenPopupConfirm(true);
+                          }
+                        }}
+                        danger
+                        icon={<DeleteOutlined />}
+                        type="link"
+                      ></Button>
                     </Popconfirm>
                   </div>
                 </Col>

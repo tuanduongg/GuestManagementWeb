@@ -6,8 +6,9 @@ import { List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
 
 // assets
 import { CommentOutlined, LockOutlined, QuestionCircleOutlined, UserOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { requestPermisstionNoti } from 'utils/helper';
 
-// ==============================|| HEADER PROFILE - SETTING TAB ||============================== //
+// ==============================|| HEADER PROFILE - IdcardOutlined TAB ||============================== //
 
 const SettingTab = () => {
   const theme = useTheme();
@@ -15,6 +16,9 @@ const SettingTab = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const handleListItemClick = (event, index) => {
     setSelectedIndex(index);
+    if (index === 0) {
+      requestPermisstionNoti();
+    }
   };
 
   return (
@@ -23,15 +27,15 @@ const SettingTab = () => {
         <ListItemIcon>
           <QuestionCircleOutlined />
         </ListItemIcon>
-        <ListItemText primary="Support" />
+        <ListItemText primary="Ngôn ngữ" />
       </ListItemButton>
-      <ListItemButton selected={selectedIndex === 1} onClick={(event) => handleListItemClick(event, 1)}>
+      {/* <ListItemButton selected={selectedIndex === 1} onClick={(event) => handleListItemClick(event, 1)}>
         <ListItemIcon>
           <UserOutlined />
         </ListItemIcon>
         <ListItemText primary="Account Settings" />
-      </ListItemButton>
-      <ListItemButton selected={selectedIndex === 2} onClick={(event) => handleListItemClick(event, 2)}>
+      </ListItemButton> */}
+      {/* <ListItemButton selected={selectedIndex === 2} onClick={(event) => handleListItemClick(event, 2)}>
         <ListItemIcon>
           <LockOutlined />
         </ListItemIcon>
@@ -48,7 +52,7 @@ const SettingTab = () => {
           <UnorderedListOutlined />
         </ListItemIcon>
         <ListItemText primary="History" />
-      </ListItemButton>
+      </ListItemButton> */}
     </List>
   );
 };

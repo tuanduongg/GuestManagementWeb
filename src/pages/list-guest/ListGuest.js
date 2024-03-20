@@ -11,6 +11,7 @@ import {
   getDataUserFromLocal,
   isMobile,
   listNameStatus,
+  requestPermisstionNoti,
   statusName
 } from 'utils/helper';
 const { Title, Link, Text } = Typography;
@@ -309,7 +310,6 @@ const ListGuest = () => {
         type: 'success',
         content: text
       });
-      handleCloseModalAdd();
       getData();
     } else {
       messageApi.open({
@@ -318,42 +318,21 @@ const ListGuest = () => {
       });
     }
   };
-  const registerPushNotification = async () => {
-    const swRegistration = await navigator?.serviceWorker?.ready;
-    if (swRegistration) {
-      console.log('process.env.REACT_APP_VAPID_PUBLIC_KEY', process.env.REACT_APP_VAPID_PUBLIC_KEY);
-      const subscription = await swRegistration?.pushManager?.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: process.env.REACT_APP_VAPID_PUBLIC_KEY
-      });
-      console.log('subscription', subscription);
-      const rest = await restApi.post(RouterAPI.notifi_subscribe, { data: JSON.stringify(subscription) });
-      console.log('resst', rest);
-    }
-    // Gửi subscription object lên server thông qua API
-    // await fetch(process.env.REACT_APP_URL_API + 'auth/subscribeNoti', {
-    //   method: 'POST',
-    //   body: JSON.stringify(subscription),
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   }
-    // });
-  };
+
   const handleDelete = async () => {
-    registerPushNotification();
-    // const rest = await restApi.post(RouterAPI.deleteGuest, { data: selectedRowKeys });
-    // if (rest?.status === 200) {
-    //   messageApi.open({
-    //     type: 'success',
-    //     content: 'Xoá thành công!'
-    //   });
-    //   getData();
-    // } else {
-    //   messageApi.open({
-    //     type: 'warning',
-    //     content: rest?.data?.message ?? 'Xoá thất bại!'
-    //   });
-    // }
+    const rest = await restApi.post(RouterAPI.deleteGuest, { data: selectedRowKeys });
+    if (rest?.status === 200) {
+      messageApi.open({
+        type: 'success',
+        content: 'Xoá thành công!'
+      });
+      getData();
+    } else {
+      messageApi.open({
+        type: 'warning',
+        content: rest?.data?.message ?? 'Xoá thất bại!'
+      });
+    }
   };
   if (!role) {
     return <ForbidenPage />;

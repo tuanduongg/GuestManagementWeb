@@ -14,7 +14,7 @@ const HeaderContent = () => {
     <>
       <Box sx={{ width: '100%', ml: 1 }} />
 
-      <Notification />
+      {/* <Notification /> */}
       <Profile />
     </>
   );

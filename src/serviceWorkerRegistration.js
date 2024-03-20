@@ -19,7 +19,6 @@ const isLocalhost = Boolean(
 );
 
 export function register(config) {
-  console.log('navigator', navigator);
   if ('serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href);
@@ -32,7 +31,7 @@ export function register(config) {
     }
 
     window.addEventListener('load', () => {
-      const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
+      const swUrl = `${process.env.PUBLIC_URL}/firebase-messaging-sw.js`;
       console.log('isLocalhost', isLocalhost);
       if (isLocalhost) {
         // This is running on localhost. Let's check if a service worker still exists or not.
@@ -57,7 +56,6 @@ function registerValidSW(swUrl, config) {
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {
-      console.log('registration', registration);
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         if (installingWorker == null) {
@@ -103,7 +101,6 @@ function checkValidServiceWorker(swUrl, config) {
     headers: { 'Service-Worker': 'script' }
   })
     .then((response) => {
-      console.log('response', response);
       // Ensure service worker exists, and that we really are getting a JS file.
       const contentType = response.headers.get('content-type');
       if (response.status === 404 || (contentType != null && contentType.indexOf('javascript') === -1)) {

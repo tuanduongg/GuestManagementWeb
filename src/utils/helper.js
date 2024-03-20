@@ -5,6 +5,8 @@ import { ConfigRouter } from 'config_router';
 import dayjs from 'dayjs';
 import config from 'config';
 import { ConfigMenuAlias } from 'ConfigMenuAlias';
+import restApi from './restAPI';
+import { RouterAPI } from './routerAPI';
 
 export function generateRandomVNLicensePlate() {
   // Mã tỉnh/thành phố
@@ -262,7 +264,7 @@ export const getColorChipStatus = (status, timeInExpected) => {
   let message = '';
   switch (status) {
     case statusName.NEW:
-      color = '#16a34a';
+      color = '#16a34a'; //success color
       message = 'Mới';
       break;
     case statusName.ACCEPT:
@@ -310,26 +312,29 @@ export const ROLE_ACC = {
   SECURITY: 'SECURITY'
 };
 export const STATUS_ACC = {
-  ACTIVE: 'ACTIVE',
-  BLOCK: 'BLOCK'
+  ACTIVE: true,
+  BLOCK: false
 };
 export const getChipStatusAcc = (status) => {
-  if (!status) return;
-  // console.log('compareDateTime(timeInExpected)', compareDateTime(timeInExpected));
   let color = '';
+  let text = '';
   switch (status) {
-    case STATUS_ACC.ACTIVE:
+    case true:
+      text = 'Active';
       color = 'green';
       break;
-    case STATUS_ACC.BLOCK:
+    case false:
+      text = 'Block';
       color = 'volcano';
       break;
     default:
+      text = 'Block';
+      color = 'volcano';
       break;
   }
   return (
-    <Tag color={color} key={status}>
-      {status}
+    <Tag color={color} key={text}>
+      {text}
     </Tag>
   );
 };
@@ -418,4 +423,73 @@ export const getDataUserFromLocal = () => {
     return JSON.parse(dataString);
   }
   return {};
+};
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+export const registerPushNotification = async () => {
+  const swRegistration = await navigator?.serviceWorker?.ready;
+  if (swRegistration) {
+    let vapidKey = process.env.REACT_APP_VAPID_PUBLIC_KEY;
+    const subscription = await swRegistration?.pushManager?.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(process.env.REACT_APP_VAPID_PUBLIC_KEY)
+    });
+    const rest = await restApi.post(RouterAPI.notifi_subscribe, { data: JSON.stringify(subscription) });
+    console.log('resst', rest);
+  }
+};
+export const storeToken = async (key) => {
+  const rest = await restApi.post(RouterAPI.storeToken, { token: key });
+  console.log('rest', rest);
+  if (rest?.status !== 200) {
+    alert('Đăng ký nhận thông báo không thành công!');
+  }
+};
+export const registerPushNotificationFirebase = async () => {
+  const swRegistration = await navigator?.serviceWorker?.ready;
+  if (swRegistration) {
+    let vapidKey = process.env.REACT_APP_VAPID_PUBLIC_TOKEN;
+    const messaging = getMessaging(app);
+    getToken(messaging, { vapidKey })
+      .then((currentToken) => {
+        if (currentToken) {
+          storeToken(currentToken);
+        } else {
+          // Show permission request UI
+          console.log('No registration token available. Request permission to generate one.');
+          // ...
+        }
+      })
+      .catch((err) => {
+        console.log('có lỗi khi lấy token. ', err);
+        // ...
+      });
+  }
+};
+export const requestPermisstionNoti = () => {
+  if (!('Notification' in window)) {
+    // Check if the browser supports notifications
+    console.log('This browser does not support desktop notification');
+  } else if (Notification.permission === 'granted') {
+    console.log('this browser accepted notification!');
+  } else if (Notification.permission !== 'denied') {
+    console.log('vao requestPermission');
+    // We need to ask the user for permission
+    Notification.requestPermission().then((permission) => {
+      // If the user accepts, let's create a notification
+      if (permission === 'granted') {
+        registerPushNotificationFirebase();
+      }
+    });
+  }
 };

@@ -8,10 +8,25 @@ const { TextArea } = Input;
 import { PlusOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { ROLE_ACC, STATUS_ACC } from 'utils/helper';
 import './modal-account.css';
+import restApi from 'utils/restAPI';
+import { RouterAPI } from 'utils/routerAPI';
 
 const initialValidate = { error: false, message: '' };
-
-const ModalAccount = ({ open, handleClose, typeModal }) => {
+const optionStatus = [
+  { value: true, label: 'Active' },
+  { value: false, label: 'Block' }
+];
+const initRole = (arr = []) => {
+  console.log('initRole', arr);
+  if (arr) {
+    const rs = arr.find((item) => item?.ROLE_NAME === 'USER');
+    if (rs) {
+      return rs?.ROLE_ID;
+    }
+  }
+  return '';
+};
+const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afterSave }) => {
   const { modal } = App.useApp();
   const [disabled, setDisabled] = useState(true);
   const [bounds, setBounds] = useState({
@@ -27,10 +42,10 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
   const [password, setPassword] = useState('');
   const [validatePassword, setValidatePassword] = useState(initialValidate);
 
-  const [status, setStatus] = useState(STATUS_ACC.ACTIVE);
+  const [status, setStatus] = useState(true);
   const [validateStatus, setValidateStatus] = useState(initialValidate);
 
-  const [role, setRole] = useState(ROLE_ACC.USER);
+  const [role, setRole] = useState(initRole(listRole));
 
   const draggleRef = useRef(null);
   const handleOk = (e) => {
@@ -69,6 +84,23 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
         }
       }
     }
+    const handleSave = async () => {
+      let url = RouterAPI.addUser;
+      if (typeModal === 'EDIT') {
+        url = RouterAPI.editUser;
+      }
+      const res = await restApi.post(url, {
+        USER_ID: dataSelect?.USER_ID ? dataSelect?.USER_ID : '',
+        USERNAME: username,
+        PASSWORD: password,
+        role: role,
+        ACTIVE: status
+      });
+      if (res?.status === 200) {
+        handleCancel();
+      }
+      afterSave(res);
+    };
     if (!check) {
       Modal.confirm({
         title: `Thông báo`,
@@ -77,16 +109,24 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
         cancelText: 'No',
         centered: true,
         icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
-        onOk: () => {
-          alert('pass');
+        onOk: async () => {
+          handleSave();
         }
       });
     }
   };
+
+  useEffect(() => {
+    if (open) {
+      setUsername(dataSelect?.USERNAME);
+      setRole(dataSelect?.role?.ROLE_ID);
+      setStatus(dataSelect?.ACTIVE ? true : false);
+    }
+  }, [dataSelect]);
   const handleCancel = (e) => {
     setUsername('');
     setPassword('');
-    setRole(ROLE_ACC.USER);
+    setRole(initRole(listRole));
     setStatus(STATUS_ACC.ACTIVE);
     setValidateUsername(initialValidate);
     setValidatePassword(initialValidate);
@@ -139,7 +179,7 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
     if (check) {
       Modal.confirm({
         title: `Thông báo`,
-        content: 'Dữ liệu chưa được lưu, bạn chắc chắn muốn đóng?',
+        content: 'Bạn chắc chắn muốn đóng?',
         okText: 'Yes',
         cancelText: 'No',
         centered: true,
@@ -155,6 +195,7 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
   return (
     <>
       <Modal
+        centered
         okText="Lưu thông tin"
         cancelText="Đóng"
         zIndex={1300}
@@ -179,7 +220,7 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
             onBlur={() => {}}
             // end
           >
-            {typeModal === 'EDIT' ? 'Thông tin tài khoản' : 'Thêm mới tài khoản'}
+            {typeModal === 'EDIT' ? 'Thông tin tài khoản' : typeModal === 'VIEW' ? 'Thông tin tài khoản' : 'Thêm mới tài khoản'}
           </div>
         }
         open={open}
@@ -190,6 +231,16 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
             <div ref={draggleRef}>{modal}</div>
           </Draggable>
         )}
+        footer={(_, { OkBtn, CancelBtn }) => (
+          <>
+            {typeModal !== 'VIEW' && (
+              <>
+                <CancelBtn />
+                <OkBtn />
+              </>
+            )}
+          </>
+        )}
       >
         <Row gutter={16}>
           <Col xs={24} sm={24}>
@@ -197,6 +248,7 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
               Tên tài khoản(<span className="color-red">*</span>)
             </p>
             <Input
+              disabled={typeModal === 'VIEW' || typeModal === 'EDIT'}
               value={username}
               name={'username'}
               status={validateUsername.error ? 'error' : ''}
@@ -210,6 +262,7 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
               Quyền(<span className="color-red">*</span>)
             </p>
             <Select
+              disabled={typeModal === 'VIEW'}
               value={role}
               style={{
                 width: '100%'
@@ -217,12 +270,16 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
               onChange={(value) => {
                 setRole(value);
               }}
-              options={Object.values(ROLE_ACC)?.map((item) => {
-                return {
-                  value: item,
-                  label: item
-                };
-              })}
+              options={
+                listRole
+                  ? listRole.map((item) => {
+                      return {
+                        value: item?.ROLE_ID,
+                        label: item?.ROLE_NAME
+                      };
+                    })
+                  : []
+              }
             />
           </Col>
           <Col span={12}>
@@ -230,6 +287,7 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
               Trạng thái(<span className="color-red">*</span>)
             </p>
             <Select
+              disabled={typeModal === 'VIEW'}
               value={status}
               style={{
                 width: '100%'
@@ -237,31 +295,28 @@ const ModalAccount = ({ open, handleClose, typeModal }) => {
               onChange={(value) => {
                 setStatus(value);
               }}
-              options={Object.values(STATUS_ACC)?.map((item) => {
-                return {
-                  value: item,
-                  label: item
-                };
-              })}
+              options={optionStatus}
             />
           </Col>
-          <Col span={24}>
-            {typeModal === 'EDIT' ? (
-              <p className="custom-label-input">Đổi mật khẩu</p>
-            ) : (
-              <p className="custom-label-input">
-                Mật khẩu(<span className="color-red">*</span>)
-              </p>
-            )}
-            <Input
-              name="password"
-              value={password}
-              onChange={onChangeInput}
-              status={validatePassword.error ? 'error' : ''}
-              placeholder="Nhập mật khẩu..."
-            />
-            {validatePassword.error && <p className="message-err">(*){validatePassword.message}</p>}
-          </Col>
+          {typeModal !== 'VIEW' && (
+            <Col span={24}>
+              {typeModal === 'EDIT' ? (
+                <p className="custom-label-input">Đổi mật khẩu</p>
+              ) : (
+                <p className="custom-label-input">
+                  Mật khẩu(<span className="color-red">*</span>)
+                </p>
+              )}
+              <Input
+                name="password"
+                value={password}
+                onChange={onChangeInput}
+                status={validatePassword.error ? 'error' : ''}
+                placeholder="Nhập mật khẩu..."
+              />
+              {validatePassword.error && <p className="message-err">(*){validatePassword.message}</p>}
+            </Col>
+          )}
         </Row>
       </Modal>
     </>
