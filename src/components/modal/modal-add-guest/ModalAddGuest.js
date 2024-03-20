@@ -384,22 +384,12 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
         open={open}
         onOk={handleOk}
         onCancel={onClickCancel}
-        // footer={(_, { OkBtn, CancelBtn }) => (
-        //   <>
-        //     <Popconfirm
-        //       open={openPopConfirm}
-        //       title="Thông báo"
-        //       description="Dữ liệu chưa được lưu, bạn chắc chắn muốn đóng?"
-        //       onConfirm={() => {}}
-        //       onCancel={() => {}}
-        //       okText="Yes"
-        //       cancelText="No"
-        //     >
-        //       <CancelBtn />
-        //     </Popconfirm>
-        //     <OkBtn />
-        //   </>-
-        // )}
+        footer={(_, { OkBtn, CancelBtn }) => (
+          <>
+            <CancelBtn />
+            <OkBtn />
+          </>
+        )}
         modalRender={(modal) => (
           <Draggable disabled={disabled} bounds={bounds} nodeRef={draggleRef} onStart={(event, uiData) => onStart(event, uiData)}>
             <div ref={draggleRef}>{modal}</div>

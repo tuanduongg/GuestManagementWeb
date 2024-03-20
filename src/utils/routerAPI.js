@@ -13,10 +13,8 @@ export const RouterAPI = {
 
   checkRole: 'role/check',
   allRole: 'role/all',
-<<<<<<< HEAD
   addRole: 'role/add',
-=======
->>>>>>> da2b1c8d487c9204a3629d5adc764bae2a5428a9
+  updateRole: 'role/update',
 
   changeStatusGuest: 'guest/change-status',
 

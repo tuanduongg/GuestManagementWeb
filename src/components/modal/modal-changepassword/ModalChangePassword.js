@@ -7,7 +7,6 @@ const { TextArea } = Input;
 // assets
 import { PlusOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { ROLE_ACC, STATUS_ACC } from 'utils/helper';
-import './modal-account.css';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 
@@ -25,7 +24,7 @@ const initRole = (arr = []) => {
   }
   return '';
 };
-const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afterSave, setSelectedRowKeys }) => {
+const ModalChangePassword = ({ open, handleClose, typeModal, dataSelect, listRole, afterSave, setSelectedRowKeys }) => {
   const { modal } = App.useApp();
   const [disabled, setDisabled] = useState(true);
   const [bounds, setBounds] = useState({
@@ -324,4 +323,4 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
     </>
   );
 };
-export default ModalAccount;
+export default ModalChangePassword;

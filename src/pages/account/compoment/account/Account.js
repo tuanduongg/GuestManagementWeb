@@ -12,19 +12,17 @@ import { checkDisableBtn, initArrayTab } from './account.service';
 const { Title } = Typography;
 import './account.css';
 
-const Account = ({ role, listRole }) => {
+const Account = ({ role, listRole, onClickEdit, dataACC, setTypeBtnBlock, setSelectedRowKeys, selectedRowKeys }) => {
   const [tableData, setTableData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [typeModal, setTypeModal] = useState('');
   const [dataSelect, setDataSelect] = useState(null);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  // const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [typeBtn, setTypeBtn] = useState('ACTIVE');
   const [messageApi, contextHolder] = message.useMessage();
   const { modal } = App.useApp();
   const handleClickEdit = (data) => {
-    setDataSelect(data);
-    setTypeModal('EDIT');
-    setOpenModal(true);
+    onClickEdit(data);
   };
   const columns = [
     {
@@ -104,30 +102,21 @@ const Account = ({ role, listRole }) => {
     }
   ];
 
+  // useEffect(() => {
+  //   let check = checkDisableBtn(selectedRowKeys, tableData);
+  //   setTypeBtnBlock(check);
+  // }, [selectedRowKeys]);
+  // useEffect(() => {
+  //   let check = checkDisableBtn(selectedRowKeys, tableData);
+  //   setTypeBtn(check);
+  // }, [selectedRowKeys]);
   useEffect(() => {
-    let check = checkDisableBtn(selectedRowKeys, tableData);
-    setTypeBtn(check);
-  }, [selectedRowKeys, tableData]);
-
-  // const checkRole = async () => {
-  //   const rest = await restApi.get(RouterAPI.checkRole);
-  //   if (rest?.status === 200) {
-  //     setRole(rest?.data);
-  //   }
-  // };
-
-  const getData = async () => {
-    const rest = await restApi.get(RouterAPI.userAll);
-    if (rest?.status === 200) {
-      setTableData(rest?.data);
+    if (dataACC) {
+      setTableData(dataACC);
+      // let check = checkDisableBtn(selectedRowKeys, dataACC);
+      // setTypeBtnBlock(check);
     }
-  };
-
-  useEffect(() => {
-    // checkRole();
-    getData();
-    // getAllRole();
-  }, []);
+  }, [dataACC]);
   const onChangeBlock = async () => {
     const url = RouterAPI.changeBlockUser;
     const rst = await restApi.post(url, { type: typeBtn, listID: selectedRowKeys });
@@ -152,27 +141,8 @@ const Account = ({ role, listRole }) => {
       }
     });
   };
-  const onCloseModal = () => {
-    setDataSelect(null);
-    setOpenModal(false);
-  };
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
-  };
-  const onAfterSave = (res) => {
-    let text = typeModal === 'EDIT' ? 'Cập nhật thông tin thành công!' : 'Thêm mới thành công!';
-    if (res?.status === 200) {
-      messageApi.open({
-        type: 'success',
-        content: text
-      });
-      getData();
-    } else {
-      messageApi.open({
-        type: 'warning',
-        content: res?.data?.message ?? 'Add user fail!'
-      });
-    }
   };
   if (!role) {
     return <ForbidenPage />;
@@ -180,50 +150,6 @@ const Account = ({ role, listRole }) => {
   return (
     <>
       {contextHolder}
-      {/* <Row>
-        <Col span={24}>
-          <Title level={5}>Danh sách tài khoản</Title>
-        </Col>
-      </Row> */}
-      <Row style={{ margin: '5px 0px 10px 0px' }}>
-        <Flex gap="small" wrap="wrap" style={{ width: '100%' }} justify="right">
-          <div>
-            {role?.IS_CREATE && (
-              <Button
-                style={{ marginRight: '5px' }}
-                onClick={() => {
-                  setTypeModal('ADD');
-                  setOpenModal(true);
-                }}
-                icon={<PlusOutlined />}
-                type="primary"
-              >
-                Thêm mới
-              </Button>
-            )}
-            {role?.IS_UPDATE && (
-              <>
-                {typeBtn === 'BLOCK' && (
-                  <Button danger disabled={selectedRowKeys?.length === 0} onClick={onClickBlock} icon={<StopOutlined />} type="primary">
-                    Khoá
-                  </Button>
-                )}
-                {typeBtn === 'ACTIVE' && (
-                  <Button
-                    onClick={onClickBlock}
-                    disabled={selectedRowKeys?.length === 0}
-                    className="btn-success-custom"
-                    icon={<UnlockOutlined />}
-                    type="primary"
-                  >
-                    Mở khoá
-                  </Button>
-                )}
-              </>
-            )}
-          </div>
-        </Flex>
-      </Row>
       <Table
         rowKey="USER_ID"
         rowSelection={{
@@ -241,15 +167,6 @@ const Account = ({ role, listRole }) => {
       >
         {tableData?.length === 0 && <Empty />}
       </Table>
-      <ModalAccount
-        listRole={listRole}
-        role={role}
-        dataSelect={dataSelect}
-        typeModal={typeModal}
-        open={openModal}
-        handleClose={onCloseModal}
-        afterSave={onAfterSave}
-      />
     </>
   );
 };

@@ -30,7 +30,7 @@ import Transitions from 'components/@extended/Transitions';
 import './profile.style.css';
 
 // assets
-import { IdcardOutlined, LogoutOutlined, CheckOutlined, UserOutlined, RedoOutlined } from '@ant-design/icons';
+import { IdcardOutlined, LogoutOutlined, CheckOutlined, TranslationOutlined, RedoOutlined } from '@ant-design/icons';
 import { logout } from 'utils/helper';
 import { OPTION_LANGUAGE } from './profile.service';
 
@@ -68,6 +68,10 @@ const getDataUser = () => {
 // ==============================|| HEADER CONTENT - PROFILE ||============================== //
 
 const Profile = () => {
+  const [value, setValue] = useState(0);
+  const [valueLanguage, setValueLanguage] = useState(['vn']);
+  const [dataUser, setDataUser] = useState(getDataUser());
+  const [itemSelect, setItemSelect] = useState('');
   const theme = useTheme();
 
   const handleLogout = async () => {
@@ -87,10 +91,6 @@ const Profile = () => {
     setOpen(false);
   };
 
-  const [value, setValue] = useState(0);
-  const [dataUser, setDataUser] = useState(getDataUser());
-  const [itemSelect, setItemSelect] = useState('');
-
   const handleListItemClick = (event, item) => {
     setItemSelect(item);
   };
@@ -100,6 +100,7 @@ const Profile = () => {
   };
 
   const iconBackColorOpen = 'grey.300';
+
 
   return (
     <Box sx={{ flexShrink: 0, ml: 0.75 }}>
@@ -205,12 +206,12 @@ const Profile = () => {
                           </Tabs>
                         </Box> */}
                         <List component="nav" sx={{ p: 0, '& .MuiListItemIcon-root': { minWidth: 32, color: theme.palette.grey[500] } }}>
-                          <ListItemButton selected={itemSelect === 'profile'} onClick={(event) => handleListItemClick(event, 'profile')}>
+                          {/* <ListItemButton selected={itemSelect === 'profile'} onClick={(event) => handleListItemClick(event, 'profile')}>
                             <ListItemIcon>
                               <IdcardOutlined />
                             </ListItemIcon>
                             <ListItemText primary="Trang cá nhân" />
-                          </ListItemButton>
+                          </ListItemButton> */}
 
                           <ListItemButton
                             selected={itemSelect === 'changepassword'}
@@ -222,13 +223,15 @@ const Profile = () => {
                             <ListItemText primary="Đổi mật khẩu" />
                           </ListItemButton>
                           <Cascader
+                            value={valueLanguage}
                             placement={'left'}
                             options={[
                               {
                                 value: 'vn',
                                 label: (
                                   <>
-                                    <CheckOutlined style={{ color: '#1677ff' }} /> Việt Nam
+                                    {valueLanguage && valueLanguage.includes('vn') && <CheckOutlined style={{ color: '#1677ff' }} />} Việt
+                                    Nam
                                   </>
                                 )
                               },
@@ -236,7 +239,7 @@ const Profile = () => {
                                 value: 'ko',
                                 label: (
                                   <>
-                                    <CheckOutlined style={{ color: '#1677ff' }} /> Korean
+                                    {valueLanguage && valueLanguage.includes('ko') && <CheckOutlined style={{ color: '#1677ff' }} />} Korean
                                   </>
                                 )
                               },
@@ -244,13 +247,15 @@ const Profile = () => {
                                 value: 'en',
                                 label: (
                                   <>
-                                    <CheckOutlined style={{ color: '#1677ff' }} /> English
+                                    {valueLanguage && valueLanguage.includes('en') && <CheckOutlined style={{ color: '#1677ff' }} />}{' '}
+                                    English
                                   </>
                                 )
                               }
                             ]}
                             onChange={(_, selectedOptions) => {
-                              console.log(selectedOptions);
+                              const value = selectedOptions[0].value;
+                              setValueLanguage([value]);
                             }}
                           >
                             <ListItemButton
@@ -258,7 +263,7 @@ const Profile = () => {
                               onClick={(event) => handleListItemClick(event, 'language')}
                             >
                               <ListItemIcon>
-                                <RedoOutlined />
+                              <TranslationOutlined />
                               </ListItemIcon>
                               <ListItemText primary="Ngôn ngữ" />
                             </ListItemButton>

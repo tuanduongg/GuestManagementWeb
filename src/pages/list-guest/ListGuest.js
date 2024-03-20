@@ -26,7 +26,7 @@ import config from 'config';
 import { concatGuestInfo, filterName, initialFilterStatus, optionsSelect } from './list-guest.service';
 import ForbidenPage from 'components/403/ForbidenPage';
 import ICON from '../../assets/images/logo/favilogo.png';
-import { getMessaging } from 'firebase/messaging';
+import Loading from 'components/Loading';
 
 const today = dayjs(); // Get the current date using dayjs
 let urlSocket = process.env.REACT_APP_URL_SOCKET;
@@ -43,6 +43,7 @@ const ListGuest = () => {
   const [dateSelect, setDateSelect] = useState([today]);
   const [dataUser, setDateUser] = useState(getDataUserFromLocal());
   const [role, setRole] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
   const handleCloseModalInfo = () => {
@@ -61,10 +62,12 @@ const ListGuest = () => {
     }
   };
   const checkRole = async () => {
+    setLoading(true);
     const rest = await restApi.get(RouterAPI.checkRole);
     if (rest?.status === 200) {
       setRole(rest?.data);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -150,7 +153,7 @@ const ListGuest = () => {
       key: 'guest_info',
       title: 'Tên khách',
       dataIndex: 'guest_info',
-      width: isMobile() ? 150 : '19%',
+      width: isMobile() ? 150 : '24%',
       fixed: 'left',
 
       render: (_, data) => (
@@ -263,7 +266,7 @@ const ListGuest = () => {
     {
       key: 'ACTION',
       align: 'center',
-      title: 'Duyệt',
+      title: dataUser?.role?.ROLE_NAME === 'SECURITY' ? 'Đã vào' : 'Duyệt',
       fixed: 'right',
       render: (_, data) => {
         if (
@@ -335,7 +338,10 @@ const ListGuest = () => {
       });
     }
   };
-  if (!role) {
+  if (loading) {
+    return <Loading />;
+  }
+  if (!role?.IS_READ) {
     return <ForbidenPage />;
   }
   return (
@@ -349,6 +355,7 @@ const ListGuest = () => {
       <Row style={{ margin: '5px 0px 10px 0px' }}>
         <Flex gap="small" wrap="wrap" style={{ width: '100%' }} justify="space-between">
           <DatePicker
+            size="small"
             className="date-picker-custom"
             multiple
             maxTagCount={1}
@@ -370,13 +377,13 @@ const ListGuest = () => {
           /> */}
           <div style={{ display: 'flex', justifyContent: 'end' }}>
             {role?.IS_CREATE && (
-              <Button onClick={handleClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
+              <Button size="small" onClick={handleClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
                 Đăng ký
               </Button>
             )}
             {role?.IS_DELETE && (
               <Popconfirm onConfirm={handleDelete} title="Thông báo" description="Bạn chắc chắn muốn xoá?" okText="Có" cancelText="đóng">
-                <Button disabled={selectedRowKeys?.length === 0} danger icon={<DeleteOutlined />} type="primary">
+                <Button size="small" disabled={selectedRowKeys?.length === 0} danger icon={<DeleteOutlined />} type="primary">
                   {isMobile() ? '' : 'Xoá'}
                 </Button>
               </Popconfirm>

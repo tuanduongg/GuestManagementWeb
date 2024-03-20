@@ -33,11 +33,13 @@ import { RouterAPI } from 'utils/routerAPI';
 import { setCookie } from 'utils/helper';
 import { useNavigate } from 'react-router-dom';
 import { ConfigRouter } from 'config_router';
+import Loading from 'components/Loading';
 
 // ============================|| FIREBASE - LOGIN ||============================ //
 
 const AuthLogin = () => {
   const [checked, setChecked] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => {
@@ -64,7 +66,9 @@ const AuthLogin = () => {
           try {
             setStatus({ success: false });
             setSubmitting(false);
+            setLoading(true);
             const res = await restApi.post(RouterAPI.login, values);
+            setLoading(false);
             if (res?.status === 200) {
               const data = res?.data;
               setCookie('ASSET_TOKEN', data?.accessToken, 1);
@@ -88,10 +92,12 @@ const AuthLogin = () => {
         {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
           <form noValidate onSubmit={handleSubmit}>
             <Grid container spacing={3}>
+              {loading && <Loading />}
               <Grid item xs={12}>
                 <Stack spacing={1}>
                   <InputLabel htmlFor="email-login">Tài khoản</InputLabel>
                   <OutlinedInput
+                    autoFocus
                     type="text"
                     value={values.username}
                     name="username"

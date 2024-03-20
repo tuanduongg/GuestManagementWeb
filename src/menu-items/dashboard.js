@@ -18,7 +18,7 @@ const dashboard = {
   children: [
     {
       id: ConfigRouter.listGuest,
-      title: 'Danh sách đăng ký khách',
+      title: 'Đăng ký khách',
       type: 'item',
       url: ConfigRouter.listGuest,
       icon: icons.UserOutlined,
