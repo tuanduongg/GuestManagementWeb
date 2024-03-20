@@ -24,5 +24,6 @@
       "sizes": "720x540",
       "form_factor": "wide"
     }
-  ]
+  ],
+  "gcm_sender_id": "282049744676"
 }

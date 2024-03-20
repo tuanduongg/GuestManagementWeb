@@ -17,9 +17,14 @@ const optionStatus = [
   { value: false, label: 'Block' }
 ];
 const initRole = (arr = []) => {
+<<<<<<< HEAD
   console.log('initRole', arr);
   if (arr) {
     const rs = arr.find((item) => item?.ROLE_NAME === 'USER');
+=======
+  if (arr) {
+    const rs = arr.find((item) => item.ROLE_NAME === 'USER');
+>>>>>>> da2b1c8d487c9204a3629d5adc764bae2a5428a9
     if (rs) {
       return rs?.ROLE_ID;
     }

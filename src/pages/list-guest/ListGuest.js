@@ -26,6 +26,7 @@ import config from 'config';
 import { concatGuestInfo, filterName, initialFilterStatus, optionsSelect } from './list-guest.service';
 import ForbidenPage from 'components/403/ForbidenPage';
 import ICON from '../../assets/images/logo/favilogo.png';
+import { getMessaging } from 'firebase/messaging';
 
 const today = dayjs(); // Get the current date using dayjs
 let urlSocket = process.env.REACT_APP_URL_SOCKET;
