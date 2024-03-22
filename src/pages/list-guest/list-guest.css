@@ -1,9 +1,14 @@
 .ant-dropdown .ant-dropdown-menu {
-    max-height: 200px !important;
+  max-height: 200px !important;
 }
 .date-picker-custom > .ant-picker-selection-item-remove {
-    display: none !important;
+  display: none !important;
 }
 .ant-table-cell {
-    padding: 10px !important;
+  padding: 10px !important;
 }
+/* .ant-tabs-tab-active {
+  font-weight: bold !important;
+  color: #000 !important;
+} */
+/* .ant-tabs-tab ant-tabs-tab-active */

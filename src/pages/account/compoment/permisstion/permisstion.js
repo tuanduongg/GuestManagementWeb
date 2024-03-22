@@ -151,14 +151,7 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
       <Flex gap="small" wrap="wrap" style={{ width: '100%', marginTop: '10px' }} justify="right">
         {role?.IS_UPDATE && (
           <>
-            <Button
-              size="small"
-              disabled={!checkChange}
-              onClick={onClickSave}
-              className="btn-success-custom"
-              icon={<SaveOutlined />}
-              type="primary"
-            >
+            <Button shape="round" disabled={!checkChange} onClick={onClickSave} className="btn-success-custom" icon={<SaveOutlined />} type="primary">
               Lưu thay đổi
             </Button>
           </>

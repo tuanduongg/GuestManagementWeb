@@ -265,7 +265,6 @@ export const getColorChipStatus = (status, timeInExpected) => {
   switch (status) {
     case statusName.NEW:
       color = '#16a34a'; //success color
-      color = '#16a34a'; //success color
       message = 'Mới';
       break;
     case statusName.ACCEPT:
@@ -285,6 +284,7 @@ export const getColorChipStatus = (status, timeInExpected) => {
     default:
       break;
   }
+  
   return <Badge color={color} count={message} />;
   // return (
   //   <Tag color={color} key={status}>

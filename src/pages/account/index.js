@@ -12,6 +12,7 @@ import Permisstion from './compoment/permisstion/permisstion';
 import ModalAccount from 'components/modal/modal-account/ModalAccount';
 import ModalRole from 'components/modal/modal-role/ModalRole';
 import { checkDisableBtn } from './compoment/account/account.service';
+import MainCard from 'components/MainCard';
 
 const { Title } = Typography;
 
@@ -158,82 +159,83 @@ const AccountPage = () => {
           <Title level={5}>Tài khoản & Phân quyền</Title>
         </Col>
       </Row>
-      <Row style={{ alignItems: 'center' }}>
-        <Col xs={24} sm={4} style={{ marginBottom: '10px' }}>
-          <Segmented
-            block
-            value={valueTab}
-            onChange={(value) => {
-              console.log(value);
-              setValueTab(value);
-            }}
-            options={[
-              {
-                label: 'Tài khoản',
-                value: 'account',
-                icon: <TeamOutlined />
-              },
-              {
-                label: 'Phân quyền',
-                value: 'role',
-                icon: <SafetyOutlined />
-              }
-            ]}
+      <MainCard contentSX={{ p: isMobile() ? 0.5 : 2, minHeight: '83vh' }}>
+        <Row>
+          <Col xs={24} sm={6} style={{ marginBottom: '10px' }}>
+            <Segmented
+              block
+              value={valueTab}
+              onChange={(value) => {
+                setValueTab(value);
+              }}
+              options={[
+                {
+                  label: 'Tài khoản',
+                  value: 'account',
+                  icon: <TeamOutlined />
+                },
+                {
+                  label: 'Phân quyền',
+                  value: 'role',
+                  icon: <SafetyOutlined />
+                }
+              ]}
+            />
+          </Col>
+          <Col xs={24} sm={18} style={{ marginBottom: '10px' }}>
+            <Flex gap="small" wrap="wrap" style={{ width: '100%' }} justify="end">
+              <div>
+                {role?.IS_CREATE && (
+                  <Button shape="round" onClick={onClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
+                    Thêm mới
+                  </Button>
+                )}
+                {role?.IS_UPDATE && valueTab === 'account' && (
+                  <>
+                    {typeBtnBlock === 'BLOCK' && (
+                      <Button
+                        shape="round"
+                        disabled={selectedRowKeys?.length === 0}
+                        danger
+                        onClick={onClickBlock}
+                        icon={<StopOutlined />}
+                        type="primary"
+                      >
+                        Khoá
+                      </Button>
+                    )}
+                    {typeBtnBlock === 'ACTIVE' && (
+                      <Button
+                        shape="round"
+                        disabled={selectedRowKeys?.length === 0}
+                        onClick={onClickBlock}
+                        className="btn-success-custom"
+                        icon={<UnlockOutlined />}
+                        type="primary"
+                      >
+                        Mở khoá
+                      </Button>
+                    )}
+                  </>
+                )}
+              </div>
+            </Flex>
+          </Col>
+        </Row>
+        {valueTab === 'account' && (
+          <Account
+            dataACC={dataACC}
+            setLoading={setLoading}
+            role={role}
+            listRole={listRole}
+            onClickEdit={onClickEditAcc}
+            setTypeBtnBlock={setTypeBtnBlock}
+            setSelectedRowKeys={setSelectedRowKeys}
+            selectedRowKeys={selectedRowKeys}
           />
-        </Col>
-        <Col xs={24} sm={20} style={{ marginBottom: '10px' }}>
-          <Flex gap="small" wrap="wrap" style={{ width: '100%' }} justify="end">
-            <div>
-              {role?.IS_CREATE && (
-                <Button size="small" onClick={onClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
-                  Thêm mới
-                </Button>
-              )}
-              {role?.IS_UPDATE && valueTab === 'account' && (
-                <>
-                  {typeBtnBlock === 'BLOCK' && (
-                    <Button
-                      disabled={selectedRowKeys?.length === 0}
-                      size="small"
-                      danger
-                      onClick={onClickBlock}
-                      icon={<StopOutlined />}
-                      type="primary"
-                    >
-                      Khoá
-                    </Button>
-                  )}
-                  {typeBtnBlock === 'ACTIVE' && (
-                    <Button
-                      disabled={selectedRowKeys?.length === 0}
-                      size="small"
-                      onClick={onClickBlock}
-                      className="btn-success-custom"
-                      icon={<UnlockOutlined />}
-                      type="primary"
-                    >
-                      Mở khoá
-                    </Button>
-                  )}
-                </>
-              )}
-            </div>
-          </Flex>
-        </Col>
-      </Row>
-      {valueTab === 'account' && (
-        <Account
-          dataACC={dataACC}
-          setLoading={setLoading}
-          role={role}
-          listRole={listRole}
-          onClickEdit={onClickEditAcc}
-          setTypeBtnBlock={setTypeBtnBlock}
-          setSelectedRowKeys={setSelectedRowKeys}
-          selectedRowKeys={selectedRowKeys}
-        />
-      )}
-      {valueTab === 'role' && <Permisstion setLoading={setLoading} role={role} listRole={listRole} getAllRole={getAllRole} />}
+        )}
+        {valueTab === 'role' && <Permisstion setLoading={setLoading} role={role} listRole={listRole} getAllRole={getAllRole} />}
+      </MainCard>
       {/* <Tabs
         size="middle"
         items={[

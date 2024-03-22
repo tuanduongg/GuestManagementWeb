@@ -35,7 +35,7 @@ export const filterName = (tableData) => {
         });
       }
     });
-    return arrName;
+    return arrName.filter((v, i, a) => v.value !== '' && a.findIndex((v2) => v2.value === v.value) === i);
   }
   return [];
 };
@@ -53,3 +53,5 @@ export const initialFilterStatus = (role) => {
   }
   return [];
 };
+export const NEW_TAB = 'NEW_TAB';
+export const HISTORY_TAB = 'HISTORY_TAB';

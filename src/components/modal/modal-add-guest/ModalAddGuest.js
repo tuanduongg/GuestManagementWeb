@@ -353,6 +353,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
     <>
       {contextHolder}
       <Modal
+        centered
         width={600}
         okText="Lưu thông tin"
         cancelText="Đóng"
@@ -416,31 +417,15 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
                       }}
                       placeholder="Nhập tên khách..."
                     />
-                    <Popconfirm
-                      open={openPopupConfirm}
-                      title="Thông báo"
-                      description="Bạn chắc chắn muốn xoá?"
-                      onConfirm={() => {
+                    <Button
+                      disabled={names?.filter((item) => item.isShow === true).length === 1}
+                      onClick={() => {
                         onClearInput(index);
                       }}
-                      okText="Có"
-                      cancelText="Đóng"
-                      placement="left"
-                    >
-                      <Button
-                        disabled={names?.length === 1}
-                        onClick={() => {
-                          if (names[index]?.FULL_NAME.trim() === '') {
-                            setOpenPopupConfirm(false);
-                          } else {
-                            setOpenPopupConfirm(true);
-                          }
-                        }}
-                        danger
-                        icon={<DeleteOutlined />}
-                        type="link"
-                      ></Button>
-                    </Popconfirm>
+                      danger
+                      icon={<DeleteOutlined />}
+                      type="link"
+                    ></Button>
                   </div>
                 </Col>
               );
