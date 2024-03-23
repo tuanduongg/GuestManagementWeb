@@ -24,6 +24,8 @@ export const RouterAPI = {
   editUser: 'user/edit',
   changeBlockUser: 'user/change-block',
 
+  getHistoryGuest: 'history-guest/findByGuest',
+
   getVapidKey: 'firebase/getKey',
   storeToken: 'firebase/store-token'
 };

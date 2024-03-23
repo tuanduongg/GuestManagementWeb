@@ -36,6 +36,7 @@ import { HISTORY_TAB, NEW_TAB, concatGuestInfo, filterName, initialFilterStatus,
 import ForbidenPage from 'components/403/ForbidenPage';
 import Loading from 'components/Loading';
 import MainCard from 'components/MainCard';
+import ModalHistoryGuest from 'components/modal/modal-history-guest/ModalHistoryGuest';
 
 const today = dayjs(); // Get the current date using dayjs
 let urlSocket = process.env.REACT_APP_URL_SOCKET;
@@ -46,6 +47,7 @@ const ListGuest = () => {
   const [tableData, setTableData] = useState([]);
   const [openModalInfo, setOpenModalInfo] = useState(false);
   const [openModalAdd, setOpenModalAdd] = useState(false);
+  const [openModalHistory, setOpenModalHistory] = useState(false);
   const [typeModalAdd, setTypeModalAdd] = useState('');
   const [dataSelect, setDataSelect] = useState({});
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -281,10 +283,7 @@ const ListGuest = () => {
       filterMode: 'tree',
       filterSearch: valueTab !== NEW_TAB,
       onFilter: (value, record) => {
-        if (value === statusName.CANCEL) {
-          return record?.DELETE_AT;
-        }
-        return record?.STATUS === value && !record?.DELETE_AT;
+        return record?.STATUS === value;
       },
       hidden: dataUser?.role?.ROLE_NAME === 'SECURITY'
     },
@@ -296,7 +295,8 @@ const ListGuest = () => {
       render: (_, data) => {
         if (
           (role?.IS_ACCEPT && data?.STATUS === statusName.NEW && !data?.DELETE_AT && dataUser?.role?.ROLE_NAME !== 'SECURITY') ||
-          (role?.IS_ACCEPT && data?.STATUS === statusName.ACCEPT && !data?.DELETE_AT && dataUser?.role?.ROLE_NAME === 'SECURITY')
+          (role?.IS_ACCEPT && data?.STATUS === statusName.ACCEPT && !data?.DELETE_AT && dataUser?.role?.ROLE_NAME === 'SECURITY') ||
+          data?.histories?.length === 0
         ) {
           return (
             <>
@@ -374,6 +374,10 @@ const ListGuest = () => {
         content: rest?.data?.message ?? 'Hủy thất bại!'
       });
     }
+  };
+
+  const onClickShowModalHistory = () => {
+    setOpenModalHistory(true);
   };
   if (loading) {
     return <Loading />;
@@ -480,6 +484,7 @@ const ListGuest = () => {
         ></Table>
       </MainCard>
       <ModalInfoGuest
+        onClickShowModalHistory={onClickShowModalHistory}
         role={role}
         dataSelect={dataSelect}
         onClickEdit={onClickEditOnModal}
@@ -492,6 +497,13 @@ const ListGuest = () => {
         dataSelect={dataSelect}
         open={openModalAdd}
         handleClose={handleCloseModalAdd}
+      />
+      <ModalHistoryGuest
+        idGuest={dataSelect?.GUEST_ID}
+        open={openModalHistory}
+        handleClose={() => {
+          setOpenModalHistory(false);
+        }}
       />
     </>
   );

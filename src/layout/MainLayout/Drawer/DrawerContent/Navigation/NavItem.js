@@ -8,7 +8,7 @@ import { useTheme } from '@mui/material/styles';
 import { Avatar, Chip, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
 
 // project import
-import { activeItem } from 'store/reducers/menu';
+import { activeItem, openDrawer } from 'store/reducers/menu';
 
 // ==============================|| NAVIGATION - LIST ITEM ||============================== //
 
@@ -30,6 +30,7 @@ const NavItem = ({ item, level }) => {
   }
 
   const itemHandler = (id) => {
+    dispatch(openDrawer({ drawerOpen: false }));
     dispatch(activeItem({ openItem: [id] }));
   };
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Modal, Row, Col, Flex, Typography, Spin } from 'antd';
-import { CaretRightOutlined, InfoCircleOutlined, EditOutlined, CloseOutlined, CheckOutlined } from '@ant-design/icons';
+import { CaretRightOutlined, FileSearchOutlined, EditOutlined, CloseOutlined, CheckOutlined } from '@ant-design/icons';
 const { Title, Text } = Typography;
 import './modal_info_guest.css';
 import { formatDateFromDB, formatHourMinus, getColorChipStatus, isMobile } from 'utils/helper';
@@ -9,7 +9,7 @@ import { RouterAPI } from 'utils/routerAPI';
 import { concatDateString } from './modal_info_guest.service';
 import config from 'config';
 
-const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role }) => {
+const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role, onClickShowModalHistory }) => {
   const [widthBoxImage, setWidthBoxImage] = useState(100);
 
   const handleCancel = () => {
@@ -65,17 +65,29 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role }) =>
           <>
             <div className={!role?.IS_UPDATE ? 'footer-modal-right' : 'footer-modal'}>
               <CancelBtn />
-              {role?.IS_UPDATE && (
+              <div>
                 <Button
-                  type="primary"
+                  style={{ marginRight: '5px' }}
+                  // type="link"
                   onClick={() => {
-                    onClickEdit(dataSelect);
+                    onClickShowModalHistory();
                   }}
-                  icon={<EditOutlined />}
+                  icon={<FileSearchOutlined />}
                 >
-                  Chỉnh sửa
+                  Lịch sử
                 </Button>
-              )}
+                {role?.IS_UPDATE && (
+                  <Button
+                    type="primary"
+                    onClick={() => {
+                      onClickEdit(dataSelect);
+                    }}
+                    icon={<EditOutlined />}
+                  >
+                    Chỉnh sửa
+                  </Button>
+                )}
+              </div>
             </div>
           </>
         )}
