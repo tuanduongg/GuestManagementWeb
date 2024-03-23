@@ -45,108 +45,108 @@ const ListStruck = () => {
 
   const [defaultDates, setDefaultDates] = useState([today, today]);
 
-  const columns = [
-    {
-      title: 'STT',
-      width: 70,
-      key: 'stt',
-      dataIndex: 'stt',
-      align: 'center'
-    },
-    {
-      align: 'left',
-      key: 'vendor',
-      title: 'Vendor',
-      dataIndex: 'vendor',
-      width: 130,
-      fixed: 'left',
-      render: (_, data) => (
-        <>
-          <Button
-            type="link"
-            onClick={() => {
-              setDataSelect(data);
-              setOpenModal(true);
-            }}
-          >
-            {data?.vendor}
-          </Button>
-        </>
-      ),
-      filters: tableData
-        ? tableData.map((item) => {
-            return {
-              text: item?.vendor,
-              value: item?.vendor
-            };
-          })
-        : [],
-      // {
-      //   text: 'Category 2',
-      //   value: 'Category 2'
-      // }
-      filterMode: 'tree',
-      filterSearch: true,
-      onFilter: (value, record) => record?.vendor === value
-    },
-    {
-      key: 'carNumber',
-      title: 'Biển số',
-      dataIndex: 'carNumber',
-      align: 'center',
-      width: 130,
-      fixed: 'left',
-      filters: tableData
-        ? tableData.map((item) => {
-            return {
-              text: item?.carNumber,
-              value: item?.carNumber
-            };
-          })
-        : [],
-      // {
-      //   text: 'Category 2',
-      //   value: 'Category 2'
-      // }
-      filterMode: 'tree',
-      filterSearch: true,
-      onFilter: (value, record) => record?.carNumber === value
-    },
-    {
-      key: 'timeInExpected',
-      title: 'Giờ vào\n(dự kiến)',
-      dataIndex: 'timeInExpected',
-      align: 'center',
-      render: (_, { timeInExpected }) => <>{formatDateFromDB(timeInExpected)}</>,
-      width: 130
-    },
-    {
-      key: 'timeOutExpected',
-      title: ['Giờ ra', '(dự kiến)'],
-      dataIndex: 'timeOutExpected',
-      align: 'center',
-      render: (_, { timeOutExpected }) => <>{formatDateFromDB(timeOutExpected)}</>,
-      width: 130
-    },
-    {
-      key: 'reason',
-      title: 'Mục đích',
-      dataIndex: 'reason',
-      width: 130
-    },
-    {
-      key: 'status',
-      align: 'center',
-      title: 'Trạng thái',
-      dataIndex: 'status',
-      render: (_, { status, timeInExpected }) => <>{getColorChipStatus(status, timeInExpected)}</>,
-      width: 130,
-      filters: listNameStatus() ?? [],
-      filterMode: 'tree',
-      filterSearch: true,
-      onFilter: (value, record) => record?.status === value
-    }
-  ];
+  // const columns = [
+  //   {
+  //     title: 'STT',
+  //     width: 70,
+  //     key: 'stt',
+  //     dataIndex: 'stt',
+  //     align: 'center'
+  //   },
+  //   {
+  //     align: 'left',
+  //     key: 'vendor',
+  //     title: 'Vendor',
+  //     dataIndex: 'vendor',
+  //     width: 130,
+  //     fixed: 'left',
+  //     render: (_, data) => (
+  //       <>
+  //         <Button
+  //           type="link"
+  //           onClick={() => {
+  //             setDataSelect(data);
+  //             setOpenModal(true);
+  //           }}
+  //         >
+  //           {data?.vendor}
+  //         </Button>
+  //       </>
+  //     ),
+  //     filters: tableData
+  //       ? tableData.map((item) => {
+  //           return {
+  //             text: item?.vendor,
+  //             value: item?.vendor
+  //           };
+  //         })
+  //       : [],
+  //     // {
+  //     //   text: 'Category 2',
+  //     //   value: 'Category 2'
+  //     // }
+  //     filterMode: 'tree',
+  //     filterSearch: true,
+  //     onFilter: (value, record) => record?.vendor === value
+  //   },
+  //   {
+  //     key: 'carNumber',
+  //     title: 'Biển số',
+  //     dataIndex: 'carNumber',
+  //     align: 'center',
+  //     width: 130,
+  //     fixed: 'left',
+  //     filters: tableData
+  //       ? tableData.map((item) => {
+  //           return {
+  //             text: item?.carNumber,
+  //             value: item?.carNumber
+  //           };
+  //         })
+  //       : [],
+  //     // {
+  //     //   text: 'Category 2',
+  //     //   value: 'Category 2'
+  //     // }
+  //     filterMode: 'tree',
+  //     filterSearch: true,
+  //     onFilter: (value, record) => record?.carNumber === value
+  //   },
+  //   {
+  //     key: 'timeInExpected',
+  //     title: 'Giờ vào\n(dự kiến)',
+  //     dataIndex: 'timeInExpected',
+  //     align: 'center',
+  //     render: (_, { timeInExpected }) => <>{formatDateFromDB(timeInExpected)}</>,
+  //     width: 130
+  //   },
+  //   {
+  //     key: 'timeOutExpected',
+  //     title: ['Giờ ra', '(dự kiến)'],
+  //     dataIndex: 'timeOutExpected',
+  //     align: 'center',
+  //     render: (_, { timeOutExpected }) => <>{formatDateFromDB(timeOutExpected)}</>,
+  //     width: 130
+  //   },
+  //   {
+  //     key: 'reason',
+  //     title: 'Mục đích',
+  //     dataIndex: 'reason',
+  //     width: 130
+  //   },
+  //   {
+  //     key: 'status',
+  //     align: 'center',
+  //     title: 'Trạng thái',
+  //     dataIndex: 'status',
+  //     render: (_, { status, timeInExpected }) => <>{getColorChipStatus(status,)}</>,
+  //     width: 130,
+  //     filters: listNameStatus() ?? [],
+  //     filterMode: 'tree',
+  //     filterSearch: true,
+  //     onFilter: (value, record) => record?.status === value
+  //   }
+  // ];
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -168,7 +168,7 @@ const ListStruck = () => {
   };
   return (
     <>
-      <Row>
+      {/* <Row>
         <Col span={24}>
           <Title level={5}>Danh sách xe đăng ký</Title>
         </Col>
@@ -192,7 +192,7 @@ const ListStruck = () => {
       >
         {tableData?.length === 0 && <Empty />}
       </Table>
-      <ModalInfoStruck dataSelect={dataSelect} open={openModal} handleClose={handleCloseModal} />
+      <ModalInfoStruck dataSelect={dataSelect} open={openModal} handleClose={handleCloseModal} /> */}
     </>
   );
 };

@@ -87,26 +87,26 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role }) =>
             <Flex direction="row">
               <Text className="min-width-50" style={{ marginRight: '5px', fontWeight: 500 }}>
                 {`Trạng thái: `}
-                {dataSelect ? getColorChipStatus(dataSelect?.STATUS, dataSelect?.TIME_IN) : ''}
+                {dataSelect ? getColorChipStatus(dataSelect?.STATUS, dataSelect?.DELETE_AT) : ''}
               </Text>
             </Flex>
             <Flex direction="row">
               <Text className="min-width-50" style={{ marginRight: '5px', fontWeight: 500 }}>
                 Công ty:
               </Text>
-              <Text>{dataSelect?.COMPANY ? dataSelect?.COMPANY : 'Chưa cập nhật'}</Text>
+              <Text>{dataSelect?.COMPANY ? dataSelect?.COMPANY : '...'}</Text>
             </Flex>
             <Flex direction="row">
               <Text className="min-width-50" style={{ marginRight: '5px', fontWeight: 500 }}>
                 Biển số xe:
               </Text>
-              <Text>{dataSelect?.CAR_NUMBER ? dataSelect?.CAR_NUMBER : 'Chưa cập nhật'}</Text>
+              <Text>{dataSelect?.CAR_NUMBER ? dataSelect?.CAR_NUMBER : '...'}</Text>
             </Flex>
             <Flex direction="row">
               <Text className="min-width-50" style={{ marginRight: '5px', fontWeight: 500 }}>
                 Thời gian tạo:
               </Text>
-              <Text>{dataSelect?.CREATE_AT ? formatDateFromDB(dataSelect?.CREATE_AT) : 'Chưa cập nhật'}</Text>
+              <Text>{dataSelect?.CREATE_AT ? formatDateFromDB(dataSelect?.CREATE_AT) : '...'}</Text>
             </Flex>
           </Col>
           <Col xs={24} sm={12}>
@@ -116,10 +116,6 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role }) =>
               <Text>{dataSelect?.TIME_IN ? formatHourMinus(dataSelect?.TIME_IN) : ''}</Text>
             </Flex>
             <Flex direction="row">
-              <Text className="title-time">Giờ vào(thực tế):</Text>
-              <Text>{dataSelect?.REAL_TIME_IN ?? 'Chưa cập nhật'}</Text>
-            </Flex>
-            <Flex direction="row">
               <Text className="title-time">Giờ ra(dự kiến):</Text>
               <Text>{dataSelect?.TIME_OUT ? formatHourMinus(dataSelect?.TIME_OUT) : ''}</Text>
             </Flex>
@@ -127,7 +123,7 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role }) =>
               <Text className="title-name-custom" style={{ minWidth: '40px' }}>
                 Ngày:
               </Text>
-              <Text>{dataSelect?.guest_date ? concatDateString(dataSelect?.guest_date) : 'Chưa cập nhật'}</Text>
+              <Text>{dataSelect?.guest_date ? concatDateString(dataSelect?.guest_date) : '...'}</Text>
             </Flex>
           </Col>
           {/* ==================== */}

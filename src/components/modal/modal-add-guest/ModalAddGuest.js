@@ -124,6 +124,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
       handleCancel();
     }
   };
+  console.log('date', date);
   const draggleRef = useRef(null);
   const handleOk = (e) => {
     let check = false;
@@ -481,6 +482,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
               Ngày vào(<span className="color-red">*</span>)
             </p>
             <DatePicker
+              needConfirm
               status={errorDate ? 'error' : ''}
               value={date}
               disabledDate={typeModal !== 'EDIT' ? disabledDate : false}

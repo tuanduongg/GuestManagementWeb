@@ -72,7 +72,6 @@ const ListGuest = () => {
   // }, [dataUser]);
 
   const getData = async () => {
-    console.log('valueTab', valueTab);
     const data = { date: JSON.stringify(formatArrDate(dateSelect)), status: statusName.NEW };
     if (valueTab === NEW_TAB) {
       data.date = JSON.stringify(formatArrDate([today]));
@@ -108,7 +107,6 @@ const ListGuest = () => {
         if (data) {
           //nếu là người duyệt(quyền duyệt,không là người tạo)
           if (dataUser?.username !== data?.CREATE_BY && dataUser?.role?.ROLE_NAME !== 'SECURITY' && role?.IS_ACCEPT) {
-            console.log('valueTab', valueTab);
             setCheckChange(true);
           }
         }
@@ -277,12 +275,17 @@ const ListGuest = () => {
       align: 'center',
       title: 'Trạng thái',
       dataIndex: 'STATUS',
-      render: (_, { STATUS, TIME_IN }) => <>{getColorChipStatus(STATUS, TIME_IN)}</>,
+      render: (_, { STATUS, DELETE_AT }) => <>{getColorChipStatus(STATUS, DELETE_AT)}</>,
       width: isMobile() ? 100 : '11%',
       filters: valueTab === NEW_TAB ? [] : listNameStatus(),
       filterMode: 'tree',
       filterSearch: valueTab !== NEW_TAB,
-      onFilter: (value, record) => record?.STATUS === value,
+      onFilter: (value, record) => {
+        if (value === statusName.CANCEL) {
+          return record?.DELETE_AT;
+        }
+        return record?.STATUS === value && !record?.DELETE_AT;
+      },
       hidden: dataUser?.role?.ROLE_NAME === 'SECURITY'
     },
     {
@@ -292,8 +295,8 @@ const ListGuest = () => {
       fixed: 'right',
       render: (_, data) => {
         if (
-          (role?.IS_ACCEPT && data?.STATUS === statusName.NEW && dataUser?.role?.ROLE_NAME !== 'SECURITY') ||
-          (role?.IS_ACCEPT && data?.STATUS === statusName.ACCEPT && dataUser?.role?.ROLE_NAME === 'SECURITY')
+          (role?.IS_ACCEPT && data?.STATUS === statusName.NEW && !data?.DELETE_AT && dataUser?.role?.ROLE_NAME !== 'SECURITY') ||
+          (role?.IS_ACCEPT && data?.STATUS === statusName.ACCEPT && !data?.DELETE_AT && dataUser?.role?.ROLE_NAME === 'SECURITY')
         ) {
           return (
             <>
@@ -350,18 +353,25 @@ const ListGuest = () => {
     getData();
   };
 
+  const showCancelBtn = () => {
+    const rs = tableData?.filter((item) => {
+      return selectedRowKeys.includes(item?.GUEST_ID) && item.STATUS !== statusName.CANCEL;
+    });
+    return rs?.length > 0;
+  };
+
   const handleDelete = async () => {
-    const rest = await restApi.post(RouterAPI.deleteGuest, { data: selectedRowKeys });
+    const rest = await restApi.post(RouterAPI.cancelGuest, { data: selectedRowKeys });
     if (rest?.status === 200) {
       messageApi.open({
         type: 'success',
-        content: 'Xoá thành công!'
+        content: 'Hủy thành công!'
       });
       getData();
     } else {
       messageApi.open({
         type: 'warning',
-        content: rest?.data?.message ?? 'Xoá thất bại!'
+        content: rest?.data?.message ?? 'Hủy thất bại!'
       });
     }
   };
@@ -387,7 +397,7 @@ const ListGuest = () => {
             {
               key: NEW_TAB,
               label: (
-                <Badge dot={tableData?.filter((item) => item?.STATUS === statusName.NEW).length > 0}>
+                <Badge dot={0}>
                   <span>Đăng ký mới</span>
                 </Badge>
               ),
@@ -443,7 +453,7 @@ const ListGuest = () => {
               )}
               {role?.IS_DELETE && (
                 <Popconfirm onConfirm={handleDelete} title="Thông báo" description="Bạn chắc chắn muốn hủy?" okText="Có" cancelText="đóng">
-                  <Button shape="round" disabled={selectedRowKeys?.length === 0} danger icon={<CloseOutlined />} type="primary">
+                  <Button shape="round" disabled={!showCancelBtn()} danger icon={<CloseOutlined />} type="primary">
                     {'Hủy'}
                   </Button>
                 </Popconfirm>

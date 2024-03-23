@@ -66,7 +66,7 @@ const ModalInfoStruck = ({ open, handleClose, dataSelect }) => {
             <div style={{ margin: '5px 0px 0px 0px' }}>
               <Text style={{ marginRight: '5px', fontWeight: 500 }}>
                 {`Trạng thái: `}
-                {dataSelect ? getColorChipStatus(dataSelect?.status, dataSelect?.timeInExpected) : ''}
+                {/* {dataSelect ? getColorChipStatus(dataSelect?.status, dataSelect?.timeInExpected) : ''} */}
               </Text>
               <Flex direction="row">
                 <Text style={{ marginRight: '5px', fontWeight: 500 }}>Vendor:</Text>

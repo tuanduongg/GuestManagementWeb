@@ -7,6 +7,7 @@ export const RouterAPI = {
   updateGuest: 'guest/update',
   deleteGuest: 'guest/delete',
   findByIdGuest: 'guest/findById',
+  cancelGuest: 'guest/cancel',
   allGuest: 'guest/all',
   updateGuestInfo: 'guest-info/update',
   deleteGuestInfo: 'guest-info/delete',

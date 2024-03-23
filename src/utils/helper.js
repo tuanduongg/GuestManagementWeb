@@ -128,6 +128,7 @@ export function generateRandomVNLicensePlate() {
   return licensePlate;
 }
 export const statusName = {
+  CANCEL: 'CANCEL',
   NEW: 'NEW',
   ACCEPT: 'ACCEPT',
   COME_IN: 'COME_IN'
@@ -184,6 +185,9 @@ export const listNameStatus = () => {
     let message = '';
     if (item) {
       switch (item) {
+        case statusName.CANCEL:
+          message = 'Đã hủy';
+          break;
         case statusName.NEW:
           message = 'Mới';
           break;
@@ -224,6 +228,9 @@ export const getNameStatus = (status) => {
       case statusName.COME_OUT:
         message = 'Đã ra';
         break;
+      case statusName.CANCEL:
+        message = 'Đã hủy';
+        break;
 
       default:
         break;
@@ -258,10 +265,13 @@ function tinhKhoangCachDenThoiGian(chuoiThoiGian) {
     return `${phut}p`;
   }
 }
-export const getColorChipStatus = (status, timeInExpected) => {
+export const getColorChipStatus = (status, deleteAt) => {
   // console.log('compareDateTime(timeInExpected)', compareDateTime(timeInExpected));
   let color = '';
   let message = '';
+  if (deleteAt) {
+    return <Badge color={'#f5222d'} count={'Đã hủy'} />;
+  }
   switch (status) {
     case statusName.NEW:
       color = '#16a34a'; //success color
@@ -280,11 +290,15 @@ export const getColorChipStatus = (status, timeInExpected) => {
       color = '#44403c';
       message = 'Đã ra';
       break;
+    case statusName.CANCEL:
+      color = '#f5222d';
+      message = 'Đã hủy';
+      break;
 
     default:
       break;
   }
-  
+
   return <Badge color={color} count={message} />;
   // return (
   //   <Tag color={color} key={status}>
@@ -314,7 +328,7 @@ export const ROLE_ACC = {
 };
 export const STATUS_ACC = {
   ACTIVE: true,
-  BLOCK: false,
+  BLOCK: false
 };
 export const getChipStatusAcc = (status) => {
   let color = '';
