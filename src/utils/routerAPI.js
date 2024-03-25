@@ -23,6 +23,7 @@ export const RouterAPI = {
   addUser: 'user/add',
   editUser: 'user/edit',
   changeBlockUser: 'user/change-block',
+  changePassword: 'user/change-password',
 
   getHistoryGuest: 'history-guest/findByGuest',
 

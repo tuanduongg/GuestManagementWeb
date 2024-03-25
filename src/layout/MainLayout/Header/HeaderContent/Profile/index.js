@@ -33,6 +33,8 @@ import './profile.style.css';
 import { IdcardOutlined, LogoutOutlined, CheckOutlined, TranslationOutlined, RedoOutlined } from '@ant-design/icons';
 import { logout } from 'utils/helper';
 import { OPTION_LANGUAGE } from './profile.service';
+import ModalChangePassword from 'components/modal/modal-changepassword/ModalChangePassword';
+import { useTranslation } from 'react-i18next';
 
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
@@ -72,7 +74,9 @@ const Profile = () => {
   const [valueLanguage, setValueLanguage] = useState(['vn']);
   const [dataUser, setDataUser] = useState(getDataUser());
   const [itemSelect, setItemSelect] = useState('');
+  const [openModalChangePassword, setOpenModalChangePassword] = useState(false);
   const theme = useTheme();
+  const { t, i18n } = useTranslation();
 
   const handleLogout = async () => {
     logout();
@@ -92,6 +96,16 @@ const Profile = () => {
   };
 
   const handleListItemClick = (event, item) => {
+    switch (item) {
+      case 'changepassword':
+        setOpenModalChangePassword(true);
+        break;
+      case 'language':
+        break;
+
+      default:
+        break;
+    }
     setItemSelect(item);
   };
 
@@ -100,7 +114,6 @@ const Profile = () => {
   };
 
   const iconBackColorOpen = 'grey.300';
-
 
   return (
     <Box sx={{ flexShrink: 0, ml: 0.75 }}>
@@ -256,6 +269,8 @@ const Profile = () => {
                             onChange={(_, selectedOptions) => {
                               const value = selectedOptions[0].value;
                               setValueLanguage([value]);
+                              localStorage.setItem('LANGUAGE', value);
+                              i18n.changeLanguage(value);
                             }}
                           >
                             <ListItemButton
@@ -263,7 +278,7 @@ const Profile = () => {
                               onClick={(event) => handleListItemClick(event, 'language')}
                             >
                               <ListItemIcon>
-                              <TranslationOutlined />
+                                <TranslationOutlined />
                               </ListItemIcon>
                               <ListItemText primary="Ngôn ngữ" />
                             </ListItemButton>
@@ -290,6 +305,12 @@ const Profile = () => {
           </Transitions>
         )}
       </Popper>
+      <ModalChangePassword
+        open={openModalChangePassword}
+        handleClose={() => {
+          setOpenModalChangePassword(false);
+        }}
+      />
     </Box>
   );
 };

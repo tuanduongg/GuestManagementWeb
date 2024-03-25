@@ -135,8 +135,8 @@ const AccountPage = () => {
     Modal.confirm({
       title: `Thông báo`,
       content: `Bạn chắc chắn muốn ${typeBtnBlock === 'BLOCK' ? 'khóa' : 'mở khóa'} tài khoản ?`,
-      okText: 'Yes',
-      cancelText: 'No',
+      okText: 'Có',
+      cancelText: 'Không',
       centered: true,
       icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
       onOk: async () => {
@@ -144,15 +144,12 @@ const AccountPage = () => {
       }
     });
   };
-
-  if (loading) {
-    return <Loading />;
-  }
   if (!role?.IS_READ) {
     return <ForbidenPage />;
   }
   return (
     <>
+    <Loading loading={loading} />
       {contextHolder}
       <Row>
         <Col span={24}>

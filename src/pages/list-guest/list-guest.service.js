@@ -1,4 +1,5 @@
 import { listNameStatus, statusName } from 'utils/helper';
+import dayjs from 'dayjs';
 
 // export const optionsSelect = listNameStatus().map((item, index) => {
 //   return {
@@ -55,3 +56,17 @@ export const initialFilterStatus = (role) => {
 };
 export const NEW_TAB = 'NEW_TAB';
 export const HISTORY_TAB = 'HISTORY_TAB';
+export const getAllDateOfWeek = () => {
+  // Lấy ngày hôm nay
+  const today = dayjs();
+
+  // Khởi tạo mảng để chứa 7 ngày trước đó
+  const sevenDaysAgo = [];
+
+  // Lặp qua 7 ngày trước và thêm vào mảng
+  for (let i = 6; i >= 0; i--) {
+    const date = today.subtract(i, 'day');
+    sevenDaysAgo.push(date);
+  }
+  return sevenDaysAgo;
+};

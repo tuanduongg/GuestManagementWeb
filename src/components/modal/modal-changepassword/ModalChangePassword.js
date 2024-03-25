@@ -1,30 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
-import { Input, Modal, App, Row, Col, DatePicker, Select } from 'antd';
-import dayjs from 'dayjs';
-const { TextArea } = Input;
+import { Input, Modal, App, Row, Col } from 'antd';
 
 // assets
-import { PlusOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { ROLE_ACC, STATUS_ACC } from 'utils/helper';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
+import './modalChangePassword.css';
+import { handleLogout, logout } from 'utils/helper';
+import { useTranslation } from 'react-i18next';
 
 const initialValidate = { error: false, message: '' };
-const optionStatus = [
-  { value: true, label: 'Active' },
-  { value: false, label: 'Block' }
-];
-const initRole = (arr = []) => {
-  if (arr) {
-    const rs = arr.find((item) => item?.ROLE_NAME === 'USER');
-    if (rs) {
-      return rs?.ROLE_ID;
-    }
-  }
-  return '';
-};
-const ModalChangePassword = ({ open, handleClose, typeModal, dataSelect, listRole, afterSave, setSelectedRowKeys }) => {
+const ModalChangePassword = ({ open, handleClose }) => {
   const { modal } = App.useApp();
   const [disabled, setDisabled] = useState(true);
   const [bounds, setBounds] = useState({
@@ -33,81 +20,83 @@ const ModalChangePassword = ({ open, handleClose, typeModal, dataSelect, listRol
     bottom: 0,
     right: 0
   });
+  const { t, i18n } = useTranslation();
 
-  const [username, setUsername] = useState('');
-  const [validateUsername, setValidateUsername] = useState(initialValidate);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [validateCurrentPassword, setValidateCurrentPassword] = useState(initialValidate);
 
-  const [password, setPassword] = useState('');
-  const [validatePassword, setValidatePassword] = useState(initialValidate);
+  const [newPassword, setNewPassword] = useState('');
+  const [validateNewPassword, setValidateNewPassword] = useState(initialValidate);
 
-  const [status, setStatus] = useState(true);
-  const [validateStatus, setValidateStatus] = useState(initialValidate);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [validateConfirmPassword, setValidateConfirmPassword] = useState(initialValidate);
 
-  const [role, setRole] = useState(initRole(listRole));
   const [loading, setLoading] = useState(false);
 
   const draggleRef = useRef(null);
+  const handleSave = async () => {
+    setLoading(true);
+    let url = RouterAPI.changePassword;
+    let data = {
+      currentPassword,
+      newPassword,
+      confirmPassword
+    };
+    const res = await restApi.post(url, data);
+    setLoading(false);
+    if (res?.status === 200) {
+      Modal.confirm({
+        centered: true,
+        closable: false,
+        okText: 'Đăng xuất',
+        title: 'Thông báo',
+        content: 'Đổi mật khẩu thành công!',
+        keyboard: false,
+        onOk: () => {
+          handleLogout();
+        },
+        footer: (_, { OkBtn, CancelBtn }) => (
+          <>
+            {/* <CancelBtn /> */}
+            <OkBtn />
+          </>
+        )
+      });
+    } else {
+      setValidateCurrentPassword({ error: true, message: res?.data?.message });
+    }
+  };
   const handleOk = (e) => {
     let check = false;
-    if (username?.trim() === '') {
+    if (currentPassword?.trim() === '') {
       check = true;
-      setValidateUsername({ error: true, message: 'Bắt buộc nhập tên tài khoản' });
+      setValidateCurrentPassword({ error: true, message: ' Bắt buộc nhập trường này!' });
     }
-    if (username?.includes(' ')) {
+    if (newPassword?.trim() === '') {
       check = true;
-      setValidateUsername({ error: true, message: 'Tên tài khoản không chứa ký tự khoảng trắng' });
-    }
-    if (typeModal !== 'EDIT') {
-      // modal add
-      if (password?.trim() === '') {
-        check = true;
-        setValidatePassword({ error: true, message: 'Bắt buộc nhập mật khẩu' });
-      }
-      if (password.includes(' ')) {
-        check = true;
-        setValidatePassword({ error: true, message: 'Mật khẩu không được chứa ký tự khoảng trắng' });
-      }
-      if (password.length < 4) {
-        check = true;
-        setValidatePassword({ error: true, message: 'Mật khẩu chứa ít nhất 4 ký tự' });
-      }
+      setValidateNewPassword({ error: true, message: ' Bắt buộc nhập trường này!' });
     } else {
-      if (password?.trim() !== '') {
-        if (password.includes(' ')) {
-          check = true;
-          setValidatePassword({ error: true, message: 'Mật khẩu không được chứa ký tự khoảng trắng' });
-        }
-        if (password.length < 4) {
-          check = true;
-          setValidatePassword({ error: true, message: 'Mật khẩu chứa ít nhất 4 ký tự' });
-        }
+      if (newPassword?.length < 4) {
+        check = true;
+        setValidateNewPassword({ error: true, message: ' Mật khẩu có ít nhất 4 ký tự!' });
       }
     }
-    const handleSave = async () => {
-      setLoading(true);
-      let url = RouterAPI.addUser;
-      if (typeModal === 'EDIT') {
-        url = RouterAPI.editUser;
+    if (confirmPassword?.trim() === '') {
+      check = true;
+      setValidateConfirmPassword({ error: true, message: ' Bắt buộc nhập trường này!' });
+    } else {
+      if (confirmPassword?.trim() !== newPassword?.trim()) {
+        check = true;
+        setValidateNewPassword({ error: true, message: ' Mật khẩu không khớp nhau!' });
+        setValidateConfirmPassword({ error: true, message: ' Mật khẩu không khớp nhau!' });
       }
-      const res = await restApi.post(url, {
-        USER_ID: dataSelect?.USER_ID ? dataSelect?.USER_ID : '',
-        USERNAME: username,
-        PASSWORD: password,
-        role: role,
-        ACTIVE: status
-      });
-      setLoading(false);
-      if (res?.status === 200) {
-        handleCancel();
-      }
-      afterSave(res);
-    };
+    }
     if (!check) {
       Modal.confirm({
         title: `Thông báo`,
-        content: 'Bạn chắc chắn muốn lưu thông tin?',
-        okText: 'Yes',
-        cancelText: 'No',
+        content: 'Bạn chắc chắn muốn lưu thay đổi?',
+        okText: 'Có',
+        cancelText: 'Không',
         centered: true,
         icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
         onOk: async () => {
@@ -117,21 +106,16 @@ const ModalChangePassword = ({ open, handleClose, typeModal, dataSelect, listRol
     }
   };
 
-  useEffect(() => {
-    if (open) {
-      setUsername(dataSelect?.USERNAME);
-      setRole(dataSelect?.role?.ROLE_ID);
-      setStatus(dataSelect?.ACTIVE ? true : false);
-    }
-  }, [dataSelect]);
   const handleCancel = (e) => {
-    setUsername('');
-    setPassword('');
-    setRole(initRole(listRole));
-    setStatus(STATUS_ACC.ACTIVE);
-    setValidateUsername(initialValidate);
-    setValidatePassword(initialValidate);
-    setValidateStatus(initialValidate);
+    setCurrentPassword('');
+    setValidateCurrentPassword(initialValidate);
+
+    setValidateNewPassword(initialValidate);
+    setNewPassword('');
+
+    setConfirmPassword('');
+    setValidateConfirmPassword(initialValidate);
+
     handleClose();
   };
   const onStart = (_event, uiData) => {
@@ -151,17 +135,23 @@ const ModalChangePassword = ({ open, handleClose, typeModal, dataSelect, listRol
   const onChangeInput = (e) => {
     const { value, name } = e.target;
     switch (name) {
-      case 'password':
-        if (validatePassword?.error) {
-          setValidatePassword(initialValidate);
+      case 'currentPassword':
+        if (validateCurrentPassword?.error) {
+          setValidateCurrentPassword(initialValidate);
         }
-        setPassword(value);
+        setCurrentPassword(value);
         break;
-      case 'username':
-        if (validateUsername?.error) {
-          setValidateUsername(initialValidate);
+      case 'newPassword':
+        if (validateNewPassword?.error) {
+          setValidateNewPassword(initialValidate);
         }
-        setUsername(value);
+        setNewPassword(value);
+        break;
+      case 'confirmPassword':
+        if (validateConfirmPassword?.error) {
+          setValidateConfirmPassword(initialValidate);
+        }
+        setConfirmPassword(value);
         break;
 
       default:
@@ -171,10 +161,7 @@ const ModalChangePassword = ({ open, handleClose, typeModal, dataSelect, listRol
 
   const onClickCancel = () => {
     let check = false;
-    if (username?.trim() !== '') {
-      check = true;
-    }
-    if (password?.trim() !== '') {
+    if (currentPassword?.trim() !== '' || newPassword?.trim() !== '' || confirmPassword?.trim() !== '') {
       check = true;
     }
     if (check) {
@@ -221,7 +208,7 @@ const ModalChangePassword = ({ open, handleClose, typeModal, dataSelect, listRol
             onBlur={() => {}}
             // end
           >
-            {typeModal === 'EDIT' ? 'Thông tin tài khoản' : typeModal === 'VIEW' ? 'Thông tin tài khoản' : 'Thêm mới tài khoản'}
+            Đổi mật khẩu
           </div>
         }
         open={open}
@@ -234,90 +221,51 @@ const ModalChangePassword = ({ open, handleClose, typeModal, dataSelect, listRol
         )}
         footer={(_, { OkBtn, CancelBtn }) => (
           <>
-            {typeModal !== 'VIEW' && (
-              <>
-                <CancelBtn />
-                <OkBtn loading={loading} />
-              </>
-            )}
+            <CancelBtn />
+            <OkBtn loading={loading} />
           </>
         )}
       >
         <Row gutter={16}>
-          <Col xs={24} sm={24}>
+          <Col span={24}>
             <p className="custom-label-input">
-              Tên tài khoản(<span className="color-red">*</span>)
+              Mật khẩu hiện tại(<span className="color-red">*</span>)
             </p>
             <Input
-              disabled={typeModal === 'VIEW' || typeModal === 'EDIT'}
-              value={username}
-              name={'username'}
-              status={validateUsername.error ? 'error' : ''}
+              name="currentPassword"
+              value={currentPassword}
               onChange={onChangeInput}
-              placeholder="Nhập tên tài khoản..."
+              status={validateCurrentPassword.error ? 'error' : ''}
+              placeholder="Nhập mật khẩu hiện tại..."
             />
-            {validateUsername.error && <p className="message-err">(*){validateUsername.message}</p>}
+            {validateCurrentPassword.error && <p className="message-err">(*){validateCurrentPassword.message}</p>}
           </Col>
-          <Col span={12}>
+          <Col span={24}>
             <p className="custom-label-input">
-              Quyền(<span className="color-red">*</span>)
+              Mật khẩu mới(<span className="color-red">*</span>)
             </p>
-            <Select
-              disabled={typeModal === 'VIEW'}
-              value={role}
-              style={{
-                width: '100%'
-              }}
-              onChange={(value) => {
-                setRole(value);
-              }}
-              options={
-                listRole
-                  ? listRole.map((item) => {
-                      return {
-                        value: item?.ROLE_ID,
-                        label: item?.ROLE_NAME
-                      };
-                    })
-                  : []
-              }
+            <Input
+              name="newPassword"
+              value={newPassword}
+              onChange={onChangeInput}
+              status={validateNewPassword.error ? 'error' : ''}
+              placeholder="Nhập mật khẩu mới..."
             />
+            {validateNewPassword.error && <p className="message-err">(*){validateNewPassword.message}</p>}
           </Col>
-          <Col span={12}>
+          <Col span={24}>
             <p className="custom-label-input">
-              Trạng thái(<span className="color-red">*</span>)
+              Nhập lại mật khẩu(<span className="color-red">*</span>)
             </p>
-            <Select
-              disabled={typeModal === 'VIEW'}
-              value={status}
-              style={{
-                width: '100%'
-              }}
-              onChange={(value) => {
-                setStatus(value);
-              }}
-              options={optionStatus}
+            <Input
+              name="confirmPassword"
+              value={confirmPassword}
+              onChange={onChangeInput}
+              status={validateConfirmPassword.error ? 'error' : ''}
+              placeholder="Xác nhận mật khẩu mới..."
             />
+            {validateConfirmPassword.error && <p className="message-err">(*){validateConfirmPassword.message}</p>}
           </Col>
-          {typeModal !== 'VIEW' && (
-            <Col span={24}>
-              {typeModal === 'EDIT' ? (
-                <p className="custom-label-input">Đổi mật khẩu</p>
-              ) : (
-                <p className="custom-label-input">
-                  Mật khẩu(<span className="color-red">*</span>)
-                </p>
-              )}
-              <Input
-                name="password"
-                value={password}
-                onChange={onChangeInput}
-                status={validatePassword.error ? 'error' : ''}
-                placeholder="Nhập mật khẩu..."
-              />
-              {validatePassword.error && <p className="message-err">(*){validatePassword.message}</p>}
-            </Col>
-          )}
         </Row>
       </Modal>
     </>

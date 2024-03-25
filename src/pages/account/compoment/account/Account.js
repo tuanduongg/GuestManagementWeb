@@ -132,8 +132,8 @@ const Account = ({ role, listRole, onClickEdit, dataACC, setTypeBtnBlock, setSel
     Modal.confirm({
       title: `Thông báo`,
       content: `Bạn chắc chắn muốn ${typeBtn === 'BLOCK' ? 'khóa' : 'mở khóa'} tài khoản ?`,
-      okText: 'Yes',
-      cancelText: 'No',
+      okText: 'Có',
+      cancelText:'Không',
       centered: true,
       icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
       onOk: async () => {

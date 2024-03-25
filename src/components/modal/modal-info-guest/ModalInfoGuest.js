@@ -67,7 +67,7 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role, onCl
               <CancelBtn />
               <div>
                 <Button
-                  style={{ marginRight: '5px' }}
+                  style={{ margin: '0px 5px' }}
                   // type="link"
                   onClick={() => {
                     onClickShowModalHistory();

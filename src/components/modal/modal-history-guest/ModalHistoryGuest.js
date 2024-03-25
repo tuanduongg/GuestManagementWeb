@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
-import { Input, Modal, App, Row, Col, message, Table } from 'antd';
+import { Input, Modal, App, Row, Col, message, Table, Typography } from 'antd';
 import dayjs from 'dayjs';
 const { TextArea, Search } = Input;
+const { Link } = Typography;
 
 // assets
 import { PlusOutlined, InfoCircleOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -14,7 +15,7 @@ const columns = [
   {
     align: 'center',
     key: 'no',
-    title: 'No.',
+    title: '#',
     fixed: 'left',
     width: '15%',
     render: (text, object, index) => index + 1
@@ -29,16 +30,21 @@ const columns = [
   {
     align: 'left',
     key: 'VALUE',
-    title: 'Giá trị',
+    title: 'Mô tả',
     dataIndex: 'VALUE',
     width: '25%'
   },
   {
     align: 'left',
     key: 'USER',
-    title: 'Username',
+    title: 'User',
     dataIndex: 'USER',
-    width: '20%'
+    width: '20%',
+    render: (_, data) => (
+      <>
+        <Link onClick={() => {}}>{data?.USER}</Link>
+      </>
+    )
   },
   {
     key: 'TIME',

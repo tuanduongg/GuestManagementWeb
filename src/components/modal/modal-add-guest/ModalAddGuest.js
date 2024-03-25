@@ -25,7 +25,7 @@ const tagInputStyle = {
   verticalAlign: 'top'
 };
 const initialValiateName = { FULL_NAME: '', NAME_ID: '', isShow: true };
-const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) => {
+const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal, setLoading }) => {
   const [disabled, setDisabled] = useState(true);
   const [arrInputName, setArrInputName] = useState([initInputName]);
   const [messageApi, contextHolder] = message.useMessage();
@@ -105,6 +105,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
     borderColor: errorEditTag ? 'red' : ''
   };
   const handleSaveGuest = async () => {
+    setLoading(true);
     let url = typeModal === 'EDIT' ? RouterAPI.updateGuest : RouterAPI.addGuest;
     const data = {
       id: dataSelect?.GUEST_ID,
@@ -119,12 +120,12 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
       names
     };
     const rest = await restApi.post(url, data);
+    setLoading(false);
     afterSave(rest);
     if (rest?.status === 200) {
       handleCancel();
     }
   };
-  console.log('date', date);
   const draggleRef = useRef(null);
   const handleOk = (e) => {
     let check = false;
@@ -182,8 +183,8 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
       Modal.confirm({
         title: `Thông báo`,
         content: 'Bạn chắc chắn muốn lưu thông tin?',
-        okText: 'Yes',
-        cancelText: 'No',
+        okText: 'Có',
+        cancelText: 'Không',
         centered: true,
         icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
         onOk: () => {
@@ -320,8 +321,8 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
       Modal.confirm({
         title: `Thông báo`,
         content: 'Bạn chắc chắn muốn đóng?',
-        okText: 'Yes',
-        cancelText: 'No',
+        okText: 'Có',
+        cancelText: 'Không',
         centered: true,
         onOk: () => {
           handleCancel();
@@ -380,7 +381,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal }) 
             onBlur={() => {}}
             // end
           >
-            {typeModal === 'EDIT' ? 'Chỉnh sửa thông tin' : 'Đăng ký khách vào'}
+            {typeModal === 'EDIT' ? 'Chỉnh sửa thông tin' : 'Đăng ký khách'}
           </div>
         }
         open={open}

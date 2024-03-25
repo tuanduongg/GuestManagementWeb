@@ -283,7 +283,6 @@ export const getColorChipStatus = (status, deleteAt) => {
       break;
     case statusName.COME_IN:
       color = '#1e3a8a';
-      // color = 'geekblue';
       message = 'Đã vào';
       break;
     case statusName.COME_OUT:
@@ -380,11 +379,14 @@ export const logout = () => {
     title: 'Thông báo',
     content: 'Bạn chắc chắn muốn đăng xuất?',
     onOk: () => {
-      delete_cookie('ASSET_TOKEN');
-      setCookie('ASSET_TOKEN', '', 1);
-      location.href = ConfigRouter.login;
+      handleLogout();
     }
   });
+};
+export const handleLogout = () => {
+  delete_cookie('ASSET_TOKEN');
+  setCookie('ASSET_TOKEN', '', 1);
+  location.href = ConfigRouter.login;
 };
 
 export function setCookie(name, value, days) {

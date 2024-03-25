@@ -7,7 +7,7 @@ import Loading from './Loading';
 // ==============================|| LOADABLE - LAZY LOADING ||============================== //
 
 const Loadable = (Component) => (props) => (
-  <Suspense fallback={<Loading />}>
+  <Suspense fallback={<Loading loading={true} />}>
     <Component {...props} />
   </Suspense>
 );

@@ -18,12 +18,12 @@ const { Title, Link, Text } = Typography;
 import {
   PlusOutlined,
   DeleteOutlined,
-  EditOutlined,
+  CalendarOutlined,
   CheckOutlined,
   CloseOutlined,
   FilterOutlined,
   UsergroupAddOutlined,
-  HistoryOutlined
+  UnorderedListOutlined
 } from '@ant-design/icons';
 import './list-guest.css';
 import dayjs from 'dayjs';
@@ -32,13 +32,22 @@ import ModalAddGuest from 'components/modal/modal-add-guest/ModalAddGuest';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import config from 'config';
-import { HISTORY_TAB, NEW_TAB, concatGuestInfo, filterName, initialFilterStatus, optionsSelect } from './list-guest.service';
+import {
+  HISTORY_TAB,
+  NEW_TAB,
+  concatGuestInfo,
+  filterName,
+  getAllDateOfWeek,
+  initialFilterStatus,
+  optionsSelect
+} from './list-guest.service';
 import ForbidenPage from 'components/403/ForbidenPage';
 import Loading from 'components/Loading';
 import MainCard from 'components/MainCard';
 import ModalHistoryGuest from 'components/modal/modal-history-guest/ModalHistoryGuest';
 
 const today = dayjs(); // Get the current date using dayjs
+// console.log('getAllDateOfWeek', getAllDateOfWeek());
 let urlSocket = process.env.REACT_APP_URL_SOCKET;
 const socket = io(urlSocket);
 console.log('socket ListGuest:', socket);
@@ -51,9 +60,10 @@ const ListGuest = () => {
   const [typeModalAdd, setTypeModalAdd] = useState('');
   const [dataSelect, setDataSelect] = useState({});
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [dateSelect, setDateSelect] = useState([today]);
+  const [dateSelect, setDateSelect] = useState(getAllDateOfWeek());
   const [dataUser, setDateUser] = useState(getDataUserFromLocal());
   const [role, setRole] = useState(null);
+  const [disabledBtnCancel, setDisableBtnCancel] = useState(true);
   const [loading, setLoading] = useState(false);
   const [checkChange, setCheckChange] = useState(false);
   const [valueTab, setValueTab] = useState(dataUser && dataUser?.role?.ROLE_NAME === 'USER' ? HISTORY_TAB : NEW_TAB);
@@ -99,6 +109,7 @@ const ListGuest = () => {
   useEffect(() => {
     checkRole();
   }, []);
+
   useEffect(() => {
     getData();
   }, [valueTab]);
@@ -129,6 +140,18 @@ const ListGuest = () => {
       getData();
     }
   }, [checkChange]);
+  const showCancelBtn = () => {
+    const rs = tableData?.filter((item) => {
+      return selectedRowKeys.includes(item?.GUEST_ID) && item.STATUS !== statusName.CANCEL;
+    });
+    return rs?.length > 0;
+  };
+  useEffect(() => {
+    if (selectedRowKeys) {
+      const result = !showCancelBtn();
+      setDisableBtnCancel(result);
+    }
+  }, [selectedRowKeys]);
 
   const onClickEditOnModal = (DATA) => {
     setTypeModalAdd('EDIT');
@@ -157,7 +180,10 @@ const ListGuest = () => {
     if (GUEST_ID) {
       const rest = await restApi.post(RouterAPI.changeStatusGuest, { GUEST_ID });
       if (rest?.status === 200) {
-        // getData();
+        messageApi.open({
+          type: 'success',
+          content: 'Cập nhật thành công!'
+        });
       } else {
         messageApi.open({
           type: 'warning',
@@ -287,12 +313,19 @@ const ListGuest = () => {
       },
       hidden: dataUser?.role?.ROLE_NAME === 'SECURITY'
     },
+    // {
+    //   key: 'CREATE_AT',
+    //   align: 'center',
+    //   title: 'Thời Gian Tạo',
+    //   render: (_, { CREATE_AT }) => formatDateFromDB(CREATE_AT),
+    //   hidden: !dataUser?.role?.ROLE_NAME === 'USER'
+    // },
     {
       key: 'ACTION',
       align: 'center',
       title: 'Chức năng',
       fixed: 'right',
-      render: (_, data) => {
+      render: (text, data, index) => {
         if (
           (role?.IS_ACCEPT && data?.STATUS === statusName.NEW && !data?.DELETE_AT && dataUser?.role?.ROLE_NAME !== 'SECURITY') ||
           (role?.IS_ACCEPT && data?.STATUS === statusName.ACCEPT && !data?.DELETE_AT && dataUser?.role?.ROLE_NAME === 'SECURITY') ||
@@ -315,7 +348,7 @@ const ListGuest = () => {
           );
         }
       },
-      width: isMobile() ? 60 : '9%',
+      width: isMobile() ? 60 : '12%',
       hidden: dataUser?.role?.ROLE_NAME === 'USER'
     }
   ];
@@ -353,13 +386,6 @@ const ListGuest = () => {
     getData();
   };
 
-  const showCancelBtn = () => {
-    const rs = tableData?.filter((item) => {
-      return selectedRowKeys.includes(item?.GUEST_ID) && item.STATUS !== statusName.CANCEL;
-    });
-    return rs?.length > 0;
-  };
-
   const handleDelete = async () => {
     const rest = await restApi.post(RouterAPI.cancelGuest, { data: selectedRowKeys });
     if (rest?.status === 200) {
@@ -379,14 +405,15 @@ const ListGuest = () => {
   const onClickShowModalHistory = () => {
     setOpenModalHistory(true);
   };
-  if (loading) {
-    return <Loading />;
-  }
+  // if (loading) {
+  //   return <Loading />;
+  // }
   if (!role?.IS_READ) {
     return <ForbidenPage />;
   }
   return (
     <>
+      <Loading loading={loading} />
       {contextHolder}
       <Row>
         <Col span={24}>
@@ -402,17 +429,16 @@ const ListGuest = () => {
               key: NEW_TAB,
               label: (
                 <Badge dot={0}>
-                  <span>Đăng ký mới</span>
+                  <span>Hôm nay</span>
                 </Badge>
               ),
-              icon: <UsergroupAddOutlined />,
+              icon: <CalendarOutlined />,
               hidden: dataUser?.role?.ROLE_NAME === 'USER'
-              // children: 'Content of Tab Pane 1'
             },
             {
               key: HISTORY_TAB,
-              label: dataUser?.role?.ROLE_NAME === 'USER' ? 'Danh sách đăng ký' : 'Lịch sử đăng ký',
-              icon: <HistoryOutlined />,
+              label: 'Danh sách đăng ký',
+              icon: <UnorderedListOutlined />,
               hidden: false
               // children: 'Content of Tab Pane 2'
             }
@@ -457,8 +483,8 @@ const ListGuest = () => {
               )}
               {role?.IS_DELETE && (
                 <Popconfirm onConfirm={handleDelete} title="Thông báo" description="Bạn chắc chắn muốn hủy?" okText="Có" cancelText="đóng">
-                  <Button shape="round" disabled={!showCancelBtn()} danger icon={<CloseOutlined />} type="primary">
-                    {'Hủy'}
+                  <Button shape="round" disabled={disabledBtnCancel} danger icon={<CloseOutlined />} type="primary">
+                    {'Huỷ'}
                   </Button>
                 </Popconfirm>
               )}
@@ -492,6 +518,7 @@ const ListGuest = () => {
         handleClose={handleCloseModalInfo}
       />
       <ModalAddGuest
+        setLoading={setLoading}
         typeModal={typeModalAdd}
         afterSave={onAfterSave}
         dataSelect={dataSelect}

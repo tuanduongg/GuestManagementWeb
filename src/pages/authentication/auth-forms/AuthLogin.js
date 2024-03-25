@@ -15,7 +15,10 @@ import {
   InputLabel,
   OutlinedInput,
   Stack,
-  Typography
+  Typography,
+  FormControl,
+  Select,
+  MenuItem
 } from '@mui/material';
 
 // third party
@@ -34,12 +37,16 @@ import { setCookie } from 'utils/helper';
 import { useNavigate } from 'react-router-dom';
 import { ConfigRouter } from 'config_router';
 import Loading from 'components/Loading';
+import { useTranslation } from 'react-i18next';
 
 // ============================|| FIREBASE - LOGIN ||============================ //
 
 const AuthLogin = () => {
+  const { t, i18n } = useTranslation();
+
   const [checked, setChecked] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [language, setLanguage] = React.useState('en');
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => {
@@ -91,8 +98,8 @@ const AuthLogin = () => {
       >
         {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
           <form noValidate onSubmit={handleSubmit}>
+            <Loading loading={loading} />
             <Grid container spacing={3}>
-              {loading && <Loading />}
               <Grid item xs={12}>
                 <Stack spacing={1}>
                   <InputLabel htmlFor="email-login">Tài khoản</InputLabel>
@@ -143,6 +150,28 @@ const AuthLogin = () => {
                   )}
                 </Stack>
               </Grid>
+              <Grid item xs={12}>
+                <Stack spacing={1}>
+                  <InputLabel id="demo-select-small-label">Ngôn Ngữ</InputLabel>
+                  <FormControl size="small" fullWidth>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      value={language}
+                      label="Ngôn Ngữ"
+                      onChange={(event) => {
+                        setLanguage(event.target.value);
+                        localStorage.setItem('LANGUAGE', event.target.value);
+                        i18n.changeLanguage(event.target.value);
+                      }}
+                    >
+                      <MenuItem value={'vn'}>Việt Nam</MenuItem>
+                      <MenuItem value={'ko'}>Korean</MenuItem>
+                      <MenuItem value={'en'}>English</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Stack>
+              </Grid>
               {errors.submit && (
                 <Grid item xs={12}>
                   <FormHelperText error>{errors.submit}</FormHelperText>
@@ -151,7 +180,7 @@ const AuthLogin = () => {
               <Grid item xs={12}>
                 <AnimateButton>
                   <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
-                    Đăng nhập
+                    {t('login')}
                   </Button>
                 </AnimateButton>
               </Grid>

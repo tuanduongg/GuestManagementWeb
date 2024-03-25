@@ -56,8 +56,8 @@ const ModalRole = ({ open, handleClose, listRole, afterSave }) => {
       Modal.confirm({
         title: `Thông báo`,
         content: 'Bạn chắc chắn muốn đóng?',
-        okText: 'Yes',
-        cancelText: 'No',
+        okText: 'Có',
+        cancelText: 'Không',
         centered: true,
         onOk: () => {
           handleSave();
@@ -113,8 +113,8 @@ const ModalRole = ({ open, handleClose, listRole, afterSave }) => {
       Modal.confirm({
         title: `Thông báo`,
         content: 'Bạn chắc chắn muốn đóng?',
-        okText: 'Yes',
-        cancelText: 'No',
+        okText: 'Có',
+        cancelText: 'Không',
         centered: true,
         onOk: () => {
           handleCancel();
