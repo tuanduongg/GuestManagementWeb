@@ -11,6 +11,7 @@ import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import { formatArrDate, isMobile } from 'utils/helper';
 import config from 'config';
+import { useTranslation } from 'react-i18next';
 const initInputName = {
   value: '',
   error: false,
@@ -26,6 +27,7 @@ const tagInputStyle = {
 };
 const initialValiateName = { FULL_NAME: '', NAME_ID: '', isShow: true };
 const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal, setLoading }) => {
+  const { t } = useTranslation();
   const [disabled, setDisabled] = useState(true);
   const [arrInputName, setArrInputName] = useState([initInputName]);
   const [messageApi, contextHolder] = message.useMessage();
@@ -36,6 +38,8 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal, se
     right: 0
   });
   const [names, setNames] = useState(isMobile() ? [initialValiateName] : [initialValiateName, initialValiateName]);
+  const [errorName, setErrorName] = useState(false);
+
   const [errorEditTag, setErrorEditTag] = useState(false);
 
   const [timeIn, setTimeIn] = useState(defaultValueTime);
@@ -129,25 +133,19 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal, se
   const draggleRef = useRef(null);
   const handleOk = (e) => {
     let check = false;
-
-    if (names?.length === 0) {
+    const fil = names?.filter((name) => name.isShow);
+    if (fil?.length === 0) {
       check = true;
-      messageApi.open({
-        type: 'error',
-        content: 'Vui lòng điền thông tin tên khách!'
-      });
+      setErrorName(true);
     } else {
       check = true;
-      names.map((item, index) => {
+      fil.map((item) => {
         if (item?.FULL_NAME?.trim() !== '') {
           check = false;
         }
       });
       if (check) {
-        messageApi.open({
-          type: 'error',
-          content: 'Vui lòng điền thông tin tên khách!'
-        });
+        setErrorName(true);
       }
     }
 
@@ -181,13 +179,13 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal, se
     }
     if (!check) {
       Modal.confirm({
-        title: `Thông báo`,
-        content: 'Bạn chắc chắn muốn lưu thông tin?',
-        okText: 'Có',
-        cancelText: 'Không',
+        title: t('msg_notification'),
+        content: t('msg_confirm_save'),
+        okText: t('yes'),
+        cancelText: t('close'),
         centered: true,
         icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
-        onOk: () => {
+        onOk: async () => {
           handleSaveGuest();
         }
       });
@@ -203,6 +201,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal, se
     setErrorPersonSeowon(false);
     setErrorDepartment(false);
     setErrReason(false);
+    setErrorName(false);
 
     setNames(isMobile() ? [initialValiateName] : [initialValiateName, initialValiateName]);
     setTimeIn(defaultValueTime);
@@ -319,10 +318,10 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal, se
     }
     if (check) {
       Modal.confirm({
-        title: `Thông báo`,
-        content: 'Bạn chắc chắn muốn đóng?',
-        okText: 'Có',
-        cancelText: 'Không',
+        title: t('msg_notification'),
+        content: t('msg_confirm_close'),
+        okText: t('yes'),
+        cancelText: t('close'),
         centered: true,
         onOk: () => {
           handleCancel();
@@ -333,6 +332,9 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal, se
     }
   };
   const onChangeInputName = (e, index) => {
+    if (errorName) {
+      setErrorName(false);
+    }
     const { value } = e.target;
     const updatedNames = names.map((item, idx) => {
       if (idx === index) {
@@ -357,8 +359,8 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal, se
       <Modal
         centered
         width={600}
-        okText="Lưu thông tin"
-        cancelText="Đóng"
+        okText={t('saveButton')}
+        cancelText={t('close')}
         zIndex={1300}
         maskClosable={false}
         title={
@@ -381,7 +383,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal, se
             onBlur={() => {}}
             // end
           >
-            {typeModal === 'EDIT' ? 'Chỉnh sửa thông tin' : 'Đăng ký khách'}
+            {typeModal === 'EDIT' ? t('tittle_edit') : t('sidebar_registration_guest')}
           </div>
         }
         open={open}
@@ -402,7 +404,7 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal, se
         <Row gutter={16}>
           <Col span={24}>
             <p className="custom-label-input">
-              Tên khách(<span className="color-red">*</span>)
+              {t('nameGuest_col')}(<span className="color-red">*</span>)
             </p>
           </Col>
 
@@ -412,12 +414,13 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal, se
                 <Col key={index} span={isMobile() ? 24 : 12} style={{ marginTop: '5px' }}>
                   <div style={{ display: 'flex' }}>
                     <Input
-                      name="carNumber"
+                      // name="carNumber"
+                      status={errorName ? 'error' : ''}
                       value={names[index]?.FULL_NAME}
                       onChange={(e) => {
                         onChangeInputName(e, index);
                       }}
-                      placeholder="Nhập tên khách..."
+                      placeholder={t('nameGuest_col') + '...'}
                     />
                     <Button
                       disabled={names?.filter((item) => item.isShow === true).length === 1}
@@ -445,12 +448,12 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal, se
                 setNames(data);
               }}
             >
-              Thêm
+              Add
             </Button>
           </Col>
-          <Col xs={12} sm={4}>
+          <Col xs={12} sm={6}>
             <p className="custom-label-input">
-              Giờ đến(<span className="color-red">*</span>)
+              {t('timeIn_col')}(<span className="color-red">*</span>)
             </p>
             <TimePicker
               value={timeIn}
@@ -463,9 +466,9 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal, se
               format="HH:mm"
             />
           </Col>
-          <Col xs={12} sm={4}>
+          <Col xs={12} sm={6}>
             <p className="custom-label-input">
-              Giờ về(<span className="color-red">*</span>)
+              {t('timeOut_col')}(<span className="color-red">*</span>)
             </p>
             <TimePicker
               value={timeOut}
@@ -478,9 +481,9 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal, se
               format="HH:mm"
             />
           </Col>
-          <Col xs={24} sm={16}>
+          <Col xs={24} sm={12}>
             <p className="custom-label-input">
-              Ngày vào(<span className="color-red">*</span>)
+              {t('dateArrived')}(<span className="color-red">*</span>)
             </p>
             <DatePicker
               needConfirm
@@ -496,54 +499,54 @@ const ModalAddGuest = ({ open, handleClose, afterSave, dataSelect, typeModal, se
           </Col>
           <Col span={12}>
             <p className="custom-label-input">
-              Công ty(<span className="color-red">*</span>)
+              {t('company_col')}(<span className="color-red">*</span>)
             </p>
             <Input
               status={errorCompany ? 'error' : ''}
               value={company}
               name={'company'}
               onChange={onChangeInput}
-              placeholder="Nhập tên công ty..."
+              placeholder={t('company_col') + '...'}
             />
           </Col>
           <Col span={12}>
-            <p className="custom-label-input">Biển số xe</p>
-            <Input name="carNumber" value={carNumber} onChange={onChangeInput} placeholder="Nhập biển số xe..." />
+            <p className="custom-label-input">{t('carNum_col')}</p>
+            <Input name="carNumber" value={carNumber} onChange={onChangeInput} placeholder={t('carNum_col') + '...'} />
           </Col>
           <Col span={12}>
             <p className="custom-label-input">
-              Người bảo lãnh(<span className="color-red">*</span>)
+              {t('personSeowon_col')}(<span className="color-red">*</span>)
             </p>
             <Input
               name="personInSeowon"
               value={personSeowon}
               onChange={onChangeInput}
               status={errorPersonSeowon ? 'error' : ''}
-              placeholder="Nhập tên người bảo lãnh..."
+              placeholder={t('personSeowon_col') + '...'}
             />
           </Col>
           <Col span={12}>
             <p className="custom-label-input">
-              Bộ phận(<span className="color-red">*</span>)
+              {t('department_col')}(<span className="color-red">*</span>)
             </p>
             <Input
               name="department"
               value={department}
               onChange={onChangeInput}
               status={errorDepartment ? 'error' : ''}
-              placeholder="Nhập bộ phận..."
+              placeholder={t('department_col')}
             />
           </Col>
           <Col span={24}>
             <p className="custom-label-input">
-              Lý do(<span className="color-red">*</span>)
+              {t('reason_col')}(<span className="color-red">*</span>)
             </p>
             <TextArea
               name="reason"
               value={reason}
               onChange={onChangeInput}
               status={errReason ? 'error' : ''}
-              placeholder="Nhập lý do..."
+              placeholder={t('reason_col') + '...'}
               rows={2}
             />
           </Col>

@@ -46,7 +46,7 @@ const AuthLogin = () => {
 
   const [checked, setChecked] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const [language, setLanguage] = React.useState('en');
+  const [language, setLanguage] = React.useState(localStorage.getItem('LANGUAGE') ?? 'en');
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => {
@@ -66,8 +66,12 @@ const AuthLogin = () => {
           submit: null
         }}
         validationSchema={Yup.object().shape({
-          username: Yup.string().max(255).required('Tên tài khoản không được để trống'),
-          password: Yup.string().max(255).required('Mật khẩu không được để trống')
+          username: Yup.string()
+            .max(255)
+            .required(`${t('errorEmptyUsername')}`),
+          password: Yup.string()
+            .max(255)
+            .required(`${t('errorEmptyPassword')}`)
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           try {
@@ -83,10 +87,10 @@ const AuthLogin = () => {
               location.href = ConfigRouter.listGuest;
             } else {
               Modal.error({
-                title: 'Thông báo',
-                content: 'Tên tài khoản hoặc mật khẩu không đúng!',
+                title: t('msg_notification'),
+                content: t('msg_login_fail'),
                 centered: true,
-                okText: 'Đóng'
+                okText: t('close')
               });
             }
           } catch (err) {
@@ -102,7 +106,7 @@ const AuthLogin = () => {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Stack spacing={1}>
-                  <InputLabel htmlFor="email-login">Tài khoản</InputLabel>
+                  <InputLabel htmlFor="email-login">{t('username')}</InputLabel>
                   <OutlinedInput
                     autoFocus
                     type="text"
@@ -110,7 +114,7 @@ const AuthLogin = () => {
                     name="username"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    placeholder="Nhập tên tài khoản..."
+                    placeholder={t('username') + '...'}
                     fullWidth
                     error={Boolean(touched.username && errors.username)}
                   />
@@ -119,7 +123,7 @@ const AuthLogin = () => {
               </Grid>
               <Grid item xs={12}>
                 <Stack spacing={1}>
-                  <InputLabel htmlFor="password-login">Mật khẩu</InputLabel>
+                  <InputLabel htmlFor="password-login">{t('password')}</InputLabel>
                   <OutlinedInput
                     fullWidth
                     error={Boolean(touched.password && errors.password)}
@@ -141,7 +145,7 @@ const AuthLogin = () => {
                         </IconButton>
                       </InputAdornment>
                     }
-                    placeholder="Nhập mật khẩu..."
+                    placeholder={t('password') + '...'}
                   />
                   {touched.password && errors.password && (
                     <FormHelperText error id="standard-weight-helper-text-password-login">
@@ -151,26 +155,25 @@ const AuthLogin = () => {
                 </Stack>
               </Grid>
               <Grid item xs={12}>
-                <Stack spacing={1}>
-                  <InputLabel id="demo-select-small-label">Ngôn Ngữ</InputLabel>
-                  <FormControl size="small" fullWidth>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      value={language}
-                      label="Ngôn Ngữ"
-                      onChange={(event) => {
-                        setLanguage(event.target.value);
-                        localStorage.setItem('LANGUAGE', event.target.value);
-                        i18n.changeLanguage(event.target.value);
-                      }}
-                    >
-                      <MenuItem value={'vn'}>Việt Nam</MenuItem>
-                      <MenuItem value={'ko'}>Korean</MenuItem>
-                      <MenuItem value={'en'}>English</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Stack>
+                {/* <Stack spacing={1}> */}
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">{t('language')}</InputLabel>
+                  <Select
+                    value={language}
+                    label={t('language')}
+                    onChange={(event) => {
+                      setLanguage(event.target.value);
+                      localStorage.setItem('LANGUAGE', event.target.value);
+                      i18n.changeLanguage(event.target.value);
+                    }}
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                  >
+                    <MenuItem value={'vn'}>Việt Nam</MenuItem>
+                    <MenuItem value={'ko'}>Korean</MenuItem>
+                    <MenuItem value={'en'}>English</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
               {errors.submit && (
                 <Grid item xs={12}>

@@ -10,6 +10,7 @@ import { PlusOutlined, InfoCircleOutlined, DeleteOutlined } from '@ant-design/ic
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import { formatArrDate, formatDateFromDB, isMobile } from 'utils/helper';
+import { useTranslation } from 'react-i18next';
 
 const columns = [
   {
@@ -58,6 +59,7 @@ const columns = [
   }
 ];
 const ModalHistoryGuest = ({ open, handleClose, idGuest }) => {
+  const { t } = useTranslation();
   const [disabled, setDisabled] = useState(true);
   const [loading, setLoading] = useState(false);
   const [guestID, setGuestID] = useState('');
@@ -144,7 +146,7 @@ const ModalHistoryGuest = ({ open, handleClose, idGuest }) => {
             onBlur={() => {}}
             // end
           >
-            {'Thông tin lịch sử'}
+            {t('history')}
           </div>
         }
         open={open}

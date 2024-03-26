@@ -13,12 +13,12 @@ const icons = {
 
 const dashboard = {
   id: 'guest',
-  title: 'Quản lý đăng ký khách',
+  title: 'sidebar_manager_guest',
   type: 'group',
   children: [
     {
       id: ConfigRouter.listGuest,
-      title: 'Đăng ký khách',
+      title: 'sidebar_registration_guest',
       type: 'item',
       url: ConfigRouter.listGuest,
       icon: icons.UserOutlined,

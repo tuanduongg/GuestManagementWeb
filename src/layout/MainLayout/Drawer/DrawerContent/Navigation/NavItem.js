@@ -10,10 +10,12 @@ import { Avatar, Chip, ListItemButton, ListItemIcon, ListItemText, Typography } 
 // project import
 import { activeItem, openDrawer } from 'store/reducers/menu';
 import { isMobile } from 'utils/helper';
+import { useTranslation } from 'react-i18next';
 
 // ==============================|| NAVIGATION - LIST ITEM ||============================== //
 
 const NavItem = ({ item, level }) => {
+  const { t, i18n } = useTranslation();
   const theme = useTheme();
   const dispatch = useDispatch();
   const { pathname } = useLocation();
@@ -120,7 +122,7 @@ const NavItem = ({ item, level }) => {
         <ListItemText
           primary={
             <Typography variant="h6" sx={{ color: isSelected ? iconSelectedColor : textColor }}>
-              {item.title}
+              {t(`${item.title}`)}
             </Typography>
           }
         />

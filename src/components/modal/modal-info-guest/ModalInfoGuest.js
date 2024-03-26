@@ -8,9 +8,11 @@ import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import { concatDateString } from './modal_info_guest.service';
 import config from 'config';
+import { useTranslation } from 'react-i18next';
 
 const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role, onClickShowModalHistory }) => {
   const [widthBoxImage, setWidthBoxImage] = useState(100);
+  const { t } = useTranslation();
 
   const handleCancel = () => {
     handleClose();
@@ -52,12 +54,12 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role, onCl
         open={open}
         title={
           <>
-            <Text style={{ fontSize: '15px', fontWeight: 'bold' }}>Thông tin đăng ký khách</Text>
+            <Text style={{ fontSize: '15px', fontWeight: 'bold' }}>{t('title_modal_info_guset')}</Text>
           </>
         }
         onCancel={handleCancel}
-        cancelText="Đóng"
-        okText="Chỉnh sửa"
+        cancelText={t('close')}
+        // okText={t('edit')}
         autoFocusButton="cancel"
         // okButtonProps={{ icon: <EditOutlined /> }}
         cancelButtonProps={{ icon: <CloseOutlined /> }}
@@ -74,7 +76,7 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role, onCl
                   }}
                   icon={<FileSearchOutlined />}
                 >
-                  Lịch sử
+                  {t('history')}
                 </Button>
                 {role?.IS_UPDATE && (
                   <Button
@@ -84,7 +86,7 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role, onCl
                     }}
                     icon={<EditOutlined />}
                   >
-                    Chỉnh sửa
+                    {t('edit')}
                   </Button>
                 )}
               </div>
@@ -95,45 +97,45 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role, onCl
         <Row gutter={16}>
           {/* thông tin chung */}
           <Col xs={24} sm={12}>
-            <p className="title-detail">Thông tin chung</p>
+            <p className="title-detail">{t('general_info')}</p>
             <Flex direction="row">
               <Text className="min-width-50" style={{ marginRight: '5px', fontWeight: 500 }}>
-                {`Trạng thái: `}
+                {`${t('status_col')}: `}
                 {dataSelect ? getColorChipStatus(dataSelect?.STATUS, dataSelect?.DELETE_AT) : ''}
               </Text>
             </Flex>
             <Flex direction="row">
               <Text className="min-width-50" style={{ marginRight: '5px', fontWeight: 500 }}>
-                Công ty:
+                {t('company_col')}:
               </Text>
               <Text>{dataSelect?.COMPANY ? dataSelect?.COMPANY : '...'}</Text>
             </Flex>
             <Flex direction="row">
               <Text className="min-width-50" style={{ marginRight: '5px', fontWeight: 500 }}>
-                Biển số xe:
+                {t('carNum_col')}:
               </Text>
               <Text>{dataSelect?.CAR_NUMBER ? dataSelect?.CAR_NUMBER : '...'}</Text>
             </Flex>
             <Flex direction="row">
               <Text className="min-width-50" style={{ marginRight: '5px', fontWeight: 500 }}>
-                Thời gian tạo:
+                {t('time_create')}:
               </Text>
               <Text>{dataSelect?.CREATE_AT ? formatDateFromDB(dataSelect?.CREATE_AT) : '...'}</Text>
             </Flex>
           </Col>
           <Col xs={24} sm={12}>
-            <p className="title-detail">Thời gian</p>
+            <p className="title-detail">{t('time')}</p>
             <Flex direction="row">
-              <Text className="title-time">Giờ vào(dự kiến):</Text>
+              <Text className="title-time">{t('timeIn_col')}:</Text>
               <Text>{dataSelect?.TIME_IN ? formatHourMinus(dataSelect?.TIME_IN) : ''}</Text>
             </Flex>
             <Flex direction="row">
-              <Text className="title-time">Giờ ra(dự kiến):</Text>
+              <Text className="title-time">{t('timeOut_col')}:</Text>
               <Text>{dataSelect?.TIME_OUT ? formatHourMinus(dataSelect?.TIME_OUT) : ''}</Text>
             </Flex>
             <Flex direction="row">
               <Text className="title-name-custom" style={{ minWidth: '40px' }}>
-                Ngày:
+                {t('dateArrived')}:
               </Text>
               <Text>{dataSelect?.guest_date ? concatDateString(dataSelect?.guest_date) : '...'}</Text>
             </Flex>
@@ -141,11 +143,11 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role, onCl
           {/* ==================== */}
           {/* thông tin khách */}
           <Col xs={24} sm={12}>
-            <p className="title-detail">Thông tin khách</p>
+            <p className="title-detail">{t('nameGuest_col')}</p>
             <Row>
               {dataSelect?.guest_info?.map((item, index) => (
                 <Col key={index} span={24}>
-                  <Text className="font-bold">{`${index + 1}.${item?.FULL_NAME}`}</Text>
+                  <Text className="font-bold">{`${index + 1}. ${item?.FULL_NAME}`}</Text>
                 </Col>
               ))}
             </Row>
@@ -153,23 +155,17 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role, onCl
           {/* =================== */}
           {/* Người bảo lãnh */}
           <Col xs={24} sm={12}>
-            <p className="title-detail">Người bảo lãnh</p>
+            <p className="title-detail">{t('personSeowon_col')}:</p>
             <Flex direction="row">
-              <Text className="min-width-50" style={{ marginRight: '5px', fontWeight: 500 }}>
-                Họ tên:
-              </Text>
+              <Text style={{ marginRight: '5px', fontWeight: 500 }}>{t('name')}:</Text>
               <Text>{dataSelect?.PERSON_SEOWON}</Text>
             </Flex>
             <Flex direction="row">
-              <Text className="min-width-50" style={{ marginRight: '5px', fontWeight: 500 }}>
-                Bộ phận:
-              </Text>
+              <Text style={{ marginRight: '5px', fontWeight: 500 }}>{t('department_col')}:</Text>
               <Text>{dataSelect?.DEPARTMENT}</Text>
             </Flex>
             <Flex direction="row">
-              <Text className="min-width-50" style={{ marginRight: '5px', fontWeight: 500 }}>
-                Lý do:
-              </Text>
+              <Text style={{ marginRight: '5px', fontWeight: 500 }}>{t('reason_col')}:</Text>
               <Text>{dataSelect?.REASON}</Text>
             </Flex>
           </Col>

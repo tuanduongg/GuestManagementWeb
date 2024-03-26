@@ -3,12 +3,13 @@ import Draggable from 'react-draggable';
 import { Input, Modal, App, Row, Col } from 'antd';
 
 // assets
-import { InfoCircleOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import './modalChangePassword.css';
-import { handleLogout, logout } from 'utils/helper';
+import { delete_cookie, handleLogout, logout, setCookie } from 'utils/helper';
 import { useTranslation } from 'react-i18next';
+import { ConfigRouter } from 'config_router';
 
 const initialValidate = { error: false, message: '' };
 const ModalChangePassword = ({ open, handleClose }) => {
@@ -45,15 +46,19 @@ const ModalChangePassword = ({ open, handleClose }) => {
     const res = await restApi.post(url, data);
     setLoading(false);
     if (res?.status === 200) {
-      Modal.confirm({
+      delete_cookie('ASSET_TOKEN');
+      setCookie('ASSET_TOKEN', '', 1);
+      Modal.info({
+        icon: <CheckCircleOutlined style={{ color: 'green' }} />,
+        autoFocusButton: 'oke',
         centered: true,
         closable: false,
-        okText: 'Đăng xuất',
-        title: 'Thông báo',
-        content: 'Đổi mật khẩu thành công!',
+        okText: t('logout'),
+        title: t('msg_notification'),
+        content: t('msg_changePW_success'),
         keyboard: false,
         onOk: () => {
-          handleLogout();
+          location.href = ConfigRouter.login;
         },
         footer: (_, { OkBtn, CancelBtn }) => (
           <>
@@ -63,40 +68,40 @@ const ModalChangePassword = ({ open, handleClose }) => {
         )
       });
     } else {
-      setValidateCurrentPassword({ error: true, message: res?.data?.message });
+      setValidateCurrentPassword({ error: true, message: 'msg_changePW_fail' });
     }
   };
   const handleOk = (e) => {
     let check = false;
     if (currentPassword?.trim() === '') {
       check = true;
-      setValidateCurrentPassword({ error: true, message: ' Bắt buộc nhập trường này!' });
+      setValidateCurrentPassword({ error: true, message: 'requirdField' });
     }
     if (newPassword?.trim() === '') {
       check = true;
-      setValidateNewPassword({ error: true, message: ' Bắt buộc nhập trường này!' });
+      setValidateNewPassword({ error: true, message: 'requirdField' });
     } else {
       if (newPassword?.length < 4) {
         check = true;
-        setValidateNewPassword({ error: true, message: ' Mật khẩu có ít nhất 4 ký tự!' });
+        setValidateNewPassword({ error: true, message: 'pwMinCharacter' });
       }
     }
     if (confirmPassword?.trim() === '') {
       check = true;
-      setValidateConfirmPassword({ error: true, message: ' Bắt buộc nhập trường này!' });
+      setValidateConfirmPassword({ error: true, message: 'requirdField' });
     } else {
       if (confirmPassword?.trim() !== newPassword?.trim()) {
         check = true;
-        setValidateNewPassword({ error: true, message: ' Mật khẩu không khớp nhau!' });
-        setValidateConfirmPassword({ error: true, message: ' Mật khẩu không khớp nhau!' });
+        setValidateNewPassword({ error: true, message: 'pwNotMatch' });
+        setValidateConfirmPassword({ error: true, message: 'pwNotMatch' });
       }
     }
     if (!check) {
       Modal.confirm({
-        title: `Thông báo`,
-        content: 'Bạn chắc chắn muốn lưu thay đổi?',
-        okText: 'Có',
-        cancelText: 'Không',
+        title: t('msg_notification'),
+        content: t('msg_confirm_save'),
+        okText: t('yes'),
+        cancelText: t('close'),
         centered: true,
         icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
         onOk: async () => {
@@ -166,10 +171,10 @@ const ModalChangePassword = ({ open, handleClose }) => {
     }
     if (check) {
       Modal.confirm({
-        title: `Thông báo`,
-        content: 'Bạn chắc chắn muốn đóng?',
-        okText: 'Yes',
-        cancelText: 'No',
+        title: t('msg_notification'),
+        content: t('msg_confirm_close'),
+        okText: t('yes'),
+        cancelText: t('close'),
         centered: true,
         onOk: () => {
           handleCancel();
@@ -184,8 +189,8 @@ const ModalChangePassword = ({ open, handleClose }) => {
     <>
       <Modal
         centered
-        okText="Lưu thông tin"
-        cancelText="Đóng"
+        okText={t('saveButton')}
+        cancelText={t('close')}
         zIndex={1300}
         maskClosable={false}
         title={
@@ -208,7 +213,7 @@ const ModalChangePassword = ({ open, handleClose }) => {
             onBlur={() => {}}
             // end
           >
-            Đổi mật khẩu
+            {t('header_changePW')}
           </div>
         }
         open={open}
@@ -229,42 +234,42 @@ const ModalChangePassword = ({ open, handleClose }) => {
         <Row gutter={16}>
           <Col span={24}>
             <p className="custom-label-input">
-              Mật khẩu hiện tại(<span className="color-red">*</span>)
+              {t('currentPW')}(<span className="color-red">*</span>)
             </p>
             <Input
               name="currentPassword"
               value={currentPassword}
               onChange={onChangeInput}
               status={validateCurrentPassword.error ? 'error' : ''}
-              placeholder="Nhập mật khẩu hiện tại..."
+              placeholder={t('currentPW') + '...'}
             />
-            {validateCurrentPassword.error && <p className="message-err">(*){validateCurrentPassword.message}</p>}
+            {validateCurrentPassword.error && <p className="message-err">(*){t(validateCurrentPassword.message)}</p>}
           </Col>
           <Col span={24}>
             <p className="custom-label-input">
-              Mật khẩu mới(<span className="color-red">*</span>)
+              {t('newPW')}(<span className="color-red">*</span>)
             </p>
             <Input
               name="newPassword"
               value={newPassword}
               onChange={onChangeInput}
               status={validateNewPassword.error ? 'error' : ''}
-              placeholder="Nhập mật khẩu mới..."
+              placeholder={t('newPW') + '...'}
             />
-            {validateNewPassword.error && <p className="message-err">(*){validateNewPassword.message}</p>}
+            {validateNewPassword.error && <p className="message-err">(*){t(validateNewPassword.message)}</p>}
           </Col>
           <Col span={24}>
             <p className="custom-label-input">
-              Nhập lại mật khẩu(<span className="color-red">*</span>)
+              {t('confirmPW')}(<span className="color-red">*</span>)
             </p>
             <Input
               name="confirmPassword"
               value={confirmPassword}
               onChange={onChangeInput}
               status={validateConfirmPassword.error ? 'error' : ''}
-              placeholder="Xác nhận mật khẩu mới..."
+              placeholder={t('newPW') + '...'}
             />
-            {validateConfirmPassword.error && <p className="message-err">(*){validateConfirmPassword.message}</p>}
+            {validateConfirmPassword.error && <p className="message-err">(*){t(validateConfirmPassword.message)}</p>}
           </Col>
         </Row>
       </Modal>

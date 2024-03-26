@@ -6,10 +6,12 @@ import { Box, List, Typography } from '@mui/material';
 
 // project import
 import NavItem from './NavItem';
+import { useTranslation } from 'react-i18next';
 
 // ==============================|| NAVIGATION - LIST GROUP ||============================== //
 
 const NavGroup = ({ item }) => {
+  const { t, i18n } = useTranslation();
   const menu = useSelector((state) => state.menu);
   const { drawerOpen } = menu;
 
@@ -39,7 +41,7 @@ const NavGroup = ({ item }) => {
         drawerOpen && (
           <Box sx={{ pl: 3, mb: 1.5 }}>
             <Typography variant="subtitle2" color="textSecondary">
-              {item.title}
+              {t(item.title)}
             </Typography>
             {/* only available in paid version */}
           </Box>

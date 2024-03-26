@@ -45,6 +45,7 @@ import ForbidenPage from 'components/403/ForbidenPage';
 import Loading from 'components/Loading';
 import MainCard from 'components/MainCard';
 import ModalHistoryGuest from 'components/modal/modal-history-guest/ModalHistoryGuest';
+import { useTranslation } from 'react-i18next';
 
 const today = dayjs(); // Get the current date using dayjs
 // console.log('getAllDateOfWeek', getAllDateOfWeek());
@@ -53,6 +54,7 @@ const socket = io(urlSocket);
 console.log('socket ListGuest:', socket);
 
 const ListGuest = () => {
+  const { t } = useTranslation();
   const [tableData, setTableData] = useState([]);
   const [openModalInfo, setOpenModalInfo] = useState(false);
   const [openModalAdd, setOpenModalAdd] = useState(false);
@@ -142,7 +144,7 @@ const ListGuest = () => {
   }, [checkChange]);
   const showCancelBtn = () => {
     const rs = tableData?.filter((item) => {
-      return selectedRowKeys.includes(item?.GUEST_ID) && item.STATUS !== statusName.CANCEL;
+      return selectedRowKeys.includes(item?.GUEST_ID) && item.STATUS === statusName.NEW;
     });
     return rs?.length > 0;
   };
@@ -196,7 +198,7 @@ const ListGuest = () => {
     {
       align: 'left',
       key: 'guest_info',
-      title: 'Tên khách',
+      title: 'nameGuest_col',
       dataIndex: 'guest_info',
       width: isMobile() ? 150 : '21%',
       fixed: 'left',
@@ -231,7 +233,7 @@ const ListGuest = () => {
     {
       align: 'left',
       key: 'COMPANY',
-      title: 'Công ty',
+      title: 'company_col',
       dataIndex: 'COMPANY',
       width: isMobile() ? 130 : '11%',
       filters: tableData
@@ -254,7 +256,7 @@ const ListGuest = () => {
     },
     {
       key: 'CAR_NUMBER',
-      title: 'Biển số',
+      title: 'carNum_col',
       dataIndex: 'CAR_NUMBER',
       align: 'center',
       width: isMobile() ? 130 : '11%',
@@ -278,7 +280,7 @@ const ListGuest = () => {
     },
     {
       key: 'TIME_IN',
-      title: 'Giờ vào',
+      title: 'timeIn_col',
       dataIndex: 'TIME_IN',
       align: 'center',
       render: (_, { TIME_IN }) => <>{formatHourMinus(TIME_IN)}</>,
@@ -286,7 +288,7 @@ const ListGuest = () => {
     },
     {
       key: 'TIME_OUT',
-      title: ['Giờ ra'],
+      title: 'timeOut_col',
       dataIndex: 'TIME_OUT',
       align: 'center',
       render: (_, { TIME_OUT }) => <>{formatHourMinus(TIME_OUT)}</>,
@@ -294,14 +296,14 @@ const ListGuest = () => {
     },
     {
       key: 'PERSON_SEOWON',
-      title: 'Người bảo lãnh',
+      title: 'personSeowon_col',
       dataIndex: 'PERSON_SEOWON',
       width: isMobile() ? 150 : '15%'
     },
     {
       key: 'STATUS',
       align: 'center',
-      title: 'Trạng thái',
+      title: 'status_col',
       dataIndex: 'STATUS',
       render: (_, { STATUS, DELETE_AT }) => <>{getColorChipStatus(STATUS, DELETE_AT)}</>,
       width: isMobile() ? 100 : '11%',
@@ -323,7 +325,7 @@ const ListGuest = () => {
     {
       key: 'ACTION',
       align: 'center',
-      title: 'Chức năng',
+      title: 'action_col',
       fixed: 'right',
       render: (text, data, index) => {
         if (
@@ -351,7 +353,9 @@ const ListGuest = () => {
       width: isMobile() ? 60 : '12%',
       hidden: dataUser?.role?.ROLE_NAME === 'USER'
     }
-  ];
+  ].map((item) => {
+    return { ...item, title: t(item?.title) };
+  });
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
@@ -369,7 +373,7 @@ const ListGuest = () => {
 
   const onAfterSave = (rest) => {
     if (rest?.status === 200) {
-      let text = typeModalAdd === 'EDIT' ? 'Cập nhật thông tin thành công!' : 'Đăng ký thành công!';
+      let text = typeModalAdd === 'EDIT' ? t('msg_update_fail') : t('msg_add_success');
       messageApi.open({
         type: 'success',
         content: text
@@ -378,7 +382,7 @@ const ListGuest = () => {
     } else {
       messageApi.open({
         type: 'warning',
-        content: rest?.data?.message ?? 'Thêm mới thất bại!'
+        content: rest?.data?.message ?? t('msg_add_fail')
       });
     }
   };
@@ -387,13 +391,19 @@ const ListGuest = () => {
   };
 
   const handleDelete = async () => {
-    const rest = await restApi.post(RouterAPI.cancelGuest, { data: selectedRowKeys });
+    const data = [];
+    tableData.map((item) => {
+      if (selectedRowKeys.includes(item?.GUEST_ID) && item?.STATUS === statusName.NEW) {
+        data.push(item.GUEST_ID);
+      }
+    });
+    const rest = await restApi.post(RouterAPI.cancelGuest, { data: data });
     if (rest?.status === 200) {
       messageApi.open({
         type: 'success',
         content: 'Hủy thành công!'
       });
-      getData();
+      // getData();
     } else {
       messageApi.open({
         type: 'warning',
@@ -417,7 +427,7 @@ const ListGuest = () => {
       {contextHolder}
       <Row>
         <Col span={24}>
-          <Title level={5}>Đăng ký khách vào công ty</Title>
+          <Title level={5}>{t('sidebar_manager_guest')}</Title>
         </Col>
       </Row>
       <MainCard contentSX={{ p: 2, minHeight: '83vh' }}>
@@ -429,7 +439,7 @@ const ListGuest = () => {
               key: NEW_TAB,
               label: (
                 <Badge dot={0}>
-                  <span>Hôm nay</span>
+                  <span>{t('today')}</span>
                 </Badge>
               ),
               icon: <CalendarOutlined />,
@@ -437,7 +447,7 @@ const ListGuest = () => {
             },
             {
               key: HISTORY_TAB,
-              label: 'Danh sách đăng ký',
+              label: t('regisList'),
               icon: <UnorderedListOutlined />,
               hidden: false
               // children: 'Content of Tab Pane 2'
@@ -453,7 +463,7 @@ const ListGuest = () => {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: isMobile() ? 'space-between' : '' }}>
                 <span style={{ fontWeight: 'bold', marginRight: '10px' }}>
                   {' '}
-                  {dataUser?.role?.ROLE_NAME === 'SECURITY' ? 'Ngày vào:' : 'Ngày tạo:'}
+                  {dataUser?.role?.ROLE_NAME === 'SECURITY' ? 'Ngày vào:' : `${t('createDate')}:`}
                 </span>
                 <DatePicker
                   className="date-picker-custom"
@@ -478,13 +488,13 @@ const ListGuest = () => {
             <div style={{ display: 'flex', justifyContent: 'end' }}>
               {role?.IS_CREATE && (
                 <Button shape="round" onClick={handleClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
-                  Đăng ký
+                  {t('createBTN')}
                 </Button>
               )}
               {role?.IS_DELETE && (
                 <Popconfirm onConfirm={handleDelete} title="Thông báo" description="Bạn chắc chắn muốn hủy?" okText="Có" cancelText="đóng">
                   <Button shape="round" disabled={disabledBtnCancel} danger icon={<CloseOutlined />} type="primary">
-                    {'Huỷ'}
+                    {t('canelBTN')}
                   </Button>
                 </Popconfirm>
               )}

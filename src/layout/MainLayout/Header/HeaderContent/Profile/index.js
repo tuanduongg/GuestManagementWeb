@@ -66,12 +66,12 @@ const getDataUser = () => {
   }
   return {};
 };
-
+const currentLang = localStorage.getItem('LANGUAGE') ?? 'en';
 // ==============================|| HEADER CONTENT - PROFILE ||============================== //
 
 const Profile = () => {
   const [value, setValue] = useState(0);
-  const [valueLanguage, setValueLanguage] = useState(['vn']);
+  const [valueLanguage, setValueLanguage] = useState([currentLang]);
   const [dataUser, setDataUser] = useState(getDataUser());
   const [itemSelect, setItemSelect] = useState('');
   const [openModalChangePassword, setOpenModalChangePassword] = useState(false);
@@ -233,7 +233,7 @@ const Profile = () => {
                             <ListItemIcon>
                               <RedoOutlined />
                             </ListItemIcon>
-                            <ListItemText primary="Đổi mật khẩu" />
+                            <ListItemText primary={t('header_changePW')} />
                           </ListItemButton>
                           <Cascader
                             value={valueLanguage}
@@ -280,14 +280,14 @@ const Profile = () => {
                               <ListItemIcon>
                                 <TranslationOutlined />
                               </ListItemIcon>
-                              <ListItemText primary="Ngôn ngữ" />
+                              <ListItemText primary={t('language')} />
                             </ListItemButton>
                           </Cascader>
                           <ListItemButton onClick={handleLogout}>
                             <ListItemIcon>
                               <LogoutOutlined />
                             </ListItemIcon>
-                            <ListItemText primary="Đăng xuất" />
+                            <ListItemText primary={t('logout')} />
                           </ListItemButton>
                         </List>
                         {/* <TabPanel value={value} index={0} dir={theme.direction}>

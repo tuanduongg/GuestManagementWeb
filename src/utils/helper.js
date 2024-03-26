@@ -7,6 +7,7 @@ import config from 'config';
 import { ConfigMenuAlias } from 'ConfigMenuAlias';
 import restApi from './restAPI';
 import { RouterAPI } from './routerAPI';
+import i18next from 'i18next';
 
 export function generateRandomVNLicensePlate() {
   // Mã tỉnh/thành phố
@@ -275,30 +276,30 @@ export const getColorChipStatus = (status, deleteAt) => {
   switch (status) {
     case statusName.NEW:
       color = '#16a34a'; //success color
-      message = 'Mới';
+      message = 'status_new';
       break;
     case statusName.ACCEPT:
       color = '#0ea5e9';
-      message = 'Đã duyệt';
+      message = 'status_accepted';
       break;
     case statusName.COME_IN:
       color = '#1e3a8a';
-      message = 'Đã vào';
+      message = 'status_comein';
       break;
     case statusName.COME_OUT:
       color = '#44403c';
-      message = 'Đã ra';
+      message = 'Come out';
       break;
     case statusName.CANCEL:
       color = '#f5222d';
-      message = 'Đã hủy';
+      message = 'status_cancel';
       break;
 
     default:
       break;
   }
 
-  return <Badge color={color} count={message} />;
+  return <Badge color={color} count={i18next.t(message)} />;
   // return (
   //   <Tag color={color} key={status}>
   //     {message}
@@ -367,17 +368,17 @@ export function eraseCookie(name) {
   document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 }
 
-const delete_cookie = (name) => {
+export const delete_cookie = (name) => {
   document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 };
 
 export const logout = () => {
   Modal.confirm({
-    okText: 'Đăng xuất',
-    cancelText: 'Đóng',
+    okText: i18next.t('logout'),
+    cancelText: i18next.t('close'),
     centered: true,
-    title: 'Thông báo',
-    content: 'Bạn chắc chắn muốn đăng xuất?',
+    title: i18next.t('msg_notification'),
+    content: i18next.t('msg_logout'),
     onOk: () => {
       handleLogout();
     }

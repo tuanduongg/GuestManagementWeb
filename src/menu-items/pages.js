@@ -14,12 +14,12 @@ const icons = {
 
 const pages = {
   id: 'pages',
-  title: 'Thông tin tài khoản',
+  title: 'sidebar_manage_acc',
   type: 'group',
   children: [
     {
       id: ConfigRouter.user,
-      title: 'Tài khoản',
+      title: 'sibar_acc',
       type: 'item',
       url: ConfigRouter.user,
       icon: icons.ProfileOutlined,
