@@ -13,6 +13,7 @@ import ModalAccount from 'components/modal/modal-account/ModalAccount';
 import ModalRole from 'components/modal/modal-role/ModalRole';
 import { checkDisableBtn } from './compoment/account/account.service';
 import MainCard from 'components/MainCard';
+import { useTranslation } from 'react-i18next';
 
 const { Title } = Typography;
 
@@ -29,14 +30,13 @@ const AccountPage = () => {
   const [dataSelectAcc, setDataSelectAcc] = useState(null);
   const [messageApi, contextHolder] = message.useMessage();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const { t } = useTranslation();
 
   const checkRole = async () => {
     setLoading(true);
     const rest = await restApi.get(RouterAPI.checkRole);
     if (rest?.status === 200) {
       setRole(rest?.data);
-      getAllRole();
-      getDataACC();
     }
     setLoading(false);
   };
@@ -50,6 +50,8 @@ const AccountPage = () => {
 
   useEffect(() => {
     checkRole();
+    getAllRole();
+    getDataACC();
   }, []);
   useEffect(() => {
     let check = checkDisableBtn(selectedRowKeys, dataACC);
@@ -62,8 +64,8 @@ const AccountPage = () => {
     }
   };
   const onCloseModal = async () => {
-    setDataSelectAcc(null);
     setOpenModalAcc(false);
+    setDataSelectAcc(null);
   };
   const onClickAdd = () => {
     switch (valueTab) {
@@ -88,7 +90,7 @@ const AccountPage = () => {
   };
 
   const onAfterSaveAcc = (res) => {
-    let text = typeModalAcc === 'EDIT' ? 'Cập nhật thông tin thành công!' : 'Thêm mới thành công!';
+    let text = typeModalAcc === 'EDIT' ? t('msg_update_success') : t('msg_add_success');
     if (res?.status === 200) {
       messageApi.open({
         type: 'success',
@@ -110,7 +112,7 @@ const AccountPage = () => {
     if (res?.status === 200) {
       messageApi.open({
         type: 'success',
-        content: 'Thêm mới thành công!'
+        content: t('msg_add_success')
       });
       getAllRole();
     } else {
@@ -121,22 +123,24 @@ const AccountPage = () => {
     }
   };
   const onChangeBlock = async () => {
+    setLoading(true);
     const url = RouterAPI.changeBlockUser;
     const rst = await restApi.post(url, { type: typeBtnBlock, listID: selectedRowKeys });
+    setLoading(false);
     if (rst?.status === 200) {
       getDataACC();
       messageApi.open({
         type: 'success',
-        content: 'Cập nhật thông tin thành công!'
+        content: t('msg_update_success')
       });
     }
   };
   const onClickBlock = () => {
     Modal.confirm({
-      title: `Thông báo`,
-      content: `Bạn chắc chắn muốn ${typeBtnBlock === 'BLOCK' ? 'khóa' : 'mở khóa'} tài khoản ?`,
-      okText: 'Có',
-      cancelText: 'Không',
+      title: t('msg_notification'),
+      content: `Are you sure you want to ${typeBtnBlock === 'BLOCK' ? 'block' : 'unlock'} this account ?`,
+      okText: t('yes'),
+      cancelText: t('close'),
       centered: true,
       icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
       onOk: async () => {
@@ -149,11 +153,11 @@ const AccountPage = () => {
   }
   return (
     <>
-    <Loading loading={loading} />
+      <Loading loading={loading} />
       {contextHolder}
       <Row>
         <Col span={24}>
-          <Title level={5}>Tài khoản & Phân quyền</Title>
+          <Title level={5}>{t('title_page_role_user')}</Title>
         </Col>
       </Row>
       <MainCard contentSX={{ p: isMobile() ? 0.5 : 2, minHeight: '83vh' }}>
@@ -167,16 +171,18 @@ const AccountPage = () => {
               }}
               options={[
                 {
-                  label: 'Tài khoản',
+                  label: 'sibar_acc',
                   value: 'account',
                   icon: <TeamOutlined />
                 },
                 {
-                  label: 'Phân quyền',
+                  label: 'role',
                   value: 'role',
                   icon: <SafetyOutlined />
                 }
-              ]}
+              ].map((col) => {
+                return { ...col, label: t(col.label) };
+              })}
             />
           </Col>
           <Col xs={24} sm={18} style={{ marginBottom: '10px' }}>
@@ -184,7 +190,7 @@ const AccountPage = () => {
               <div>
                 {role?.IS_CREATE && (
                   <Button shape="round" onClick={onClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
-                    Thêm mới
+                    {t('btn_new')}
                   </Button>
                 )}
                 {role?.IS_UPDATE && valueTab === 'account' && (
@@ -198,7 +204,7 @@ const AccountPage = () => {
                         icon={<StopOutlined />}
                         type="primary"
                       >
-                        Khoá
+                        {t('btn_lock')}
                       </Button>
                     )}
                     {typeBtnBlock === 'ACTIVE' && (
@@ -206,11 +212,11 @@ const AccountPage = () => {
                         shape="round"
                         disabled={selectedRowKeys?.length === 0}
                         onClick={onClickBlock}
-                        className="btn-success-custom"
+                        className={selectedRowKeys?.length === 0 ? '' : 'btn-success-custom'}
                         icon={<UnlockOutlined />}
                         type="primary"
                       >
-                        Mở khoá
+                        {t('btn_unlock')}
                       </Button>
                     )}
                   </>

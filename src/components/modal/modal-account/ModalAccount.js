@@ -10,6 +10,7 @@ import { ROLE_ACC, STATUS_ACC } from 'utils/helper';
 import './modal-account.css';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
+import { useTranslation } from 'react-i18next';
 
 const initialValidate = { error: false, message: '' };
 const optionStatus = [
@@ -18,9 +19,9 @@ const optionStatus = [
 ];
 const initRole = (arr = []) => {
   if (arr) {
-    const rs = arr.find((item) => item?.ROLE_NAME === 'USER');
+    const rs = arr.find((item) => item?.label === 'USER');
     if (rs) {
-      return rs?.ROLE_ID;
+      return rs?.value;
     }
   }
   return '';
@@ -35,6 +36,17 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
     right: 0
   });
 
+  const { t } = useTranslation();
+
+  const optionSelect = listRole
+    ? listRole.map((item) => {
+        return {
+          value: item?.ROLE_ID,
+          label: item?.ROLE_NAME
+        };
+      })
+    : [];
+
   const [username, setUsername] = useState('');
   const [validateUsername, setValidateUsername] = useState(initialValidate);
 
@@ -44,7 +56,7 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
   const [status, setStatus] = useState(true);
   const [validateStatus, setValidateStatus] = useState(initialValidate);
 
-  const [role, setRole] = useState(initRole(listRole));
+  const [roleSelect, setRoleSelect] = useState(listRole ? listRole[0]?.ROLE_ID : '');
   const [loading, setLoading] = useState(false);
 
   const draggleRef = useRef(null);
@@ -52,35 +64,35 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
     let check = false;
     if (username?.trim() === '') {
       check = true;
-      setValidateUsername({ error: true, message: 'Bắt buộc nhập tên tài khoản' });
+      setValidateUsername({ error: true, message: 'errorEmptyUsername' });
     }
     if (username?.includes(' ')) {
       check = true;
-      setValidateUsername({ error: true, message: 'Tên tài khoản không chứa ký tự khoảng trắng' });
+      setValidateUsername({ error: true, message: 'error_contain_space' });
     }
     if (typeModal !== 'EDIT') {
       // modal add
       if (password?.trim() === '') {
         check = true;
-        setValidatePassword({ error: true, message: 'Bắt buộc nhập mật khẩu' });
+        setValidatePassword({ error: true, message: 'errorEmptyPassword' });
       }
       if (password.includes(' ')) {
         check = true;
-        setValidatePassword({ error: true, message: 'Mật khẩu không được chứa ký tự khoảng trắng' });
+        setValidatePassword({ error: true, message: 'error_contain_space' });
       }
       if (password.length < 4) {
         check = true;
-        setValidatePassword({ error: true, message: 'Mật khẩu chứa ít nhất 4 ký tự' });
+        setValidatePassword({ error: true, message: 'pwMinCharacter' });
       }
     } else {
       if (password?.trim() !== '') {
         if (password.includes(' ')) {
           check = true;
-          setValidatePassword({ error: true, message: 'Mật khẩu không được chứa ký tự khoảng trắng' });
+          setValidatePassword({ error: true, message: 'error_contain_space' });
         }
         if (password.length < 4) {
           check = true;
-          setValidatePassword({ error: true, message: 'Mật khẩu chứa ít nhất 4 ký tự' });
+          setValidatePassword({ error: true, message: 'pwMinCharacter' });
         }
       }
     }
@@ -94,7 +106,7 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
         USER_ID: dataSelect?.USER_ID ? dataSelect?.USER_ID : '',
         USERNAME: username,
         PASSWORD: password,
-        role: role,
+        role: roleSelect,
         ACTIVE: status
       });
       setLoading(false);
@@ -105,10 +117,10 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
     };
     if (!check) {
       Modal.confirm({
-        title: `Thông báo`,
-        content: 'Bạn chắc chắn muốn lưu thông tin?',
-        okText: 'Yes',
-        cancelText: 'No',
+        title: t('msg_notification'),
+        content: t('msg_confirm_save'),
+        okText: t('yes'),
+        cancelText: t('close'),
         centered: true,
         icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
         onOk: async () => {
@@ -121,14 +133,14 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
   useEffect(() => {
     if (open) {
       setUsername(dataSelect?.USERNAME);
-      setRole(dataSelect?.role?.ROLE_ID);
+      setRoleSelect(dataSelect?.role?.ROLE_ID);
       setStatus(dataSelect?.ACTIVE ? true : false);
     }
   }, [dataSelect]);
   const handleCancel = (e) => {
     setUsername('');
     setPassword('');
-    setRole(initRole(listRole));
+    setRoleSelect(initRole(listRole));
     setStatus(STATUS_ACC.ACTIVE);
     setValidateUsername(initialValidate);
     setValidatePassword(initialValidate);
@@ -180,10 +192,10 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
     }
     if (check) {
       Modal.confirm({
-        title: `Thông báo`,
-        content: 'Bạn chắc chắn muốn đóng?',
-        okText: 'Yes',
-        cancelText: 'No',
+        title: t('msg_notification'),
+        content: t('msg_confirm_close'),
+        okText: t('yes'),
+        cancelText: t('close'),
         centered: true,
         onOk: () => {
           handleCancel();
@@ -198,8 +210,8 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
     <>
       <Modal
         centered
-        okText="Lưu thông tin"
-        cancelText="Đóng"
+        okText={t('saveButton')}
+        cancelText={t('close')}
         zIndex={1300}
         maskClosable={false}
         title={
@@ -222,7 +234,7 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
             onBlur={() => {}}
             // end
           >
-            {typeModal === 'EDIT' ? 'Thông tin tài khoản' : typeModal === 'VIEW' ? 'Thông tin tài khoản' : 'Thêm mới tài khoản'}
+            {typeModal === 'EDIT' ? t('tittle_edit') : typeModal === 'VIEW' ? 'Account infomation' : t('title_modal_add_new_account')}
           </div>
         }
         open={open}
@@ -247,7 +259,7 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
         <Row gutter={16}>
           <Col xs={24} sm={24}>
             <p className="custom-label-input">
-              Tên tài khoản(<span className="color-red">*</span>)
+              {t('username')}(<span className="color-red">*</span>)
             </p>
             <Input
               disabled={typeModal === 'VIEW' || typeModal === 'EDIT'}
@@ -255,38 +267,29 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
               name={'username'}
               status={validateUsername.error ? 'error' : ''}
               onChange={onChangeInput}
-              placeholder="Nhập tên tài khoản..."
+              placeholder={t('username') + '...'}
             />
-            {validateUsername.error && <p className="message-err">(*){validateUsername.message}</p>}
+            {validateUsername.error && <p className="message-err">(*){t(validateUsername.message)}</p>}
           </Col>
           <Col span={12}>
             <p className="custom-label-input">
-              Quyền(<span className="color-red">*</span>)
+              {t('role')}(<span className="color-red">*</span>)
             </p>
             <Select
               disabled={typeModal === 'VIEW'}
-              value={role}
+              value={roleSelect}
               style={{
                 width: '100%'
               }}
               onChange={(value) => {
-                setRole(value);
+                setRoleSelect(value);
               }}
-              options={
-                listRole
-                  ? listRole.map((item) => {
-                      return {
-                        value: item?.ROLE_ID,
-                        label: item?.ROLE_NAME
-                      };
-                    })
-                  : []
-              }
+              options={optionSelect}
             />
           </Col>
           <Col span={12}>
             <p className="custom-label-input">
-              Trạng thái(<span className="color-red">*</span>)
+              {t('status_col')}(<span className="color-red">*</span>)
             </p>
             <Select
               disabled={typeModal === 'VIEW'}
@@ -303,10 +306,10 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
           {typeModal !== 'VIEW' && (
             <Col span={24}>
               {typeModal === 'EDIT' ? (
-                <p className="custom-label-input">Đổi mật khẩu</p>
+                <p className="custom-label-input">{t('header_changePW')}</p>
               ) : (
                 <p className="custom-label-input">
-                  Mật khẩu(<span className="color-red">*</span>)
+                  {t('password')}(<span className="color-red">*</span>)
                 </p>
               )}
               <Input
@@ -314,9 +317,9 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
                 value={password}
                 onChange={onChangeInput}
                 status={validatePassword.error ? 'error' : ''}
-                placeholder="Nhập mật khẩu..."
+                placeholder={t('password') + '...'}
               />
-              {validatePassword.error && <p className="message-err">(*){validatePassword.message}</p>}
+              {validatePassword.error && <p className="message-err">(*){t(validatePassword.message)}</p>}
             </Col>
           )}
         </Row>

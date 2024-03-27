@@ -4,10 +4,12 @@ import './permisstion.css';
 import { useEffect, useState } from 'react';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
+import { useTranslation } from 'react-i18next';
 
 const SPAN = 3;
 
 const Permisstion = ({ listRole, role, getAllRole }) => {
+  const { t } = useTranslation();
   const [messageApi, contextHolder] = message.useMessage();
   const [roles, setRoles] = useState([]);
   const [checkChange, setCheckChange] = useState(false);
@@ -114,7 +116,7 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
     if (res?.status === 200) {
       messageApi.open({
         type: 'success',
-        content: 'Cập nhật thông tin thành công!'
+        content: t('msg_update_success')
       });
       getAllRole();
     } else {
@@ -151,8 +153,15 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
       <Flex gap="small" wrap="wrap" style={{ width: '100%', marginTop: '10px' }} justify="right">
         {role?.IS_UPDATE && (
           <>
-            <Button shape="round" disabled={!checkChange} onClick={onClickSave} className="btn-success-custom" icon={<SaveOutlined />} type="primary">
-              Lưu thay đổi
+            <Button
+              shape="round"
+              disabled={!checkChange}
+              onClick={onClickSave}
+              className="btn-success-custom"
+              icon={<SaveOutlined />}
+              type="primary"
+            >
+              {t('saveButton')}
             </Button>
           </>
         )}

@@ -12,52 +12,6 @@ import { RouterAPI } from 'utils/routerAPI';
 import { formatArrDate, formatDateFromDB, isMobile } from 'utils/helper';
 import { useTranslation } from 'react-i18next';
 
-const columns = [
-  {
-    align: 'center',
-    key: 'no',
-    title: '#',
-    fixed: 'left',
-    width: '15%',
-    render: (text, object, index) => index + 1
-  },
-  {
-    align: 'left',
-    key: 'type',
-    title: 'Kiểu',
-    dataIndex: 'TYPE',
-    width: '20%'
-  },
-  {
-    align: 'left',
-    key: 'VALUE',
-    title: 'Mô tả',
-    dataIndex: 'VALUE',
-    width: '25%'
-  },
-  {
-    align: 'left',
-    key: 'USER',
-    title: 'User',
-    dataIndex: 'USER',
-    width: '20%',
-    render: (_, data) => (
-      <>
-        <Link onClick={() => {}}>{data?.USER}</Link>
-      </>
-    )
-  },
-  {
-    key: 'TIME',
-    title: 'Thời gian',
-    dataIndex: 'TIME',
-    align: 'center',
-    width: '20%',
-    render: (text, object, index) => {
-      return formatDateFromDB(object?.TIME);
-    }
-  }
-];
 const ModalHistoryGuest = ({ open, handleClose, idGuest }) => {
   const { t } = useTranslation();
   const [disabled, setDisabled] = useState(true);
@@ -70,6 +24,54 @@ const ModalHistoryGuest = ({ open, handleClose, idGuest }) => {
     top: 0,
     bottom: 0,
     right: 0
+  });
+  const columns = [
+    {
+      align: 'center',
+      key: 'no',
+      title: '#',
+      fixed: 'left',
+      width: isMobile() ? 50 : '10%',
+      render: (text, object, index) => index + 1
+    },
+    {
+      align: 'left',
+      key: 'type',
+      title: 'type',
+      dataIndex: 'TYPE',
+      width: isMobile() ? 100 : '20%'
+    },
+    {
+      align: 'left',
+      key: 'VALUE',
+      title: 'description',
+      dataIndex: 'VALUE',
+      width: isMobile() ? 150 : '27%'
+    },
+    {
+      align: 'left',
+      key: 'USER',
+      title: 'User',
+      dataIndex: 'USER',
+      width: isMobile() ? 100 : '25%',
+      render: (_, data) => (
+        <>
+          <Link onClick={() => {}}>{data?.USER}</Link>
+        </>
+      )
+    },
+    {
+      key: 'TIME',
+      title: 'time',
+      dataIndex: 'TIME',
+      align: 'center',
+      width: isMobile() ? 100 : '18%',
+      render: (text, object, index) => {
+        return formatDateFromDB(object?.TIME);
+      }
+    }
+  ].map((col) => {
+    return { ...col, title: t(col.title) };
   });
   //  [
   //     {
@@ -122,8 +124,8 @@ const ModalHistoryGuest = ({ open, handleClose, idGuest }) => {
       <Modal
         centered
         width={600}
-        okText="Lưu thông tin"
-        cancelText="Đóng"
+        // okText="Lưu thông tin"
+        cancelText={t('close')}
         zIndex={1300}
         maskClosable={false}
         title={
@@ -154,8 +156,8 @@ const ModalHistoryGuest = ({ open, handleClose, idGuest }) => {
         onCancel={onClickCancel}
         footer={(_, { OkBtn, CancelBtn }) => (
           <>
-            {/* <CancelBtn />
-            <OkBtn /> */}
+            <CancelBtn />
+            {/* <OkBtn /> */}
           </>
         )}
         modalRender={(modal) => (
@@ -167,7 +169,7 @@ const ModalHistoryGuest = ({ open, handleClose, idGuest }) => {
         <Row gutter={16}>
           <Col xs={24}>
             <Table
-              tableLayout={'auto'}
+              // tableLayout={'auto'}
               // tableLayout={tableData?.length !== 0 ? 'fixed' : 'auto'}
               // rowKey="GUEST_ID"
               bordered

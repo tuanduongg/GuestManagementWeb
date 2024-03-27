@@ -86,6 +86,7 @@ const ListGuest = () => {
   // }, [dataUser]);
 
   const getData = async () => {
+    // setLoading(true);
     const data = { date: JSON.stringify(formatArrDate(dateSelect)), status: statusName.NEW };
     if (valueTab === NEW_TAB) {
       data.date = JSON.stringify(formatArrDate([today]));
@@ -94,6 +95,7 @@ const ListGuest = () => {
       data.status = 'ALL';
     }
     const rest = await restApi.post(RouterAPI.allGuest, data);
+    // setLoading(false);
     if (rest?.status === 200) {
       setTableData(rest?.data);
     }
@@ -175,7 +177,7 @@ const ListGuest = () => {
     }
     messageApi.open({
       type: 'warning',
-      content: 'không có dữ liệu!'
+      content: 'No data!'
     });
   };
   const onAccept = async (GUEST_ID) => {
@@ -184,7 +186,7 @@ const ListGuest = () => {
       if (rest?.status === 200) {
         messageApi.open({
           type: 'success',
-          content: 'Cập nhật thành công!'
+          content: t('msg_update_success')
         });
       } else {
         messageApi.open({
@@ -328,11 +330,12 @@ const ListGuest = () => {
       title: 'action_col',
       fixed: 'right',
       render: (text, data, index) => {
-        if (
-          (role?.IS_ACCEPT && data?.STATUS === statusName.NEW && !data?.DELETE_AT && dataUser?.role?.ROLE_NAME !== 'SECURITY') ||
-          (role?.IS_ACCEPT && data?.STATUS === statusName.ACCEPT && !data?.DELETE_AT && dataUser?.role?.ROLE_NAME === 'SECURITY') ||
-          data?.histories?.length === 0
-        ) {
+        // if (
+        //   (role?.IS_ACCEPT && data?.STATUS === statusName.NEW && dataUser?.role?.ROLE_NAME !== 'SECURITY') ||
+        //   (role?.IS_ACCEPT && data?.STATUS === statusName.ACCEPT && dataUser?.role?.ROLE_NAME === 'SECURITY') ||
+        //   data?.histories?.length === 0
+        // ) {
+        if ((role?.IS_ACCEPT && data?.STATUS === statusName.NEW) || (role?.IS_ACCEPT && data?.histories?.length === 0)) {
           return (
             <>
               {/* <div style={{ display: 'flex', justifyContent: 'center' }}> */}
@@ -373,7 +376,7 @@ const ListGuest = () => {
 
   const onAfterSave = (rest) => {
     if (rest?.status === 200) {
-      let text = typeModalAdd === 'EDIT' ? t('msg_update_fail') : t('msg_add_success');
+      let text = typeModalAdd === 'EDIT' ? t('msg_update_success') : t('msg_add_success');
       messageApi.open({
         type: 'success',
         content: text
@@ -401,13 +404,13 @@ const ListGuest = () => {
     if (rest?.status === 200) {
       messageApi.open({
         type: 'success',
-        content: 'Hủy thành công!'
+        content: 'Cancel successful!'
       });
       // getData();
     } else {
       messageApi.open({
         type: 'warning',
-        content: rest?.data?.message ?? 'Hủy thất bại!'
+        content: rest?.data?.message ?? 'Cancel fail!'
       });
     }
   };
@@ -492,7 +495,13 @@ const ListGuest = () => {
                 </Button>
               )}
               {role?.IS_DELETE && (
-                <Popconfirm onConfirm={handleDelete} title="Thông báo" description="Bạn chắc chắn muốn hủy?" okText="Có" cancelText="đóng">
+                <Popconfirm
+                  onConfirm={handleDelete}
+                  title={t('msg_notification')}
+                  description="Are you sure you want to cancel it?"
+                  okText={t('yes')}
+                  cancelText={t('close')}
+                >
                   <Button shape="round" disabled={disabledBtnCancel} danger icon={<CloseOutlined />} type="primary">
                     {t('canelBTN')}
                   </Button>

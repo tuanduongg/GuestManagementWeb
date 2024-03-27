@@ -126,11 +126,11 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role, onCl
           <Col xs={24} sm={12}>
             <p className="title-detail">{t('time')}</p>
             <Flex direction="row">
-              <Text className="title-time">{t('timeIn_col')}:</Text>
+              <Text style={{ fontWeight: '500', marginRight: '5px' }}>{t('timeIn_col')}:</Text>
               <Text>{dataSelect?.TIME_IN ? formatHourMinus(dataSelect?.TIME_IN) : ''}</Text>
             </Flex>
             <Flex direction="row">
-              <Text className="title-time">{t('timeOut_col')}:</Text>
+              <Text style={{ fontWeight: '500', marginRight: '5px' }}>{t('timeOut_col')}:</Text>
               <Text>{dataSelect?.TIME_OUT ? formatHourMinus(dataSelect?.TIME_OUT) : ''}</Text>
             </Flex>
             <Flex direction="row">

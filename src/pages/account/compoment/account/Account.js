@@ -11,8 +11,10 @@ import ForbidenPage from 'components/403/ForbidenPage';
 import { checkDisableBtn, initArrayTab } from './account.service';
 const { Title } = Typography;
 import './account.css';
+import { useTranslation } from 'react-i18next';
 
 const Account = ({ role, listRole, onClickEdit, dataACC, setTypeBtnBlock, setSelectedRowKeys, selectedRowKeys }) => {
+  const { t } = useTranslation();
   const [tableData, setTableData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [typeModal, setTypeModal] = useState('');
@@ -28,7 +30,7 @@ const Account = ({ role, listRole, onClickEdit, dataACC, setTypeBtnBlock, setSel
     {
       align: 'center',
       key: 'stt',
-      title: 'STT',
+      title: '#',
       dataIndex: 'stt',
       width: 70,
       render: (id, record, index) => {
@@ -39,7 +41,7 @@ const Account = ({ role, listRole, onClickEdit, dataACC, setTypeBtnBlock, setSel
     {
       align: 'left',
       key: 'USERNAME',
-      title: 'Tên tài khoản',
+      title: 'username',
       dataIndex: 'USERNAME',
       width: 130,
       fixed: 'left',
@@ -61,7 +63,7 @@ const Account = ({ role, listRole, onClickEdit, dataACC, setTypeBtnBlock, setSel
 
     {
       key: 'ROLE_NAME',
-      title: 'Quyền',
+      title: 'role',
       render: (_, { role }) => <>{role.ROLE_NAME}</>,
       align: 'center',
       width: 130
@@ -69,14 +71,14 @@ const Account = ({ role, listRole, onClickEdit, dataACC, setTypeBtnBlock, setSel
     {
       key: 'ACTIVE',
       align: 'center',
-      title: 'Trạng thái',
+      title: 'status_col',
       dataIndex: 'ACTIVE',
       width: 130,
       render: (_, { ACTIVE }) => <>{getChipStatusAcc(ACTIVE)}</>
     },
     {
       key: 'CREATE_AT',
-      title: 'Ngày tạo',
+      title: 'time_create',
       dataIndex: 'CREATE_AT',
       align: 'center',
       width: 130,
@@ -84,7 +86,7 @@ const Account = ({ role, listRole, onClickEdit, dataACC, setTypeBtnBlock, setSel
     },
     {
       key: 'ACTION',
-      title: 'Chức năng',
+      title: 'action_col',
       align: 'center',
       width: 80,
       hidden: role?.IS_UPDATE ? false : true,
@@ -100,47 +102,15 @@ const Account = ({ role, listRole, onClickEdit, dataACC, setTypeBtnBlock, setSel
         </>
       )
     }
-  ];
+  ].map((item) => {
+    return { ...item, title: t(item.title) };
+  });
 
-  // useEffect(() => {
-  //   let check = checkDisableBtn(selectedRowKeys, tableData);
-  //   setTypeBtnBlock(check);
-  // }, [selectedRowKeys]);
-  // useEffect(() => {
-  //   let check = checkDisableBtn(selectedRowKeys, tableData);
-  //   setTypeBtn(check);
-  // }, [selectedRowKeys]);
   useEffect(() => {
     if (dataACC) {
       setTableData(dataACC);
-      // let check = checkDisableBtn(selectedRowKeys, dataACC);
-      // setTypeBtnBlock(check);
     }
   }, [dataACC]);
-  const onChangeBlock = async () => {
-    const url = RouterAPI.changeBlockUser;
-    const rst = await restApi.post(url, { type: typeBtn, listID: selectedRowKeys });
-    if (rst?.status === 200) {
-      getData();
-      messageApi.open({
-        type: 'success',
-        content: 'Cập nhật thông tin thành công!'
-      });
-    }
-  };
-  const onClickBlock = () => {
-    Modal.confirm({
-      title: `Thông báo`,
-      content: `Bạn chắc chắn muốn ${typeBtn === 'BLOCK' ? 'khóa' : 'mở khóa'} tài khoản ?`,
-      okText: 'Có',
-      cancelText:'Không',
-      centered: true,
-      icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
-      onOk: async () => {
-        onChangeBlock();
-      }
-    });
-  };
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
