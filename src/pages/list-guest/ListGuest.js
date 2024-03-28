@@ -123,12 +123,14 @@ const ListGuest = () => {
       socket.on('newguest', (data) => {
         if (data) {
           //nếu là người duyệt(quyền duyệt,không là người tạo)
-          if (dataUser?.username !== data?.CREATE_BY && dataUser?.role?.ROLE_NAME !== 'SECURITY' && role?.IS_ACCEPT) {
+          if (role?.IS_ACCEPT) {
+          // if (dataUser?.username !== data?.CREATE_BY && dataUser?.role?.ROLE_NAME !== 'SECURITY' && role?.IS_ACCEPT) {
             setCheckChange(true);
           }
         }
       });
       socket.on('acceptguest', (data) => {
+        console.log('data', data);
         setCheckChange(true);
       });
 
@@ -354,7 +356,7 @@ const ListGuest = () => {
         }
       },
       width: isMobile() ? 60 : '12%',
-      hidden: dataUser?.role?.ROLE_NAME === 'USER'
+      hidden: valueTab === HISTORY_TAB
     }
   ].map((item) => {
     return { ...item, title: t(item?.title) };
@@ -514,10 +516,14 @@ const ListGuest = () => {
           // tableLayout={'auto'}
           // tableLayout={tableData?.length !== 0 ? 'fixed' : 'auto'}
           rowKey="GUEST_ID"
-          rowSelection={{
-            selectedRowKeys,
-            onChange: onSelectChange
-          }}
+          rowSelection={
+            role?.IS_DELETE
+              ? {
+                  selectedRowKeys,
+                  onChange: onSelectChange
+                }
+              : null
+          }
           bordered
           scroll={{
             x: 'max',

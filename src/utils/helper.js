@@ -187,19 +187,19 @@ export const listNameStatus = () => {
     if (item) {
       switch (item) {
         case statusName.CANCEL:
-          message = 'Đã hủy';
+          message = 'status_cancel';
           break;
         case statusName.NEW:
-          message = 'Mới';
+          message = 'status_new';
           break;
         case statusName.ACCEPT:
-          message = 'Đã duyệt';
+          message = 'status_accepted';
           break;
         case statusName.COME_IN:
-          message = 'Đã vào';
+          message = 'status_comein';
           break;
         case statusName.COME_OUT:
-          message = 'Đã ra';
+          message = 'Come out';
           break;
 
         default:
@@ -207,7 +207,7 @@ export const listNameStatus = () => {
       }
     }
     arr.push({
-      text: message,
+      text: i18next.t(message),
       value: item
     });
   });

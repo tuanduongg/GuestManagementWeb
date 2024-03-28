@@ -3,7 +3,7 @@ import { Button, Modal, Row, Col, Flex, Typography, Spin } from 'antd';
 import { CaretRightOutlined, FileSearchOutlined, EditOutlined, CloseOutlined, CheckOutlined } from '@ant-design/icons';
 const { Title, Text } = Typography;
 import './modal_info_guest.css';
-import { formatDateFromDB, formatHourMinus, getColorChipStatus, isMobile } from 'utils/helper';
+import { formatDateFromDB, formatHourMinus, getColorChipStatus, isMobile, statusName } from 'utils/helper';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import { concatDateString } from './modal_info_guest.service';
@@ -43,6 +43,7 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role, onCl
     }
   }, [open]);
 
+
   return (
     <>
       <Modal
@@ -78,7 +79,7 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role, onCl
                 >
                   {t('history')}
                 </Button>
-                {role?.IS_UPDATE && (
+                {role?.IS_UPDATE && dataSelect?.STATUS == statusName.NEW && (
                   <Button
                     type="primary"
                     onClick={() => {

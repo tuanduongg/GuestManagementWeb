@@ -190,7 +190,7 @@ export const translate = {
       carNum_col: '차량번호',
       timeIn_col: '입문 예상 시간',
       timeOut_col: '출문 예상 시간',
-      reason_col: '방문 내용 및 사유',
+      reason_col: '사유',
       personSeowon_col: '담당자',
       department_col: '방문 부서',
       status_col: '유형',
