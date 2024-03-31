@@ -436,7 +436,7 @@ const ListGuest = () => {
         </Col>
       </Row>
       <div style={{ width: '100%', maxWidth: '100%' }}>
-        <MainCard contentSX={{ p: 2, minHeight: '83vh', maxWidth: '1000vh' }}>
+        <MainCard contentSX={{ p: 2, minHeight: '83vh' }}>
           <Tabs
             value={valueTab}
             defaultActiveKey="1"

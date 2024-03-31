@@ -11,7 +11,7 @@ const cols = [
   { url: ConfigRouter.listGuest, icon: <UsergroupAddOutlined style={{ fontSize: '30px' }} />, content: 'ĐĂNG KÝ KHÁCH', id: '1' },
   { url: ConfigRouter.listGuest, icon: <ShoppingCartOutlined style={{ fontSize: '30px' }} />, content: 'ORDER VẬT TƯ ', id: '2' },
   { url: ConfigRouter.user, icon: <UnlockOutlined style={{ fontSize: '30px' }} />, content: 'TÀI KHOẢN & PHÂN QUYỀN', id: '3' },
-//   { url: ConfigRouter.listGuest, icon: <UsergroupAddOutlined style={{ fontSize: '30px' }} />, content: 'ĐĂNG KÝ KHÁCH', id: '4' }
+  //   { url: ConfigRouter.listGuest, icon: <UsergroupAddOutlined style={{ fontSize: '30px' }} />, content: 'ĐĂNG KÝ KHÁCH', id: '4' }
 ];
 
 const HomePage = () => {
@@ -41,7 +41,7 @@ const HomePage = () => {
           <Row gutter={24}>
             {cols.map((item) => (
               <>
-                <Col key={item.id} xs={24} sm={12}>
+                <Col key={item.id} style={{ display: 'flex', justifyContent: 'center' }} xs={24} sm={12}>
                   <CardComponent key={item.id} content={item.content} url={item.url} icon={item.icon} />
                 </Col>
               </>

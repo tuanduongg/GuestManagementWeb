@@ -313,6 +313,12 @@ export function isMobile() {
   }
   return false;
 }
+export function isTablet() {
+  if (window) {
+    return window.matchMedia('(min-width: 768px) and (max-width: 1359px)').matches;
+  }
+  return false;
+}
 
 export function isMdScreen() {
   if (window) {
@@ -442,3 +448,10 @@ export const getDataUserFromLocal = () => {
   }
   return {};
 };
+export const truncateString = (str, maxLength) => {
+  if (str.length <= maxLength) {
+    return str;
+  } else {
+    return str.substring(0, maxLength) + '...';
+  }
+}

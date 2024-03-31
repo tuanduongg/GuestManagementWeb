@@ -1,0 +1,32 @@
+.ant-card-body {
+    padding: 10px !important;
+}
+
+.title-card-product {
+    font-weight: 500;
+    font-size: 12px;
+    min-height: 41px;
+}
+.price-card-product {
+    color: #005494;
+    font-weight: bold;
+    font-size: 15px;
+    margin: 10px 0px;
+}
+.wrap-button-card {
+    display: flex;
+    justify-content: space-between;
+}
+.add-to-cart-button {
+    width: 100%;
+    font-weight: 500;
+}
+.no-border-radius {
+    border-radius: 0px;
+}
+.card-product {
+    border-radius: 0px;
+}
+.ant-card-cover img {
+    border-radius: 0px !important;
+}

@@ -9,7 +9,7 @@ import { ConfigRouter } from 'config_router';
 // render - sample page
 const SamplePage = Loadable(lazy(() => import('pages/extra-pages/SamplePage')));
 const ListStruck = Loadable(lazy(() => import('pages/list-struck/ListStruck')));
-const HomePage = Loadable(lazy(() => import('pages/homepage/HomePage')));
+const ListProduct = Loadable(lazy(() => import('pages/list-product/ListProduct')));
 const ListGuest = Loadable(lazy(() => import('pages/list-guest/ListGuest')));
 const AccountPage = Loadable(lazy(() => import('pages/account')));
 
@@ -28,6 +28,10 @@ const MainRoutes = {
     {
       path: ConfigRouter.user,
       element: <AccountPage />
+    },
+    {
+      path: ConfigRouter.listProduct,
+      element: <ListProduct />
     }
   ]
 };
