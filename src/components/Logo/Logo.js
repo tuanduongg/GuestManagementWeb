@@ -12,12 +12,12 @@ import LOGO from '../../assets/images/logo/favilogo.png';
 
 // ==============================|| LOGO SVG ||============================== //
 
-const Logo = () => {
+const Logo = ({ styleImage, styleText }) => {
   return (
     <>
       <Stack direction="row" spacing={1} alignItems="center">
-        <img src={LOGO} alt="Seowonintech" width="40" />
-        <Typography variant="h6" sx={{ fontWeight: 'bold' }} gutterBottom>
+        <img style={styleImage} src={LOGO} alt="Seowonintech" width="40" />
+        <Typography variant="h6" sx={{ fontWeight: 'bold', ...styleText }} gutterBottom>
           HANOI SEOWONINTECH
         </Typography>
       </Stack>

@@ -124,7 +124,7 @@ const ListGuest = () => {
         if (data) {
           //nếu là người duyệt(quyền duyệt,không là người tạo)
           if (role?.IS_ACCEPT) {
-          // if (dataUser?.username !== data?.CREATE_BY && dataUser?.role?.ROLE_NAME !== 'SECURITY' && role?.IS_ACCEPT) {
+            // if (dataUser?.username !== data?.CREATE_BY && dataUser?.role?.ROLE_NAME !== 'SECURITY' && role?.IS_ACCEPT) {
             setCheckChange(true);
           }
         }
@@ -435,105 +435,111 @@ const ListGuest = () => {
           <Title level={5}>{t('sidebar_manager_guest')}</Title>
         </Col>
       </Row>
-      <MainCard contentSX={{ p: 2, minHeight: '83vh' }}>
-        <Tabs
-          value={valueTab}
-          defaultActiveKey="1"
-          items={[
-            {
-              key: NEW_TAB,
-              label: (
-                <Badge dot={0}>
-                  <span>{t('today')}</span>
-                </Badge>
-              ),
-              icon: <CalendarOutlined />,
-              hidden: dataUser?.role?.ROLE_NAME === 'USER'
-            },
-            {
-              key: HISTORY_TAB,
-              label: t('regisList'),
-              icon: <UnorderedListOutlined />,
-              hidden: false
-              // children: 'Content of Tab Pane 2'
-            }
-          ].filter((item) => !item.hidden)}
-          onChange={(key) => {
-            setValueTab(key);
-          }}
-        />
-        <Row style={{ margin: '5px 0px 10px 0px' }}>
-          {valueTab === HISTORY_TAB && (
-            <Col sm={12} xs={24}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: isMobile() ? 'space-between' : '' }}>
-                <span style={{ fontWeight: 'bold', marginRight: '10px' }}>
-                  {' '}
-                  {dataUser?.role?.ROLE_NAME === 'SECURITY' ? 'Ngày vào:' : `${t('createDate')}:`}
-                </span>
-                <DatePicker
-                  className="date-picker-custom"
-                  multiple
-                  maxTagCount={1}
-                  style={{ width: '205px' }}
-                  allowClear={false}
-                  format={config.dateFormat}
-                  value={dateSelect}
-                  onChange={onChangeDate}
-                />
-                <Button
-                  style={{ marginLeft: '5px' }}
-                  onClick={onClickFilter}
-                  type="link"
-                  icon={<FilterOutlined style={{ fontSize: '22px' }} />}
-                />
+      <div style={{ width: '100%', maxWidth: '100%' }}>
+        <MainCard contentSX={{ p: 2, minHeight: '83vh', maxWidth: '1000vh' }}>
+          <Tabs
+            value={valueTab}
+            defaultActiveKey="1"
+            items={[
+              {
+                key: NEW_TAB,
+                label: (
+                  <Badge dot={0}>
+                    <span>{t('today')}</span>
+                  </Badge>
+                ),
+                icon: <CalendarOutlined />,
+                hidden: dataUser?.role?.ROLE_NAME === 'USER'
+              },
+              {
+                key: HISTORY_TAB,
+                label: t('regisList'),
+                icon: <UnorderedListOutlined />,
+                hidden: false
+                // children: 'Content of Tab Pane 2'
+              }
+            ].filter((item) => !item.hidden)}
+            onChange={(key) => {
+              setValueTab(key);
+            }}
+          />
+          <Row style={{ margin: '5px 0px 10px 0px' }}>
+            {valueTab === HISTORY_TAB && (
+              <Col sm={12} xs={24}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: isMobile() ? 'space-between' : '' }}>
+                  <span style={{ fontWeight: 'bold', marginRight: '10px' }}>
+                    {' '}
+                    {dataUser?.role?.ROLE_NAME === 'SECURITY' ? 'Ngày vào:' : `${t('createDate')}:`}
+                  </span>
+                  <DatePicker
+                    className="date-picker-custom"
+                    multiple
+                    maxTagCount={1}
+                    style={{ width: '205px' }}
+                    allowClear={false}
+                    format={config.dateFormat}
+                    value={dateSelect}
+                    onChange={onChangeDate}
+                  />
+                  <Button
+                    style={{ marginLeft: '5px' }}
+                    onClick={onClickFilter}
+                    type="link"
+                    icon={<FilterOutlined style={{ fontSize: '22px' }} />}
+                  />
+                </div>
+              </Col>
+            )}
+            <Col style={{ margin: isMobile() ? '10px 0px' : '' }} sm={valueTab !== HISTORY_TAB ? 24 : 12} xs={24}>
+              <div style={{ display: 'flex', justifyContent: 'end' }}>
+                {role?.IS_CREATE && (
+                  <Button shape="round" onClick={handleClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
+                    {t('createBTN')}
+                  </Button>
+                )}
+                {role?.IS_DELETE && (
+                  <Popconfirm
+                    onConfirm={handleDelete}
+                    title={t('msg_notification')}
+                    description="Are you sure you want to cancel it?"
+                    okText={t('yes')}
+                    cancelText={t('close')}
+                  >
+                    <Button shape="round" disabled={disabledBtnCancel} danger icon={<CloseOutlined />} type="primary">
+                      {t('canelBTN')}
+                    </Button>
+                  </Popconfirm>
+                )}
               </div>
             </Col>
-          )}
-          <Col style={{ margin: isMobile() ? '10px 0px' : '' }} sm={valueTab !== HISTORY_TAB ? 24 : 12} xs={24}>
-            <div style={{ display: 'flex', justifyContent: 'end' }}>
-              {role?.IS_CREATE && (
-                <Button shape="round" onClick={handleClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
-                  {t('createBTN')}
-                </Button>
-              )}
-              {role?.IS_DELETE && (
-                <Popconfirm
-                  onConfirm={handleDelete}
-                  title={t('msg_notification')}
-                  description="Are you sure you want to cancel it?"
-                  okText={t('yes')}
-                  cancelText={t('close')}
-                >
-                  <Button shape="round" disabled={disabledBtnCancel} danger icon={<CloseOutlined />} type="primary">
-                    {t('canelBTN')}
-                  </Button>
-                </Popconfirm>
-              )}
-            </div>
-          </Col>
-        </Row>
-        <Table
-          // tableLayout={'auto'}
-          // tableLayout={tableData?.length !== 0 ? 'fixed' : 'auto'}
-          rowKey="GUEST_ID"
-          rowSelection={
-            role?.IS_DELETE
-              ? {
-                  selectedRowKeys,
-                  onChange: onSelectChange
-                }
-              : null
-          }
-          bordered
-          scroll={{
-            x: 'max',
-            y: '60vh'
-          }}
-          columns={columns.filter((item) => !item?.hidden)}
-          dataSource={tableData}
-          pagination={false}
-        ></Table>
-      </MainCard>
+          </Row>
+          <Table
+            // tableLayout={'auto'}
+            // tableLayout={tableData?.length !== 0 ? 'fixed' : 'auto'}
+            rowKey="GUEST_ID"
+            rowSelection={
+              role?.IS_DELETE
+                ? {
+                    selectedRowKeys,
+                    onChange: onSelectChange
+                  }
+                : null
+            }
+            bordered
+            scroll={
+              tableData?.length === 0 && !isMobile()
+                ? null
+                : {
+                    x: '100vh',
+                    y: '100vh'
+                  }
+            }
+            columns={columns.filter((item) => !item?.hidden)}
+            dataSource={tableData}
+            pagination={false}
+          ></Table>
+        </MainCard>
+      </div>
       <ModalInfoGuest
         onClickShowModalHistory={onClickShowModalHistory}
         role={role}

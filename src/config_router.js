@@ -4,5 +4,6 @@ export const ConfigRouter = {
   user: '/user',
   pwRecovery: 'password-recovery',
   listGuest: '/',
-  login: 'login'
+  login: 'login',
+  homePage: 'home'
 };

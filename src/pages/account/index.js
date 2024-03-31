@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Tabs } from 'antd';
-import { Table, Row, Col, Typography, Segmented, Flex, Button, message, Modal } from 'antd';
+import { Table, Row, Col, Typography, Segmented, Flex, Button, message, Modal, Input } from 'antd';
+const { Search } = Input;
 import { isMobile } from 'utils/helper';
 import ForbidenPage from 'components/403/ForbidenPage';
 import { RouterAPI } from 'utils/routerAPI';
@@ -30,6 +31,7 @@ const AccountPage = () => {
   const [dataSelectAcc, setDataSelectAcc] = useState(null);
   const [messageApi, contextHolder] = message.useMessage();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [valueSearch, setValueSearch] = useState('');
   const { t } = useTranslation();
 
   const checkRole = async () => {
@@ -40,29 +42,46 @@ const AccountPage = () => {
     }
     setLoading(false);
   };
-
-  const getDataACC = async () => {
-    const rest = await restApi.get(RouterAPI.userAll);
-    if (rest?.status === 200) {
-      setDataAcc(rest?.data);
-    }
-  };
-
-  useEffect(() => {
-    checkRole();
-    getAllRole();
-    getDataACC();
-  }, []);
-  useEffect(() => {
-    let check = checkDisableBtn(selectedRowKeys, dataACC);
-    setTypeBtnBlock(check);
-  }, [dataACC]);
   const getAllRole = async () => {
+    setLoading(true);
     const rest = await restApi.get(RouterAPI.allRole);
+    setLoading(false);
     if (rest?.status === 200) {
       setListRole(rest?.data);
     }
   };
+
+  const getDataACC = async (valueSearchProp = '') => {
+    setLoading(true);
+    const rest = await restApi.post(RouterAPI.userAll, { search: valueSearchProp });
+    if (rest?.status === 200) {
+      setDataAcc(rest?.data);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    checkRole();
+  }, []);
+  useEffect(() => {
+    switch (valueTab) {
+      case 'account':
+        getDataACC();
+        break;
+      case 'role':
+        getAllRole();
+        break;
+      default:
+        break;
+    }
+    // getAllRole();
+    // getDataACC();
+  }, [valueTab]);
+  useEffect(() => {
+    let check = checkDisableBtn(selectedRowKeys, dataACC);
+    setTypeBtnBlock(check);
+  }, [dataACC]);
+
   const onCloseModal = async () => {
     setOpenModalAcc(false);
     setDataSelectAcc(null);
@@ -148,6 +167,9 @@ const AccountPage = () => {
       }
     });
   };
+  const onChangeSearch = (value) => {
+    getDataACC(value);
+  };
   if (!role?.IS_READ) {
     return <ForbidenPage />;
   }
@@ -187,6 +209,18 @@ const AccountPage = () => {
           </Col>
           <Col xs={24} sm={18} style={{ marginBottom: '10px' }}>
             <Flex gap="small" wrap="wrap" style={{ width: '100%' }} justify="end">
+              {valueTab === 'account' && (
+                <Search
+                  style={{
+                    width: isMobile() ? '100%' : '250px',
+                    marginRight: isMobile() ? '0px' : '10px'
+                  }}
+                  placeholder={t('username') + '...'}
+                  allowClear
+                  enterButton
+                  onSearch={onChangeSearch}
+                />
+              )}
               <div>
                 {role?.IS_CREATE && (
                   <Button shape="round" onClick={onClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
