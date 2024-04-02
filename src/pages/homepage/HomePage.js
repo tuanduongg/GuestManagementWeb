@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Row, Col, Flex, Badge } from 'antd';
+import { Card, Row, Col, Flex } from 'antd';
 import './homepage.css';
 import { isMobile } from 'utils/helper';
 import { UsergroupAddOutlined, ShoppingCartOutlined, UnlockOutlined } from '@ant-design/icons';
@@ -49,7 +49,7 @@ const HomePage = () => {
             {/*             
             {cols.map((item) => (
               <Col xs={24} sm={12}>
-                <cardComponent>
+              <cardComponent>
               </Col>
             )} */}
           </Row>

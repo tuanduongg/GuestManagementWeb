@@ -431,7 +431,7 @@ const ListGuest = () => {
       <Loading loading={loading} />
       {contextHolder}
       <Row>
-        <Col span={24}>
+        <Col style={{marginTop:'5px'}} span={24}>
           <Title level={5}>{t('sidebar_manager_guest')}</Title>
         </Col>
       </Row>

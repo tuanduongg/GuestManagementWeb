@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Row, Col, Typography, Card, Pagination, Input, Space, Dropdown, message, Button, Badge } from 'antd';
+import { Table, Row, Col, Typography, Card, Pagination, Input, Space, Dropdown, message, Button, FloatButton, Drawer } from 'antd';
 const { Title, Link, Text } = Typography;
 const { Meta } = Card;
 import './list-product.css';
 const { Search } = Input;
 
-import { DownOutlined, FilterOutlined } from '@ant-design/icons';
+import { DownOutlined, FilterOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import { useTranslation } from 'react-i18next';
 import MainCard from 'components/MainCard';
 import CardProduct from 'components/cards/card-product/CardProduct';
 import { isMobile, isTablet } from 'utils/helper';
+import ModalCart from 'components/modal/modal-cart/ModalCart';
 
 const ListProduct = () => {
   const { t } = useTranslation();
   const [messageApi, contextHolder] = message.useMessage();
+  const [openModalCart, setOpenModalCart] = useState(false);
   //   if (!role?.IS_READ) {
   //     return <ForbidenPage />;
   //   }
@@ -26,7 +28,8 @@ const ListProduct = () => {
     <>
       {/* <Loading loading={loading} /> */}
       {contextHolder}
-      <div style={{ margin: '40px 0px 0px 0px' }}></div>
+      <div style={{ margin: '25px 0px 0px 0px' }}></div>
+      <div style={{ fontSize: '22px', fontWeight: 'bold', textAlign: 'center' }}>Danh Sách Vật Tư Tiêu Hao</div>
       <div className="wrap-list">
         <Row style={{ margin: '0px 0px 15px 0px', justifyContent: 'space-between', alignItems: 'center' }}>
           <Col sm={4} md={4} xs={9}>
@@ -60,8 +63,8 @@ const ListProduct = () => {
             </Dropdown>
           </Col>
           <Col sm={10} md={8} xs={15}>
-            <div style={{ display: 'flex',alignItems:'center' }}>
-              <Search  placeholder="Tên sản phẩm..." allowClear enterButton size="large" />
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Search placeholder="Tên sản phẩm..." allowClear enterButton size="large" />
             </div>
           </Col>
         </Row>
@@ -75,6 +78,24 @@ const ListProduct = () => {
         <div className="wrap-pagination">
           <Pagination defaultCurrent={1} total={50} />
         </div>
+        <FloatButton
+          onClick={() => {
+            setOpenModalCart(true);
+          }}
+          // trigger="click"
+          tooltip={<div>Cart</div>}
+          type="primary"
+          badge={{
+            count: 12
+          }}
+          icon={<ShoppingCartOutlined />}
+        />
+        <ModalCart
+          open={openModalCart}
+          handleClose={() => {
+            setOpenModalCart(false);
+          }}
+        />
       </div>
       {/* <MainCard contentSX={{ p: 2, minHeight: '83vh' }}>
 

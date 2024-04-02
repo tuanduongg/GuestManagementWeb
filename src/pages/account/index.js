@@ -62,21 +62,19 @@ const AccountPage = () => {
 
   useEffect(() => {
     checkRole();
+    // switch (valueTab) {
+    //   case 'account':
+    //     getDataACC();
+    //     break;
+    //   case 'role':
+    //     getAllRole();
+    //     break;
+    //   default:
+    //     break;
+    // }
+    getAllRole();
+    getDataACC();
   }, []);
-  useEffect(() => {
-    switch (valueTab) {
-      case 'account':
-        getDataACC();
-        break;
-      case 'role':
-        getAllRole();
-        break;
-      default:
-        break;
-    }
-    // getAllRole();
-    // getDataACC();
-  }, [valueTab]);
   useEffect(() => {
     let check = checkDisableBtn(selectedRowKeys, dataACC);
     setTypeBtnBlock(check);
@@ -178,7 +176,7 @@ const AccountPage = () => {
       <Loading loading={loading} />
       {contextHolder}
       <Row>
-        <Col span={24}>
+        <Col style={{ marginTop: '5px' }} span={24}>
           <Title level={5}>{t('title_page_role_user')}</Title>
         </Col>
       </Row>

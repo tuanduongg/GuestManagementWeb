@@ -14,9 +14,7 @@ const CardProduct = ({ number }) => {
         style={{
           width: `100%`
         }}
-        cover={
-        <img alt="example"  style={{ padding: '0px', objectFit: 'cover' }} height={'150px'} src="https://picsum.photos/200/300" />
-    }
+        cover={<img alt="example" style={{ padding: '0px', objectFit: 'cover' }} height={'150px'} src="https://picsum.photos/200/300" />}
       >
         {/* 66 */}
         <Box
