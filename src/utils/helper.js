@@ -326,6 +326,18 @@ export function isMdScreen() {
   }
   return false;
 }
+export const formattingVND = (num) => {
+  if (isString(num) && num?.includes('.')) {
+    const rs = num + ' vnđ';
+    return rs.replace(',', '.');
+  }
+  const number = parseFloat(num);
+  if (isNaN(number)) {
+    return 0 + ' vnđ';
+  }
+  let result = number.toLocaleString('it-IT', { style: 'currency', currency: 'VND' });
+  return isMobile() ? result.replace('VND', 'đ') : result.replace('VND', 'vnđ');
+};
 
 export const ROLE_ACC = {
   ADMIN: 'ADMIN',

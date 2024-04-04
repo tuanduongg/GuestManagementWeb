@@ -1,0 +1,13 @@
+.mySwiper {
+    height: 100%;
+}
+
+.ant-modal-footer {
+    /* display: none; */
+}
+.detail-modal > .ant-modal-content {
+    padding: 10px !important;
+}
+.no-border-radius {
+    border-radius: 0; /* Set border-radius to 0 */
+  }

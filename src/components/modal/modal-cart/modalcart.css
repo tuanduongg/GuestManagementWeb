@@ -1,0 +1,15 @@
+.cart-list-product > .ant-card-body {
+    padding: 0px 7px;
+}
+.cart-info {
+    margin-bottom: 15px;
+}
+.cart-info > .ant-card-body {
+    padding: 10px 10px 20px 10px;
+}
+.modal-cart > .ant-modal-title  {
+    background-color: #fafafb;
+}
+.modal-cart > .ant-modal-content {
+    background-color: #fafafb;
+}

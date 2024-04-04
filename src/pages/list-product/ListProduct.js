@@ -13,65 +13,79 @@ import MainCard from 'components/MainCard';
 import CardProduct from 'components/cards/card-product/CardProduct';
 import { isMobile, isTablet } from 'utils/helper';
 import ModalCart from 'components/modal/modal-cart/ModalCart';
+import ModalDetailProduct from 'components/modal/detail-product/ModalDetailProduct';
 
 const ListProduct = () => {
   const { t } = useTranslation();
   const [messageApi, contextHolder] = message.useMessage();
   const [openModalCart, setOpenModalCart] = useState(false);
+  const [openModalDetail, setOpenModalDetail] = useState(false);
   //   if (!role?.IS_READ) {
   //     return <ForbidenPage />;
   //   }
   const handleChange = (value) => {
     console.log(`selected ${value}`);
   };
+  const onCloseModalDetail = () => {
+    setOpenModalDetail(false);
+  };
+  const onClickProduct = () => {
+    setOpenModalDetail(true);
+  };
   return (
     <>
       {/* <Loading loading={loading} /> */}
       {contextHolder}
       <div style={{ margin: '25px 0px 0px 0px' }}></div>
-      <div style={{ fontSize: '22px', fontWeight: 'bold', textAlign: 'center' }}>Danh Sách Vật Tư Tiêu Hao</div>
+      <div style={{ fontSize: '20px', fontWeight: 'bold', textAlign: 'center' }}>Danh Sách Vật Tư Tiêu Hao</div>
       <div className="wrap-list">
         <Row style={{ margin: '0px 0px 15px 0px', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Col sm={4} md={4} xs={9}>
-            <Button style={{}} type="link" icon={<FilterOutlined style={{ fontSize: '17px' }} />} />
-            <Dropdown
-              menu={{
-                items: [
-                  {
-                    key: '1',
-                    label: 'Item 1'
-                  },
-                  {
-                    key: '2',
-                    label: 'Item 2'
-                  },
-                  {
-                    key: '3',
-                    label: 'Item 3'
-                  }
-                ],
-                selectable: true,
-                defaultSelectedKeys: ['3']
-              }}
-            >
-              <Typography.Link>
-                <Space>
-                  Danh Mục
-                  <DownOutlined />
-                </Space>
-              </Typography.Link>
-            </Dropdown>
-          </Col>
-          <Col sm={10} md={8} xs={15}>
+          <Col sm={10} md={18} xs={11}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <Search placeholder="Tên sản phẩm..." allowClear enterButton size="large" />
+              <Button style={{}} type="link" icon={<FilterOutlined style={{ fontSize: '17px' }} />} />
+              <div style={{ fontWeight: 'bold', marginRight: '5px' }}>Category:</div>
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: '1',
+                      label: 'Item 1'
+                    },
+                    {
+                      key: '2',
+                      label: 'Item 2'
+                    },
+                    {
+                      key: '3',
+                      label: 'Item 3'
+                    }
+                  ],
+                  selectable: true,
+                  defaultSelectedKeys: ['3']
+                }}
+              >
+                <Typography.Link>
+                  <Space>
+                    All
+                    <DownOutlined />
+                  </Space>
+                </Typography.Link>
+              </Dropdown>
+            </div>
+          </Col>
+          <Col sm={10} md={6} xs={13}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Search placeholder="Tên sản phẩm..." allowClear enterButton />
             </div>
           </Col>
         </Row>
         <div className="wrap_list_item">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map((item, index) => (
-            <div key={index} style={{ width: isMobile() ? `${100 / 2}%` : isTablet() ? `${100 / 4}%` : `${100 / 5}%`, padding: '5px' }}>
-              <CardProduct number={item} />
+            <div
+              key={index}
+              style={{ width: isMobile() ? `${100 / 2}%` : isTablet() ? `${100 / 4}%` : `${100 / 5}%`, padding: '10px' }}
+            >
+              <CardProduct onClickProduct={onClickProduct} number={item} />
             </div>
           ))}
         </div>
@@ -82,7 +96,6 @@ const ListProduct = () => {
           onClick={() => {
             setOpenModalCart(true);
           }}
-          // trigger="click"
           tooltip={<div>Cart</div>}
           type="primary"
           badge={{
@@ -100,6 +113,7 @@ const ListProduct = () => {
       {/* <MainCard contentSX={{ p: 2, minHeight: '83vh' }}>
 
       </MainCard> */}
+      <ModalDetailProduct open={openModalDetail} handleClose={onCloseModalDetail} />
     </>
   );
 };
