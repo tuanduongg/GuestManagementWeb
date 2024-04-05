@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Row, Col, Typography, App, Popconfirm, Button, Flex, DatePicker, message, Tabs, Badge } from 'antd';
+import { Table, Row, Col, Typography, App, Popconfirm, Button, Flex, DatePicker, message, Tabs, Badge, Dropdown } from 'antd';
 import io from 'socket.io-client';
 import {
   formatArrDate,
@@ -22,8 +22,11 @@ import {
   CheckOutlined,
   CloseOutlined,
   FilterOutlined,
-  UsergroupAddOutlined,
-  UnorderedListOutlined
+  UploadOutlined,
+  ImportOutlined,
+  UnorderedListOutlined,
+  DownOutlined,
+  UserOutlined
 } from '@ant-design/icons';
 import './list-guest.css';
 import dayjs from 'dayjs';
@@ -46,6 +49,7 @@ import Loading from 'components/Loading';
 import MainCard from 'components/MainCard';
 import ModalHistoryGuest from 'components/modal/modal-history-guest/ModalHistoryGuest';
 import { useTranslation } from 'react-i18next';
+import ModalUploadExcel from 'components/modal/modal-upload-excel/ModalUploadExcel';
 
 const today = dayjs(); // Get the current date using dayjs
 // console.log('getAllDateOfWeek', getAllDateOfWeek());
@@ -67,6 +71,7 @@ const ListGuest = () => {
   const [role, setRole] = useState(null);
   const [disabledBtnCancel, setDisableBtnCancel] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [openModalUpload, setOpenModalUpload] = useState(false);
   const [checkChange, setCheckChange] = useState(false);
   const [valueTab, setValueTab] = useState(dataUser && dataUser?.role?.ROLE_NAME === 'USER' ? HISTORY_TAB : NEW_TAB);
   const [messageApi, contextHolder] = message.useMessage();
@@ -204,7 +209,7 @@ const ListGuest = () => {
       key: 'guest_info',
       title: 'nameGuest_col',
       dataIndex: 'guest_info',
-      width: isMobile() ? 150 : '21%',
+      width: isMobile() ? 150 : '33%',
       fixed: 'left',
 
       render: (_, data) => (
@@ -420,9 +425,46 @@ const ListGuest = () => {
   const onClickShowModalHistory = () => {
     setOpenModalHistory(true);
   };
-  // if (loading) {
-  //   return <Loading />;
-  // }
+  const handleMenuClick = (e) => {
+    // message.info('Click on menu item.');
+    console.log('click', e.key);
+    switch (e.key) {
+      case 'importExcel':
+       setOpenModalUpload(true);
+        break;
+
+      default:
+        break;
+    }
+  };
+  const ITEMS = [
+    {
+      label: 'Export Excel',
+      key: 'exportExcel',
+      icon: <ImportOutlined />,
+      disabled: selectedRowKeys?.length === 0,
+      hidden: false
+    },
+    {
+      label: 'Import Excel',
+      key: 'importExcel',
+      icon: <UploadOutlined />,
+      hidden: !role?.IS_CREATE
+    },
+    {
+      label: 'Canel',
+      key: 'cancel',
+      icon: <CloseOutlined />,
+      disabled: disabledBtnCancel,
+      danger: true,
+      hidden: !role?.IS_DELETE
+    }
+  ];
+  const menuProps = {
+    items: ITEMS.filter((item) => item?.hidden === false) ?? [],
+    onClick: handleMenuClick
+  };
+
   if (!role?.IS_READ) {
     return <ForbidenPage />;
   }
@@ -431,7 +473,7 @@ const ListGuest = () => {
       <Loading loading={loading} />
       {contextHolder}
       <Row>
-        <Col style={{marginTop:'5px'}} span={24}>
+        <Col style={{ marginTop: '5px' }} span={24}>
           <Title level={5}>{t('sidebar_manager_guest')}</Title>
         </Col>
       </Row>
@@ -497,7 +539,7 @@ const ListGuest = () => {
                     {t('createBTN')}
                   </Button>
                 )}
-                {role?.IS_DELETE && (
+                {/* {role?.IS_DELETE && (
                   <Popconfirm
                     onConfirm={handleDelete}
                     title={t('msg_notification')}
@@ -509,13 +551,16 @@ const ListGuest = () => {
                       {t('canelBTN')}
                     </Button>
                   </Popconfirm>
-                )}
+                )} */}
+                <Dropdown menu={menuProps}>
+                  <Button style={{ marginLeft: '5px' }} shape="round" icon={<DownOutlined />}>
+                    More
+                  </Button>
+                </Dropdown>
               </div>
             </Col>
           </Row>
           <Table
-            // tableLayout={'auto'}
-            // tableLayout={tableData?.length !== 0 ? 'fixed' : 'auto'}
             rowKey="GUEST_ID"
             rowSelection={
               role?.IS_DELETE
@@ -555,6 +600,12 @@ const ListGuest = () => {
         dataSelect={dataSelect}
         open={openModalAdd}
         handleClose={handleCloseModalAdd}
+      />
+      <ModalUploadExcel
+        open={openModalUpload}
+        handleClose={() => {
+          setOpenModalUpload(false);
+        }}
       />
       <ModalHistoryGuest
         idGuest={dataSelect?.GUEST_ID}

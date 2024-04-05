@@ -15,6 +15,7 @@ import ModalRole from 'components/modal/modal-role/ModalRole';
 import { checkDisableBtn } from './compoment/account/account.service';
 import MainCard from 'components/MainCard';
 import { useTranslation } from 'react-i18next';
+import './account.css';
 
 const { Title } = Typography;
 
