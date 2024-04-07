@@ -426,11 +426,12 @@ const ListGuest = () => {
     setOpenModalHistory(true);
   };
   const handleMenuClick = (e) => {
-    // message.info('Click on menu item.');
-    console.log('click', e.key);
     switch (e.key) {
       case 'importExcel':
-       setOpenModalUpload(true);
+        setOpenModalUpload(true);
+        break;
+      case 'cancel':
+        handleDelete();
         break;
 
       default:
@@ -602,6 +603,8 @@ const ListGuest = () => {
         handleClose={handleCloseModalAdd}
       />
       <ModalUploadExcel
+      setLoading={setLoading}
+        afterSave={onAfterSave}
         open={openModalUpload}
         handleClose={() => {
           setOpenModalUpload(false);

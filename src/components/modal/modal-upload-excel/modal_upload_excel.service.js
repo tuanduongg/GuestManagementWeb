@@ -34,12 +34,11 @@ export function handleFileUpload(event) {
   reader.readAsArrayBuffer(file);
 }
 export const checkStringIsDate = (string) => {
-  var parsedDate = Date.parse(string);
+  // Regular expression to match common date formats (MM/DD/YYYY, YYYY/MM/DD, DD/MM/YYYY)
+  var dateFormatRegex =
+    /^(0?[1-9]|1[0-2])\/(0?[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$|^((19|20)\d{2})-(0?[1-9]|1[0-2])-(0?[1-9]|1\d|2\d|3[01])$|^(0?[1-9]|1\d|2\d|3[01])-(0?[1-9]|1[0-2])-(19|20)\d{2}$/;
 
-  // You want to check again for !isNaN(parsedDate) here because Dates can be converted
-  // to numbers, but a failed Date parse will not.
-  if (isNaN(string) && !isNaN(parsedDate)) {
-    return true;
-  }
-  return false;
+  return dateFormatRegex.test(string);
 };
+
+export const checkDateContaintInArr = (arr, date) => {};

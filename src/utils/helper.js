@@ -466,4 +466,61 @@ export const truncateString = (str, maxLength) => {
   } else {
     return str.substring(0, maxLength) + '...';
   }
+};
+export function createDateWithCurrentDate(hourMinute) {
+  const currentDate = new Date(); // Lấy ngày tháng năm hiện tại
+  const [hour, minute] = hourMinute.split(':').map((num) => parseInt(num)); // Tách giờ và phút từ chuỗi 'hourMinute'
+
+  // Thiết lập giờ và phút cho ngày tháng năm hiện tại
+  currentDate.setHours(hour);
+  currentDate.setMinutes(minute);
+
+  return currentDate; // Trả về đối tượng Date đã tạo
+}
+export function formatDate(input) {
+  // Chia chuỗi thành các phần tử ngày, tháng, năm bằng cách tách chuỗi bằng dấu gạch, dấu gạch chéo hoặc dấu gạch ngang
+  var parts = input.split(/\/|-/);
+
+  // Kiểm tra xem phần tử có phù hợp không
+  if (parts.length === 3) {
+    // Lấy ngày, tháng, năm từ phần tử
+    var day = parseInt(parts[0]);
+    var month = parseInt(parts[1]);
+    var year = parseInt(parts[2]);
+
+    // Kiểm tra xem ngày và tháng có hợp lệ không
+    if (month >= 1 && month <= 12 && day >= 1 && day <= new Date(year, month, 0).getDate()) {
+      // Tạo đối tượng Date từ ngày, tháng, năm
+      var date = new Date(year, month - 1, day); // Lưu ý: Tháng trong Date bắt đầu từ 0
+
+      // Kiểm tra nếu đối tượng Date hợp lệ
+      if (!isNaN(date.getTime())) {
+        // Format lại ngày thành "DD/MM/YYYY"
+        var formattedDate = ('0' + day).slice(-2) + '/' + ('0' + month).slice(-2) + '/' + year;
+        return formattedDate;
+      }
+    }
+  }
+  return null; // Trả về null nếu không thành công
+}
+export function getAllDatesInRange(startDate, endDate) {
+  let startDateFormatted = dayjs(startDate, 'DD/MM/YYYY');
+  let endDateFormatted = dayjs(endDate, 'DD/MM/YYYY');
+
+  // Kiểm tra nếu ngày bắt đầu lớn hơn ngày kết thúc, đổi chỗ hai ngày
+  if (startDateFormatted.isAfter(endDateFormatted)) {
+    const temp = startDateFormatted;
+    startDateFormatted = endDateFormatted;
+    endDateFormatted = temp;
+  }
+
+  let dates = [];
+  let currentDate = startDateFormatted;
+
+  while (currentDate.isBefore(endDateFormatted) || currentDate.isSame(endDateFormatted)) {
+    dates.push(currentDate.format('DD/MM/YYYY'));
+    currentDate = currentDate.add(1, 'day');
+  }
+
+  return dates;
 }
