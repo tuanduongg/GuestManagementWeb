@@ -50,6 +50,7 @@ import MainCard from 'components/MainCard';
 import ModalHistoryGuest from 'components/modal/modal-history-guest/ModalHistoryGuest';
 import { useTranslation } from 'react-i18next';
 import ModalUploadExcel from 'components/modal/modal-upload-excel/ModalUploadExcel';
+import axios from 'axios';
 
 const today = dayjs(); // Get the current date using dayjs
 // console.log('getAllDateOfWeek', getAllDateOfWeek());
@@ -209,7 +210,7 @@ const ListGuest = () => {
       key: 'guest_info',
       title: 'nameGuest_col',
       dataIndex: 'guest_info',
-      width: isMobile() ? 150 : '33%',
+      width: isMobile() ? 150 : role?.IS_ACCEPT ? '20%' : '33%',
       fixed: 'left',
 
       render: (_, data) => (
@@ -421,7 +422,39 @@ const ListGuest = () => {
       });
     }
   };
+  const handleExportExcel = async () => {
+    try {
+      const response = await axios.post(
+        process.env.REACT_APP_URL_API + RouterAPI.exportGuest,
+        { listID: selectedRowKeys },
+        {
+          responseType: 'blob' // Ensure response is treated as a blob
+        }
+      );
+      if (response?.data.error) {
+        console.error(response.data.error);
+      }
+      console.log(response?.data);
 
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(response?.data);
+      link.setAttribute('download', 'file.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      // const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+      // const fileLink = document.createElement('a');
+      // fileLink.href = fileURL;
+      // const contentDisposition = response.headers['content-disposition'];
+      // const fileName = contentDisposition.substring(contentDisposition.indexOf('filename=') + 9, contentDisposition.length);
+      // fileLink.setAttribute('download', fileName);
+      // fileLink.setAttribute('target', '_blank');
+      // document.body.appendChild(fileLink);
+      // fileLink.click();
+      // fileLink.remove();
+    } catch (error) {
+      console.error('Error generating Excel:', error);
+    }
+  };
   const onClickShowModalHistory = () => {
     setOpenModalHistory(true);
   };
@@ -433,6 +466,9 @@ const ListGuest = () => {
       case 'cancel':
         handleDelete();
         break;
+      case 'exportExcel':
+        handleExportExcel();
+        break;
 
       default:
         break;
@@ -440,17 +476,18 @@ const ListGuest = () => {
   };
   const ITEMS = [
     {
-      label: 'Export Excel',
-      key: 'exportExcel',
-      icon: <ImportOutlined />,
-      disabled: selectedRowKeys?.length === 0,
-      hidden: false
-    },
-    {
       label: 'Import Excel',
       key: 'importExcel',
       icon: <UploadOutlined />,
-      hidden: !role?.IS_CREATE
+      disabled: !role?.IS_IMPORT,
+      hidden: false
+    },
+    {
+      label: 'Export Excel',
+      key: 'exportExcel',
+      icon: <ImportOutlined />,
+      disabled: selectedRowKeys?.length < 1,
+      hidden: !role?.IS_EXPORT
     },
     {
       label: 'Canel',
@@ -553,11 +590,13 @@ const ListGuest = () => {
                     </Button>
                   </Popconfirm>
                 )} */}
-                <Dropdown menu={menuProps}>
-                  <Button style={{ marginLeft: '5px' }} shape="round" icon={<DownOutlined />}>
-                    More
-                  </Button>
-                </Dropdown>
+                {(role?.IS_DELETE || role?.IS_IMPORT || role?.IS_EXPORT) && (
+                  <Dropdown menu={menuProps}>
+                    <Button style={{ marginLeft: '5px' }} shape="round" icon={<DownOutlined />}>
+                      More
+                    </Button>
+                  </Dropdown>
+                )}
               </div>
             </Col>
           </Row>
@@ -575,10 +614,12 @@ const ListGuest = () => {
             scroll={
               tableData?.length === 0 && !isMobile()
                 ? null
-                : {
-                    x: '100vh',
-                    y: '100vh'
-                  }
+                : isMobile()
+                  ? {
+                      x: '100vh',
+                      y: '100vh'
+                    }
+                  : null
             }
             columns={columns.filter((item) => !item?.hidden)}
             dataSource={tableData}
@@ -603,7 +644,7 @@ const ListGuest = () => {
         handleClose={handleCloseModalAdd}
       />
       <ModalUploadExcel
-      setLoading={setLoading}
+        setLoading={setLoading}
         afterSave={onAfterSave}
         open={openModalUpload}
         handleClose={() => {

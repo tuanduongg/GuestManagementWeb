@@ -128,7 +128,7 @@ const ModalUploadExcel = ({ open, handleClose, afterSave, setLoading }) => {
                 let checkDate1 = formatDate(dates[0]);
                 let checkDate2 = formatDate(dates[1]);
                 if (checkDate1 && checkDate2) {
-                  if(guest.date.length <= 0) {
+                  if (guest.date.length <= 0) {
                     guest.date = getAllDatesInRange(checkDate1, checkDate2);
                   }
                 } else {
@@ -226,9 +226,12 @@ const ModalUploadExcel = ({ open, handleClose, afterSave, setLoading }) => {
         open={open}
         onOk={() => {}}
         onCancel={handleCancel}
-        footer={(_, { CancelBtn }) => (
+        footer={(_, { OkBtn, CancelBtn }) => (
           <>
-            <CancelBtn />
+            <div style={{ display: 'flex' ,justifyContent:'space-between'}}>
+              <OkBtn type="link"/>
+              <CancelBtn />
+            </div>
           </>
         )}
       >
