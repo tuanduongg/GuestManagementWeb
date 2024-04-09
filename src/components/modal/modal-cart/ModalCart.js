@@ -65,6 +65,7 @@ const ModalCart = ({ open, handleClose }) => {
   return (
     <>
       <Modal
+        centered
         okButtonProps={{ icon: <DoubleRightOutlined /> }}
         className="modal-cart"
         okText={t('Order now')}
@@ -156,7 +157,7 @@ const ModalCart = ({ open, handleClose }) => {
             <Col style={{ textTransform: 'uppercase', textAlign: 'right' }} xs={1}></Col>
           </Row>
           {/* <Divider style={{ margin: '0px', color: '#ddd' }} /> */}
-          <div style={{ maxHeight: '500px', overflowY: 'auto'}}>
+          <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
             {products.map((item, index) => (
               <Row key={index} style={{ display: 'flex', alignItems: 'center', padding: '5px 0px', borderBottom: '1px solid #ddd' }}>
                 <Col xs={2}>

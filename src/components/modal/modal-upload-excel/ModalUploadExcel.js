@@ -3,12 +3,13 @@ import { Modal, Upload, message, notification, Space, Button } from 'antd';
 import { checkIsExcelFile, checkStringIsDate } from './modal_upload_excel.service';
 const { Dragger } = Upload;
 import ExcelJS from 'exceljs';
-import { InboxOutlined, FileExcelOutlined } from '@ant-design/icons';
+import { InboxOutlined, FileExcelOutlined, VerticalAlignBottomOutlined } from '@ant-design/icons';
 import './modal_upload_excel.css';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import { createDateWithCurrentDate, formatDate, getAllDatesInRange } from 'utils/helper';
 import { useTranslation } from 'react-i18next';
+import SAMPLE_EXCEL_FILE from '../../../assets/excel/FileMau.xlsx';
 
 const ModalUploadExcel = ({ open, handleClose, afterSave, setLoading }) => {
   const handleCancel = () => {
@@ -213,23 +214,34 @@ const ModalUploadExcel = ({ open, handleClose, afterSave, setLoading }) => {
       }
     }
   };
+  const handelClickDownloadSampleFile = () => {
+    const link = document.createElement('a');
+    link.href = SAMPLE_EXCEL_FILE;
+    link.setAttribute('download', `sample.xlsx`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
   return (
     <>
       {contextHolder}
       <Modal
+        okButtonProps={{ type: 'link', icon: <VerticalAlignBottomOutlined /> }}
         centered
-        okText="Lưu thông tin"
+        okText="File mẫu"
         cancelText="Đóng"
         zIndex={1300}
         maskClosable={false}
         title={'Upload File'}
         open={open}
-        onOk={() => {}}
+        onOk={() => {
+          handelClickDownloadSampleFile();
+        }}
         onCancel={handleCancel}
         footer={(_, { OkBtn, CancelBtn }) => (
           <>
-            <div style={{ display: 'flex' ,justifyContent:'space-between'}}>
-              <OkBtn type="link"/>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <OkBtn />
               <CancelBtn />
             </div>
           </>

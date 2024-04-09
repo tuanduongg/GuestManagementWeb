@@ -12,6 +12,7 @@ const ListStruck = Loadable(lazy(() => import('pages/list-struck/ListStruck')));
 const ListProduct = Loadable(lazy(() => import('pages/list-product/ListProduct')));
 const ListGuest = Loadable(lazy(() => import('pages/list-guest/ListGuest')));
 const AccountPage = Loadable(lazy(() => import('pages/account')));
+const ManagerProduct = Loadable(lazy(() => import('pages/manager-product/ManagerProduct')));
 
 // render - utilities
 
@@ -32,6 +33,10 @@ const MainRoutes = {
     {
       path: ConfigRouter.listProduct,
       element: <ListProduct />
+    },
+    {
+      path: ConfigRouter.managementProduct,
+      element: <ManagerProduct />
     }
   ]
 };

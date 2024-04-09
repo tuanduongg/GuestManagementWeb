@@ -37,7 +37,7 @@ const ListProduct = () => {
       {/* <Loading loading={loading} /> */}
       {contextHolder}
       <div style={{ margin: '25px 0px 0px 0px' }}></div>
-      <div style={{ fontSize: '20px', fontWeight: 'bold', textAlign: 'center' }}>Danh Sách Vật Tư Tiêu Hao</div>
+      {/* <div style={{ fontSize: '13px', fontWeight: 'bold', textAlign: 'left' }}>Danh Sách Vật Tư Tiêu Hao</div> */}
       <div className="wrap-list">
         <Row style={{ margin: '0px 0px 15px 0px', justifyContent: 'space-between', alignItems: 'center' }}>
           <Col sm={10} md={18} xs={11}>
@@ -49,15 +49,15 @@ const ListProduct = () => {
                   items: [
                     {
                       key: '1',
-                      label: 'Item 1'
+                      label: 'Văn phòng phẩm'
                     },
                     {
                       key: '2',
-                      label: 'Item 2'
+                      label: 'Phục vụ sản xuất'
                     },
                     {
                       key: '3',
-                      label: 'Item 3'
+                      label: 'Đồ ăn uống'
                     }
                   ],
                   selectable: true,

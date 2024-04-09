@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Row, Col, Typography, App, Popconfirm, Button, Flex, DatePicker, message, Tabs, Badge, Dropdown } from 'antd';
+import { Table, Row, Col, Typography, App, Popconfirm, Button, Flex, DatePicker, message, Tabs, Badge, Dropdown, Modal } from 'antd';
 import io from 'socket.io-client';
 import {
   formatArrDate,
@@ -26,7 +26,7 @@ import {
   ImportOutlined,
   UnorderedListOutlined,
   DownOutlined,
-  UserOutlined
+  InfoCircleOutlined
 } from '@ant-design/icons';
 import './list-guest.css';
 import dayjs from 'dayjs';
@@ -74,6 +74,7 @@ const ListGuest = () => {
   const [loading, setLoading] = useState(false);
   const [openModalUpload, setOpenModalUpload] = useState(false);
   const [checkChange, setCheckChange] = useState(false);
+  const [counterNew, setCounterNew] = useState(0);
   const [valueTab, setValueTab] = useState(dataUser && dataUser?.role?.ROLE_NAME === 'USER' ? HISTORY_TAB : NEW_TAB);
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -121,6 +122,11 @@ const ListGuest = () => {
   }, []);
 
   useEffect(() => {
+    if (valueTab === NEW_TAB) {
+      setCounterNew(tableData?.filter((item) => item?.STATUS === statusName.NEW || item?.STATUS === statusName.ACCEPT).length);
+    }
+  }, [tableData]);
+  useEffect(() => {
     getData();
   }, [valueTab]);
 
@@ -136,7 +142,6 @@ const ListGuest = () => {
         }
       });
       socket.on('acceptguest', (data) => {
-        console.log('data', data);
         setCheckChange(true);
       });
 
@@ -424,6 +429,7 @@ const ListGuest = () => {
   };
   const handleExportExcel = async () => {
     try {
+      setLoading(true);
       const response = await axios.post(
         process.env.REACT_APP_URL_API + RouterAPI.exportGuest,
         { listID: selectedRowKeys },
@@ -431,28 +437,26 @@ const ListGuest = () => {
           responseType: 'blob' // Ensure response is treated as a blob
         }
       );
+      setLoading(false);
       if (response?.data.error) {
-        console.error(response.data.error);
+        messageApi.open({
+          type: 'warning',
+          content: response?.data?.error ?? 'Export fail!'
+        });
       }
-      console.log(response?.data);
-
+      const date = new Date();
+      const nameFile = `${date.getDate()}${date.getMonth() + 1}${date.getFullYear()}`;
       const link = document.createElement('a');
       link.href = URL.createObjectURL(response?.data);
-      link.setAttribute('download', 'file.xlsx');
+      link.setAttribute('download', `export${nameFile}.xlsx`);
       document.body.appendChild(link);
       link.click();
-      // const fileURL = window.URL.createObjectURL(new Blob([response.data]));
-      // const fileLink = document.createElement('a');
-      // fileLink.href = fileURL;
-      // const contentDisposition = response.headers['content-disposition'];
-      // const fileName = contentDisposition.substring(contentDisposition.indexOf('filename=') + 9, contentDisposition.length);
-      // fileLink.setAttribute('download', fileName);
-      // fileLink.setAttribute('target', '_blank');
-      // document.body.appendChild(fileLink);
-      // fileLink.click();
-      // fileLink.remove();
+      link.remove();
     } catch (error) {
-      console.error('Error generating Excel:', error);
+      messageApi.open({
+        type: 'warning',
+        content: error ?? 'Export fail!'
+      });
     }
   };
   const onClickShowModalHistory = () => {
@@ -467,7 +471,17 @@ const ListGuest = () => {
         handleDelete();
         break;
       case 'exportExcel':
-        handleExportExcel();
+        Modal.confirm({
+          title: t('msg_notification'),
+          content: t('msg_confirm_export'),
+          okText: t('yes'),
+          cancelText: t('close'),
+          centered: true,
+          icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
+          onOk: async () => {
+            handleExportExcel();
+          }
+        });
         break;
 
       default:
@@ -524,7 +538,7 @@ const ListGuest = () => {
               {
                 key: NEW_TAB,
                 label: (
-                  <Badge dot={0}>
+                  <Badge count={counterNew} offset={[12, 1]}>
                     <span>{t('today')}</span>
                   </Badge>
                 ),
@@ -577,19 +591,6 @@ const ListGuest = () => {
                     {t('createBTN')}
                   </Button>
                 )}
-                {/* {role?.IS_DELETE && (
-                  <Popconfirm
-                    onConfirm={handleDelete}
-                    title={t('msg_notification')}
-                    description="Are you sure you want to cancel it?"
-                    okText={t('yes')}
-                    cancelText={t('close')}
-                  >
-                    <Button shape="round" disabled={disabledBtnCancel} danger icon={<CloseOutlined />} type="primary">
-                      {t('canelBTN')}
-                    </Button>
-                  </Popconfirm>
-                )} */}
                 {(role?.IS_DELETE || role?.IS_IMPORT || role?.IS_EXPORT) && (
                   <Dropdown menu={menuProps}>
                     <Button style={{ marginLeft: '5px' }} shape="round" icon={<DownOutlined />}>

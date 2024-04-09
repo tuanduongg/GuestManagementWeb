@@ -3,7 +3,7 @@ import { AndroidOutlined, AppleOutlined } from '@ant-design/icons';
 import { Tabs } from 'antd';
 import { Table, Row, Col, Typography, App, Empty, Button, Flex, message, Modal } from 'antd';
 import { EditOutlined, InfoCircleOutlined, UnlockOutlined, StopOutlined, UserSwitchOutlined, PlusOutlined } from '@ant-design/icons';
-import { formatDateFromDB, getChipStatusAcc } from 'utils/helper';
+import { formatDateFromDB, getChipStatusAcc, isMobile } from 'utils/helper';
 import ModalAccount from 'components/modal/modal-account/ModalAccount';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
@@ -127,10 +127,14 @@ const Account = ({ role, listRole, onClickEdit, dataACC, setTypeBtnBlock, setSel
           onChange: onSelectChange
         }}
         bordered
-        scroll={{
-          x: 'max-content',
-          y: '70vh'
-        }}
+        scroll={
+          isMobile()
+            ? {
+                x: 'max-content',
+                y: '70vh'
+              }
+            : null
+        }
         columns={columns.filter((item) => !item?.hidden)}
         dataSource={tableData}
         pagination={false}

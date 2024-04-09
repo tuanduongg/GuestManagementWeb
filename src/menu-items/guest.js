@@ -2,13 +2,6 @@
 import { LoginOutlined, ProfileOutlined, UserOutlined, RedoOutlined } from '@ant-design/icons';
 import { ConfigRouter } from 'config_router';
 
-// icons
-const icons = {
-  LoginOutlined,
-  ProfileOutlined,
-  UserOutlined,
-  RedoOutlined
-};
 
 // ==============================|| MENU ITEMS - EXTRA PAGES ||============================== //
 
@@ -22,7 +15,7 @@ const guest = {
       title: 'Danh sách đăng ký',
       type: 'item',
       url: ConfigRouter.listGuest,
-      icon: icons.UserOutlined,
+      icon: <UserOutlined />,
       target: false
     }
   ]

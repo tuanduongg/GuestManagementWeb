@@ -8,6 +8,7 @@ import AuthLogin from 'pages/authentication/auth-forms/AuthLogin';
 import { ConfigRouter } from 'config_router';
 import Loadable from 'components/Loadable';
 import { lazy } from 'react';
+
 // import HomePage from 'pages/homepage/HomePage';
 const HomePage = Loadable(lazy(() => import('pages/homepage/HomePage')));
 

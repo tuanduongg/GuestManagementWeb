@@ -71,7 +71,8 @@ export const translate = {
       btn_unlock: 'Mở khoá',
       title_modal_add_new_account: 'Thêm mới tài khoản',
       unauthorizeMsgPage: 'Bạn không có quyền truy cập!',
-      btn_backToHome: 'Về trang chủ'
+      btn_backToHome: 'Về trang chủ',
+      msg_confirm_export: 'Bạn muốn xuất file Excel không?'
     }
   },
   en: {
@@ -146,7 +147,8 @@ export const translate = {
       btn_unlock: 'Unlock',
       title_modal_add_new_account: 'Add new account',
       unauthorizeMsgPage: 'Unauthorized!',
-      btn_backToHome: 'Back to home'
+      btn_backToHome: 'Back to home',
+      msg_confirm_export: 'Do you want to export Excel file?'
     }
   },
   ko: {
@@ -221,7 +223,8 @@ export const translate = {
       btn_unlock: '터놓다',
       title_modal_add_new_account: '새 계정 추가',
       unauthorizeMsgPage: 'Unauthorized!',
-      btn_backToHome: 'Back to home'
+      btn_backToHome: 'Back to home',
+      msg_confirm_export: 'Do you want to export Excel file?'
     }
   }
 };

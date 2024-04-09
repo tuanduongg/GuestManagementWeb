@@ -3,11 +3,11 @@ import { CarOutlined, FormOutlined, UserOutlined } from '@ant-design/icons';
 import { ConfigRouter } from 'config_router';
 
 // icons
-const icons = {
-  CarOutlined,
-  UserOutlined,
-  FormOutlined
-};
+// const icons = {
+//   CarOutlined,
+//   UserOutlined,
+//   FormOutlined
+// };
 
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //
 
@@ -21,9 +21,9 @@ const dashboard = {
       title: 'sidebar_registration_guest',
       type: 'item',
       url: ConfigRouter.listGuest,
-      icon: icons.UserOutlined,
+      icon: <UserOutlined />,
       target: false
-    },
+    }
     // {
     //   id: ConfigRouter.listStruck,
     //   title: 'Danh sách đăng ký xe',
