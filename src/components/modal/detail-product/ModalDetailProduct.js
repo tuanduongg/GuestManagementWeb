@@ -13,9 +13,9 @@ import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import { useTranslation } from 'react-i18next';
 import './detail_product.css';
-
 const ModalDetailProduct = ({ open, handleClose }) => {
   const [quantity, setQuantity] = useState(1);
+  const [openModalAdd, setOpenModalAdd] = useState(false);
   const { modal } = App.useApp();
   const { t } = useTranslation();
   const handleOk = (e) => {};
@@ -45,7 +45,7 @@ const ModalDetailProduct = ({ open, handleClose }) => {
         footer={null}
         className="detail-modal"
       >
-        <div style={{ minWidth: '100%', height:'auto',minHeight:'400px' }}>
+        <div style={{ minWidth: '100%', height: 'auto', minHeight: '400px' }}>
           <Row style={{ height: '100%' }} gutter={24}>
             <Col style={{ height: '100%' }} xs={24} sm={12}>
               <Swiper pagination={true} modules={[Pagination]} className="mySwiper">
@@ -140,6 +140,7 @@ const ModalDetailProduct = ({ open, handleClose }) => {
           </Row>
         </div>
       </Modal>
+     
     </>
   );
 };
