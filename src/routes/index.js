@@ -23,7 +23,7 @@ export default function ThemeRoutes() {
       element: <HomePageLayout />,
       children: [
         {
-          path: ConfigRouter.homePage,
+          path: ConfigRouter.homePage.url,
           element: <HomePage />
         }
       ]

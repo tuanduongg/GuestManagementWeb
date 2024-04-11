@@ -81,10 +81,7 @@ const ListProduct = () => {
         </Row>
         <div className="wrap_list_item">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map((item, index) => (
-            <div
-              key={index}
-              style={{ width: isMobile() ? `${100 / 2}%` : isTablet() ? `${100 / 4}%` : `${100 / 5}%`, padding: '10px' }}
-            >
+            <div key={index} style={{ width: isMobile() ? `${100 / 2}%` : isTablet() ? `${100 / 4}%` : `${100 / 5}%`, padding: '10px' }}>
               <CardProduct onClickProduct={onClickProduct} number={item} />
             </div>
           ))}

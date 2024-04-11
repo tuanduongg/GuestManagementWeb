@@ -14,7 +14,7 @@ const MinimalLayout = () => {
   const checkProfile = async () => {
     const rest = await restApi.get(RouterAPI.profile);
     if (rest?.status === 200) {
-      navigate(ConfigRouter.listGuest);
+      navigate(ConfigRouter.listGuest.url);
     }
   };
   return (

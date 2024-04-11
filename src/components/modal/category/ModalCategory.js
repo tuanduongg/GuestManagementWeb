@@ -90,18 +90,11 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
     // afterSave(res, textSucces);
   };
   const handleClickAdd = () => {
-    // if (name?.trim() === '') {
-    //   setValidateName({ err: true, msg: 'Category is required.' });
-    // } else {
-    //   ShowQuestion({
-    //     content: `Do you want to ${selectedRow ? 'update' : 'add new'} category?`,
-    //     titleProp: 'Category',
-    //     icon: 'warning',
-    //     onClickYes: () => {
-    //       handleSave();
-    //     }
-    //   });
-    // }
+    if (name?.trim() === '') {
+      setValidateName({ err: true, msg: 'Category is required.' });
+    } else {
+      alert('pass');
+    }
   };
   const handleClickDeleteRow = (row) => {
     alert(row?.categoryName ?? '');
@@ -119,8 +112,8 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
         aria-labelledby="responsive-dialog-title"
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <DialogTitle fontSize={'20px'} sx={{ padding: '10px' }}>
-            Category
+          <DialogTitle fontSize={'15px'} sx={{ padding: '10px' }}>
+            Danh mục
           </DialogTitle>
           <IconButton onClick={onClose}>
             <CloseOutlined />
@@ -129,8 +122,8 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
         <Divider />
         <DialogContent>
           <Box sx={{ width: '100%', height: '100%' }}>
-            <Grid container spacing={2}>
-              <Grid item xs={9.5}>
+            <Grid container sx={{ display: 'flex', alignItems: 'center' }} spacing={2}>
+              <Grid item xs={9}>
                 <TextField
                   error={validateName?.err}
                   helperText={validateName?.msg}
@@ -149,7 +142,7 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
                   variant="outlined"
                 />
               </Grid>
-              <Grid item xs={2.5}>
+              <Grid item xs={3}>
                 <Button
                   sx={{ height: '40px' }}
                   size="medium"
@@ -159,7 +152,7 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
                   autoFocus
                   // endIcon={selectedRow ? <SaveIcon /> : <AddIcon />}
                 >
-                  {selectedRow ? 'Save' : `Add`}
+                  {selectedRow ? 'Cập nhật' : `Thêm mới`}
                 </Button>
               </Grid>
               <Grid item xs={12}>
@@ -173,11 +166,6 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
             </Grid>
           </Box>
         </DialogContent>
-        {/* <DialogActions>
-          <Button size="small" variant="contained" color="primary" autoFocus endIcon={<SaveIcon />} onClick={handleClickSave}>
-            Save
-          </Button>
-        </DialogActions> */}
       </Dialog>
     </>
   );

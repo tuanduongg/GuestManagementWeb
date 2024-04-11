@@ -4,3 +4,13 @@
 .ant-form-item-explain-error {
     font-size: 12px !important;
 }
+.ant-image-preview-mask {
+    z-index: 2000 !important;
+}
+.ant-image-preview-wrap{
+    z-index: 2001 !important;
+}
+.ant-image-preview-operations-wrapper {
+    
+    z-index: 2002 !important;
+}

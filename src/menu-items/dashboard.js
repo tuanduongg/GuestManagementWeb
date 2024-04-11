@@ -17,10 +17,10 @@ const dashboard = {
   type: 'group',
   children: [
     {
-      id: ConfigRouter.listGuest,
+      id: ConfigRouter.listGuest.url,
       title: 'sidebar_registration_guest',
       type: 'item',
-      url: ConfigRouter.listGuest,
+      url: ConfigRouter.listGuest.url,
       icon: <UserOutlined />,
       target: false
     }

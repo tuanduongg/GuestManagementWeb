@@ -18,7 +18,7 @@ const HomePageLayout = () => {
   const checkProfile = async () => {
     const rest = await restApi.get(RouterAPI.profile);
     if (rest?.status !== 200) {
-      navigate(ConfigRouter.login);
+      navigate(ConfigRouter.login.url);
     }
   };
 

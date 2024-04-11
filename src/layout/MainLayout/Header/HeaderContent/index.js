@@ -13,8 +13,6 @@ const HeaderContent = () => {
   return (
     <>
       <Box sx={{ width: '100%', ml: 1 }} />
-
-      {/* <Notification /> */}
       <Profile />
     </>
   );

@@ -15,7 +15,7 @@ const LoginRoutes = {
   element: <MinimalLayout />,
   children: [
     {
-      path: ConfigRouter.login,
+      path: ConfigRouter.login.url,
       element: <AuthLogin />
     }
   ]

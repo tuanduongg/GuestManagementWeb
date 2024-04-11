@@ -9,10 +9,10 @@ const pages = {
   type: 'group',
   children: [
     {
-      id: ConfigRouter.user,
+      id: ConfigRouter.user.url,
       title: 'sibar_acc',
       type: 'item',
-      url: ConfigRouter.user,
+      url: ConfigRouter.user.url,
       icon: <ProfileOutlined />,
       target: false
     }

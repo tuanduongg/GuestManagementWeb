@@ -23,19 +23,19 @@ const MainRoutes = {
   element: <MainLayout />,
   children: [
     {
-      path: ConfigRouter.listGuest,
+      path: ConfigRouter.listGuest.url,
       element: <ListGuest />
     },
     {
-      path: ConfigRouter.user,
+      path: ConfigRouter.user.url,
       element: <AccountPage />
     },
     {
-      path: ConfigRouter.listProduct,
+      path: ConfigRouter.listProduct.url,
       element: <ListProduct />
     },
     {
-      path: ConfigRouter.managementProduct,
+      path: ConfigRouter.managementProduct.url,
       element: <ManagerProduct />
     }
   ]

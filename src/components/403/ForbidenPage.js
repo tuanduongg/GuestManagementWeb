@@ -7,7 +7,7 @@ const ForbidenPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const onClickNavigate = () => {
-    navigate(ConfigRouter.listGuest);
+    navigate(ConfigRouter.listGuest.url);
   };
   return (
     <Result

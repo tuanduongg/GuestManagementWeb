@@ -405,7 +405,7 @@ export const logout = () => {
 export const handleLogout = () => {
   delete_cookie('ASSET_TOKEN');
   setCookie('ASSET_TOKEN', '', 1);
-  location.href = ConfigRouter.login;
+  location.href = ConfigRouter.login.url;
 };
 
 export function setCookie(name, value, days) {

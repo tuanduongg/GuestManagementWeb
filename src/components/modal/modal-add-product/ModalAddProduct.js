@@ -10,6 +10,7 @@ import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import { useTranslation } from 'react-i18next';
 import './modal-add-product.css';
+import config from 'config';
 
 const formatPrice = (value) => {
   // Xóa các ký tự không phải số từ giá trị nhập vào
@@ -37,31 +38,94 @@ const getBase64 = (file) =>
     reader.onload = () => resolve(reader.result);
     reader.onerror = (error) => reject(error);
   });
-
-const ModalAddProduct = ({ open, handleClose }) => {
-  const { modal } = App.useApp();
+const initialValuesForm = {
+  name: '',
+  price: '',
+  inventory: '',
+  unit: '',
+  category: '',
+  desciption: ''
+};
+const ModalAddProduct = ({ open, handleClose, categories, listUnit, typeModal, setLoading, onAfterSave, currentRow, afterDeleteImage }) => {
   const { t } = useTranslation();
   const [name, setName] = useState('');
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
+  const [initValueForm, setInitValueForm] = useState(initialValuesForm);
   const [fileList, setFileList] = useState([]);
   const [form] = Form.useForm();
+  const [modal, contextHolder] = Modal.useModal();
 
   const handleOk = (e) => {
     form.submit();
   };
-  const handleCancel = (e) => {
+  const handleCancel = () => {
     form.resetFields(); // Đặt lại trường của form
     setFileList([]);
     handleClose();
   };
+  useEffect(() => {
+    if (open && currentRow && typeModal === 'EDIT') {
+      form.setFieldsValue({
+        name: currentRow?.productName,
+        price: currentRow?.price,
+        inventory: currentRow?.inventory,
+        unit: currentRow?.unit?.unitID,
+        category: currentRow?.category?.categoryID,
+        desciption: currentRow?.description
+      });
+      if (currentRow?.images) {
+        const dataImages = currentRow?.images.map((item) => {
+          return {
+            uid: item?.imageID,
+            name: item?.title,
+            status: 'done',
+            url: config.urlImageSever + item?.url
+          };
+        });
+        setFileList(dataImages);
+      }
+    }
+  }, [open]);
 
+  const handleOnSave = async (data) => {
+    setLoading(true);
+    const dataSend = JSON.stringify({
+      productID: currentRow?.productID,
+      name: data?.name,
+      price: data?.price,
+      description: data?.desciption,
+      inventory: data?.inventory,
+      category: data?.category,
+      unitID: data?.unit
+    });
+    var formData = new FormData();
+    formData.append('data', dataSend);
+
+    if (fileList && fileList?.length > 0) {
+      fileList.map((file) => {
+        formData.append('files', file?.originFileObj);
+      });
+    }
+    const url = typeModal === 'EDIT' ? RouterAPI.editProduct : RouterAPI.addProduct;
+    const res = await restApi.post(url, formData);
+    setLoading(false);
+    if (res?.status === 200) {
+      let txt = typeModal === 'EDIT' ? 'Update product successful!' : 'Add product successful!';
+
+      message.success(res?.data?.message ?? txt);
+      handleCancel();
+      onAfterSave();
+    } else {
+      message.error(res?.data?.message);
+    }
+    // afterSaved(res);
+  };
   const onFinish = (values) => {
-    message.success('Submit success!');
-    console.log('values', values);
+    handleOnSave(values);
   };
   const onFinishFailed = (values) => {
-    message.error('Submit failed!');
+    // message.error('Submit failed!');
   };
   const normFile = (e) => {
     if (Array.isArray(e)) {
@@ -71,7 +135,7 @@ const ModalAddProduct = ({ open, handleClose }) => {
   };
   const handleBeforeUpload = (file) => {
     // Xử lý trước khi tải lên
-    console.log('File to upload:', file);
+    // console.log('File to upload:', file);
 
     // Trả về false để ngăn không gửi yêu cầu lên server
     return false;
@@ -80,15 +144,45 @@ const ModalAddProduct = ({ open, handleClose }) => {
     setFileList(info.fileList);
   };
   const handlePreview = async (file) => {
-    console.log('file', file);
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
     }
     setPreviewImage(file.url || file.preview);
     setPreviewOpen(true);
   };
+  console.log('fileList', fileList);
+  const handleDeleteImage = async (id) => {
+    if (id) {
+      const data = await restApi.post(RouterAPI.deleteImageByID, { imageID: id });
+      if (data?.status === 200) {
+        message.success('Xóa thành công!');
+        afterDeleteImage(currentRow?.productID,id);
+        return;
+      }
+      message.error(data?.data?.message ?? 'Delete Fail');
+      setFileList(fileList); // xóa fail thì lấy lại ảnh
+    }
+  };
+  const onRemoveImage = (file) => {
+    modal.confirm({
+      title: 'Thông báo',
+      content: 'Bạn chắc chắn muốn xóa ảnh này',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        if (!file?.originFileObj) {
+          handleDeleteImage(file?.uid);
+        }
+      },
+      onCancel() {
+        setFileList(fileList);
+      }
+    });
+  };
   return (
     <>
+      {contextHolder}
       <Modal
         centered
         okText={t('saveButton')}
@@ -96,7 +190,7 @@ const ModalAddProduct = ({ open, handleClose }) => {
         width={530}
         zIndex={1300}
         maskClosable={false}
-        title={'Thêm mới sản phẩm'}
+        title={typeModal === 'EDIT' ? 'Chỉnh sửa sản phẩm' : 'Tạo mới sản phẩm'}
         open={open}
         onOk={handleOk}
         onCancel={handleCancel}
@@ -110,7 +204,7 @@ const ModalAddProduct = ({ open, handleClose }) => {
       >
         <div style={{ maxHeight: '70vh', overflowY: 'auto', overflowX: 'hidden', padding: '10px', scrollbarWidth: '1px' }}>
           <Form
-            initialValues={{ category: 'demo1' }}
+            initialValues={initValueForm}
             form={form}
             layout="vertical"
             onFinish={onFinish}
@@ -175,8 +269,18 @@ const ModalAddProduct = ({ open, handleClose }) => {
                     }
                   ]}
                 >
-                  <Select style={{ width: '100%' }}>
-                    <Select.Option value="demo">Demo</Select.Option>
+                  <Select
+                    filterOption={(input, option) => {
+                      return (option?.children ?? '').toLowerCase().includes(input.toLowerCase());
+                    }}
+                    showSearch
+                    style={{ width: '100%' }}
+                  >
+                    {listUnit?.map((unit, index) => (
+                      <Select.Option key={index} value={unit?.unitID}>
+                        {unit?.unitName}
+                      </Select.Option>
+                    ))}
                   </Select>
                 </Form.Item>
               </Col>
@@ -191,9 +295,18 @@ const ModalAddProduct = ({ open, handleClose }) => {
                     }
                   ]}
                 >
-                  <Select style={{ width: '100%' }}>
-                    <Select.Option value="demo1">Demo 1</Select.Option>
-                    <Select.Option value="demo2">Demo 2</Select.Option>
+                  <Select
+                    filterOption={(input, option) => {
+                      return (option?.children ?? '').toLowerCase().includes(input.toLowerCase());
+                    }}
+                    showSearch
+                    style={{ width: '100%' }}
+                  >
+                    {categories?.map((categorie, index) => (
+                      <Select.Option key={index} value={categorie?.categoryID}>
+                        {categorie?.categoryName}
+                      </Select.Option>
+                    ))}
                   </Select>
                 </Form.Item>
               </Col>
@@ -212,6 +325,7 @@ const ModalAddProduct = ({ open, handleClose }) => {
             </Form.Item>
             <Form.Item label="Upload" valuePropName="fileList" getValueFromEvent={normFile}>
               <Upload
+                onRemove={onRemoveImage}
                 fileList={fileList}
                 multiple
                 accept=".png,.jpeg,.png,.jpg"

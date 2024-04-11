@@ -58,7 +58,7 @@ const ModalChangePassword = ({ open, handleClose }) => {
         content: t('msg_changePW_success'),
         keyboard: false,
         onOk: () => {
-          location.href = ConfigRouter.login;
+          location.href = ConfigRouter.login.url;
         },
         footer: (_, { OkBtn, CancelBtn }) => (
           <>

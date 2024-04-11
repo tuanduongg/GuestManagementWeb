@@ -15,18 +15,22 @@ import {
   InfoCircleOutlined,
   FunnelPlotOutlined,
   BarsOutlined,
-  OneToOneOutlined
+  OneToOneOutlined,
+  EditOutlined,
+  DeleteOutlined
 } from '@ant-design/icons';
 import Loading from 'components/Loading';
 import MainCard from 'components/MainCard';
 import { useTranslation } from 'react-i18next';
 import config from 'config';
-import { ITEMROWS, urlFallBack } from './manager-product.service';
+import { urlFallBack } from './manager-product.service';
 
 const { Title, Link } = Typography;
 import './manager-product.css';
 import ModalAddProduct from 'components/modal/modal-add-product/ModalAddProduct';
 import ModalCategory from 'components/modal/category/ModalCategory';
+import ModalUnit from 'components/modal/modal-unit/ModalUnit';
+
 const ManagerProduct = () => {
   const [role, setRole] = useState(null);
   const [openModalAdd, setOpenModalAdd] = useState(false);
@@ -34,14 +38,26 @@ const ManagerProduct = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [openModalCategory, setOpenModalCategory] = useState(false);
-
+  const [openModalUnit, setOpenModalUnit] = useState(false);
   const { t } = useTranslation();
+  const [page, setPage] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [listProduct, setListProduct] = useState([]);
+  const [search, setSearch] = useState('');
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [categories, setCategories] = useState([]);
+  const [units, setUnits] = useState([]);
+  const [typeModal, setTypeModal] = useState('');
+  const [currentRow, setCurrentRow] = useState(null);
 
   const handleMenuClick = (e) => {
     switch (e.key) {
       case 'importExcel':
         break;
       case 'cancel':
+        break;
+      case 'unit':
+        setOpenModalUnit(true);
         break;
       case 'exportExcel':
         Modal.confirm({
@@ -57,11 +73,46 @@ const ManagerProduct = () => {
       case 'catgory':
         setOpenModalCategory(true);
         break;
+      case 'edit':
+        setTypeModal('EDIT');
+        setOpenModalAdd(true);
+        break;
 
       default:
         break;
     }
   };
+  const getAllUnit = async () => {
+    const res = await restApi.get(RouterAPI.getAllUnit);
+    if (res?.status === 200) {
+      setUnits(res?.data);
+    }
+  };
+  const getAllCategory = async () => {
+    const res = await restApi.get(RouterAPI.getAllCategory);
+    if (res?.status === 200) {
+      setCategories(res?.data);
+    }
+  };
+  const getAllProduct = async () => {
+    setLoading(true);
+    const obj = { page, rowsPerPage, search };
+    const url = RouterAPI.getAllProduct;
+    const res = await restApi.post(url, obj);
+    if (res?.status === 200) {
+      setLoading(false);
+      const data = res?.data;
+      setTotal(data?.count);
+      setListProduct(data?.data);
+    } else {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    getAllProduct();
+    getAllCategory();
+    getAllUnit();
+  }, []);
   const ITEMS = [
     {
       label: 'Danh mục',
@@ -92,6 +143,21 @@ const ManagerProduct = () => {
       danger: true
     }
   ];
+  const ITEMROWS = [
+    {
+      label: 'Sửa',
+      key: 'edit',
+      icon: <EditOutlined />,
+      disabled: false
+    },
+    {
+      label: 'Delete',
+      key: 'delete',
+      icon: <DeleteOutlined />,
+      disabled: false,
+      danger: true
+    }
+  ];
   const menuProps = {
     items: ITEMS,
     onClick: handleMenuClick
@@ -100,7 +166,6 @@ const ManagerProduct = () => {
     items: ITEMROWS,
     onClick: handleMenuClick
   };
-
   const columns = [
     {
       align: 'left',
@@ -110,10 +175,15 @@ const ManagerProduct = () => {
 
       render: (_, data) => (
         <>
-          <Row>
+          <Row style={{ display: 'flex', alignItems: 'center' }}>
             {!isMobile() && (
               <Col xs={4}>
-                <Image width={50} height={50} src={data?.images} fallback={urlFallBack} />
+                <Image
+                  width={50}
+                  height={50}
+                  src={data?.images[0] ? config.urlImageSever + data?.images[0]?.url : ''}
+                  fallback={urlFallBack}
+                />
               </Col>
             )}
             <Col xs={24} sm={20}>
@@ -128,7 +198,7 @@ const ManagerProduct = () => {
       filterMode: 'tree',
       filterSearch: true,
       onFilter: (value, record) => {},
-      width: isMobile() ? '130px' : '50%'
+      width: isMobile() ? '130px' : '35%'
     },
     {
       align: 'center',
@@ -141,11 +211,11 @@ const ManagerProduct = () => {
       width: isMobile() ? '100px' : '15%'
     },
     {
-      key: 'unitID',
+      key: 'unitName',
       title: 'Đơn vị',
-      dataIndex: 'unitID',
+      dataIndex: 'unitName',
       align: 'center',
-      render: (_, data) => <>{data?.unitID}</>,
+      render: (_, data) => <>{data?.unit?.unitName}</>,
       width: isMobile() ? '100px' : '10%'
     },
     {
@@ -160,8 +230,15 @@ const ManagerProduct = () => {
       width: isMobile() ? '100px' : '10%'
     },
     {
+      align: 'center',
+      key: 'category',
+      title: 'Danh mục',
+      render: (_, data) => <>{data?.category?.categoryName}</>,
+      width: isMobile() ? '100px' : '15%'
+    },
+    {
       key: 'isShow',
-      title: 'Hiển Thị',
+      title: 'Trạng thái',
       dataIndex: 'isShow',
       align: 'center',
       render: (_, data) => (
@@ -179,8 +256,14 @@ const ManagerProduct = () => {
       render: (text, data, index) => {
         return (
           <>
-            <Dropdown placement="left" menu={menuPropsRow}>
-              <Button type="text" icon={<MoreOutlined />}></Button>
+            <Dropdown trigger={['click']} placement="left" menu={menuPropsRow}>
+              <Button
+                onClick={() => {
+                  setCurrentRow(data);
+                }}
+                type="text"
+                icon={<MoreOutlined />}
+              ></Button>
             </Dropdown>
           </>
         );
@@ -190,294 +273,6 @@ const ManagerProduct = () => {
   ].map((item) => {
     return { ...item, title: t(item?.title) };
   });
-
-  const data = [
-    {
-      productID: '1',
-
-      productName: 'Giấy A4',
-
-      price: '15000',
-
-      inventory: 52,
-
-      description: 'giấy A4 đẹp xịn xò con bò',
-
-      categoryID: '11',
-
-      unitID: 'Kg',
-
-      isShow: true,
-
-      images: 'https://i.stack.imgur.com/DzAkj.png'
-    },
-    {
-      productID: '2',
-
-      productName: 'Trong xuất bản và thiết kế đồ họa',
-
-      price: '25000',
-
-      inventory: 52,
-
-      description: 'giấy A4 đẹp xịn xò con bò',
-
-      categoryID: '5',
-
-      unitID: 'Kg',
-
-      isShow: true,
-
-      images: 'https://i.stack.imgur.com/DzAkj.png'
-    },
-    {
-      productID: '3',
-
-      productName: 'Giấy A4 3',
-
-      price: '55000',
-
-      inventory: 52,
-
-      description: 'giấy A4 đẹp xịn xò con bò',
-
-      categoryID: '12',
-
-      unitID: 'Kg',
-
-      isShow: false,
-
-      images: 'https://i.stack.imgur.com/DzAkj.png'
-    },
-    {
-      productID: '1',
-
-      productName: 'Giấy A4',
-
-      price: '15000',
-
-      inventory: 52,
-
-      description: 'giấy A4 đẹp xịn xò con bò',
-
-      categoryID: '11',
-
-      unitID: 'Kg',
-
-      isShow: true,
-
-      images: 'https://i.stack.imgur.com/DzAkj.png'
-    },
-    {
-      productID: '2',
-
-      productName: 'Trong xuất bản và thiết kế đồ họa',
-
-      price: '25000',
-
-      inventory: 52,
-
-      description: 'giấy A4 đẹp xịn xò con bò',
-
-      categoryID: '5',
-
-      unitID: 'Kg',
-
-      isShow: true,
-
-      images: 'https://i.stack.imgur.com/DzAkj.png'
-    },
-    {
-      productID: '3',
-
-      productName: 'Giấy A4 3',
-
-      price: '55000',
-
-      inventory: 52,
-
-      description: 'giấy A4 đẹp xịn xò con bò',
-
-      categoryID: '12',
-
-      unitID: 'Kg',
-
-      isShow: false,
-
-      images: 'https://i.stack.imgur.com/DzAkj.png'
-    },
-    {
-      productID: '1',
-
-      productName: 'Giấy A4',
-
-      price: '15000',
-
-      inventory: 52,
-
-      description: 'giấy A4 đẹp xịn xò con bò',
-
-      categoryID: '11',
-
-      unitID: 'Kg',
-
-      isShow: true,
-
-      images: 'https://i.stack.imgur.com/DzAkj.png'
-    },
-    {
-      productID: '2',
-
-      productName: 'Trong xuất bản và thiết kế đồ họa',
-
-      price: '25000',
-
-      inventory: 52,
-
-      description: 'giấy A4 đẹp xịn xò con bò',
-
-      categoryID: '5',
-
-      unitID: 'Kg',
-
-      isShow: true,
-
-      images: 'https://i.stack.imgur.com/DzAkj.png'
-    },
-    {
-      productID: '3',
-
-      productName: 'Giấy A4 3',
-
-      price: '55000',
-
-      inventory: 52,
-
-      description: 'giấy A4 đẹp xịn xò con bò',
-
-      categoryID: '12',
-
-      unitID: 'Kg',
-
-      isShow: false,
-
-      images: 'https://i.stack.imgur.com/DzAkj.png'
-    },
-    {
-      productID: '1',
-
-      productName: 'Giấy A4',
-
-      price: '15000',
-
-      inventory: 52,
-
-      description: 'giấy A4 đẹp xịn xò con bò',
-
-      categoryID: '11',
-
-      unitID: 'Kg',
-
-      isShow: true,
-
-      images: 'https://i.stack.imgur.com/DzAkj.png'
-    },
-    {
-      productID: '2',
-
-      productName: 'Trong xuất bản và thiết kế đồ họa',
-
-      price: '25000',
-
-      inventory: 52,
-
-      description: 'giấy A4 đẹp xịn xò con bò',
-
-      categoryID: '5',
-
-      unitID: 'Kg',
-
-      isShow: true,
-
-      images: 'https://i.stack.imgur.com/DzAkj.png'
-    },
-    {
-      productID: '3',
-
-      productName: 'Giấy A4 3',
-
-      price: '55000',
-
-      inventory: 52,
-
-      description: 'giấy A4 đẹp xịn xò con bò',
-
-      categoryID: '12',
-
-      unitID: 'Kg',
-
-      isShow: false,
-
-      images: 'https://i.stack.imgur.com/DzAkj.png'
-    },
-    {
-      productID: '1',
-
-      productName: 'Giấy A4',
-
-      price: '15000',
-
-      inventory: 52,
-
-      description: 'giấy A4 đẹp xịn xò con bò',
-
-      categoryID: '11',
-
-      unitID: 'Kg',
-
-      isShow: true,
-
-      images: 'https://i.stack.imgur.com/DzAkj.png'
-    },
-    {
-      productID: '2',
-
-      productName: 'Trong xuất bản và thiết kế đồ họa',
-
-      price: '25000',
-
-      inventory: 52,
-
-      description: 'giấy A4 đẹp xịn xò con bò',
-
-      categoryID: '5',
-
-      unitID: 'Kg',
-
-      isShow: true,
-
-      images: 'https://i.stack.imgur.com/DzAkj.png'
-    },
-    {
-      productID: '3',
-
-      productName: 'Giấy A4 3',
-
-      price: '55000',
-
-      inventory: 52,
-
-      description: 'giấy A4 đẹp xịn xò con bò',
-
-      categoryID: '12',
-
-      unitID: 'Kg',
-
-      isShow: false,
-
-      images: 'https://i.stack.imgur.com/DzAkj.png'
-    }
-  ];
 
   //   const checkRole = async () => {
   //     setLoading(true);
@@ -499,19 +294,28 @@ const ManagerProduct = () => {
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
-
+  const onAfterSaveProduct = () => {
+    getAllProduct();
+  };
   const onCloseModalCategory = () => {
     setOpenModalCategory(false);
+  };
+  const afterDeleteImage = (product, image) => {
+    const data = listProduct.map((item) => {
+      if (item?.productID === product) {
+        return {
+          ...item,
+          images: item.images.filter((img) => img.imageID !== image)
+        };
+      }
+      return item;
+    });
+    setListProduct(data);
   };
   return (
     <>
       <Loading loading={loading} />
       {contextHolder}
-      <Row>
-        <Col style={{ marginTop: '5px' }} span={24}>
-          <Title level={5}>{t('Quản lý sản phẩm')}</Title>
-        </Col>
-      </Row>
       <MainCard contentSX={{ p: isMobile() ? 0.5 : 2, minHeight: '83vh' }}>
         <Row>
           <Col xs={24} sm={15} style={{ display: 'flex', alignItems: 'center' }}>
@@ -554,6 +358,7 @@ const ManagerProduct = () => {
             <Button
               shape="round"
               onClick={() => {
+                setTypeModal('ADD');
                 setOpenModalAdd(true);
               }}
               style={{ marginRight: '5px' }}
@@ -588,19 +393,32 @@ const ManagerProduct = () => {
                   : { x: null, y: '55vh' }
               }
               columns={columns}
-              dataSource={data}
+              dataSource={listProduct}
               pagination={true}
             ></Table>
           </Col>
         </Row>
       </MainCard>
       <ModalAddProduct
+        currentRow={currentRow}
+        afterDeleteImage={afterDeleteImage}
+        typeModal={typeModal}
+        setLoading={setLoading}
+        listUnit={units}
         open={openModalAdd}
         handleClose={() => {
           setOpenModalAdd(false);
         }}
+        categories={categories}
+        onAfterSave={onAfterSaveProduct}
       />
       <ModalCategory open={openModalCategory} handleClose={onCloseModalCategory} />
+      <ModalUnit
+        open={openModalUnit}
+        handleClose={() => {
+          setOpenModalUnit(false);
+        }}
+      />
     </>
   );
 };

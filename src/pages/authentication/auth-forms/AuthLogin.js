@@ -84,7 +84,7 @@ const AuthLogin = () => {
               const data = res?.data;
               setCookie('ASSET_TOKEN', data?.accessToken, 1);
               localStorage.setItem('DATA_USER', JSON.stringify(data?.user));
-              location.href = ConfigRouter.listGuest;
+              location.href = ConfigRouter.listGuest.url;
             } else {
               Modal.error({
                 title: t('msg_notification'),

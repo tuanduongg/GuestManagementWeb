@@ -8,9 +8,9 @@ import Logo from 'components/Logo/Logo';
 import { ConfigRouter } from 'config_router';
 import CardComponent from './component/card';
 const cols = [
-  { url: ConfigRouter.listGuest, icon: <UsergroupAddOutlined style={{ fontSize: '30px' }} />, content: 'ĐĂNG KÝ KHÁCH', id: '1' },
-  { url: ConfigRouter.listGuest, icon: <ShoppingCartOutlined style={{ fontSize: '30px' }} />, content: 'ORDER VẬT TƯ ', id: '2' },
-  { url: ConfigRouter.user, icon: <UnlockOutlined style={{ fontSize: '30px' }} />, content: 'TÀI KHOẢN & PHÂN QUYỀN', id: '3' },
+  { url: ConfigRouter.listGuest.url, icon: <UsergroupAddOutlined style={{ fontSize: '30px' }} />, content: 'ĐĂNG KÝ KHÁCH', id: '1' },
+  { url: ConfigRouter.listGuest.url, icon: <ShoppingCartOutlined style={{ fontSize: '30px' }} />, content: 'ORDER VẬT TƯ ', id: '2' },
+  { url: ConfigRouter.user.url, icon: <UnlockOutlined style={{ fontSize: '30px' }} />, content: 'TÀI KHOẢN & PHÂN QUYỀN', id: '3' },
   //   { url: ConfigRouter.listGuest, icon: <UsergroupAddOutlined style={{ fontSize: '30px' }} />, content: 'ĐĂNG KÝ KHÁCH', id: '4' }
 ];
 

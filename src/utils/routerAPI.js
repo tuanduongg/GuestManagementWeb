@@ -31,5 +31,20 @@ export const RouterAPI = {
   getHistoryGuest: 'history-guest/findByGuest',
 
   getVapidKey: 'firebase/getKey',
-  storeToken: 'firebase/store-token'
+  storeToken: 'firebase/store-token',
+
+  getProductPubic: '/product/public',
+  getAllProduct: '/product/all',
+  addProduct: '/product/add',
+  editProduct: '/product/edit',
+  updateProduct: '/product/update',
+  deleteProduct: '/product/delete',
+  changePublicProduct: '/product/changePublic',
+  upLoadExcel: '/product/uploadExcel',
+
+  getAllUnit: '/unit/all',
+
+  getAllCategory: 'category/all',
+
+  deleteImageByID: 'image/delete'
 };

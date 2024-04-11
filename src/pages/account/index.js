@@ -176,11 +176,11 @@ const AccountPage = () => {
     <>
       <Loading loading={loading} />
       {contextHolder}
-      <Row>
+      {/* <Row>
         <Col style={{ marginTop: '5px' }} span={24}>
           <Title level={5}>{t('title_page_role_user')}</Title>
         </Col>
-      </Row>
+      </Row> */}
       <MainCard contentSX={{ p: isMobile() ? 0.5 : 2, minHeight: '83vh' }}>
         <Row>
           <Col xs={24} sm={6} style={{ marginBottom: '10px' }}>

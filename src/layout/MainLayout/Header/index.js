@@ -12,18 +12,42 @@ import HeaderContent from './HeaderContent';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { isMdScreen, isMobile } from 'utils/helper';
 import Logo from 'components/Logo/Logo';
+import { Typography } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
+import { ConfigRouter } from 'config_router';
+import { useEffect, useState } from 'react';
+const { Title } = Typography;
 
 // ==============================|| MAIN LAYOUT - HEADER ||============================== //
 
+const getNameFromPath = (path) => {
+  const routeFind = Object.values(ConfigRouter).find((item) => {
+    if (item.url.length > path) {
+      return item.url.includes(path);
+    }
+    return path === item.url;
+  });
+  if (routeFind) {
+    return routeFind.name;
+  }
+  return '';
+};
 const Header = ({ open, handleDrawerToggle, showLogo }) => {
   const theme = useTheme();
+  const location = useLocation();
+  const { pathname } = location;
+  const { t } = useTranslation();
   const matchDownMD = useMediaQuery(theme.breakpoints.down('lg'));
   const matchDownXS = useMediaQuery(theme.breakpoints.down('sm'));
+  const [currentPage, setCurrentPage] = useState('');
   // const isMdScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const iconBackColor = 'grey.100';
   const iconBackColorOpen = 'grey.200';
-
+  useEffect(() => {
+    setCurrentPage(getNameFromPath(pathname));
+  }, [pathname]);
   // common header
   const mainHeader = (
     <Toolbar>
@@ -44,6 +68,7 @@ const Header = ({ open, handleDrawerToggle, showLogo }) => {
           <Logo />
         </div>
       )}
+      <div style={{ fontSize: '15px', minWidth: '200px', fontWeight: '500' }}>{t(`${currentPage}`)}</div>
       {/* {(isMdScreen() || isMobile()) && (
         <IconButton
           disableRipple

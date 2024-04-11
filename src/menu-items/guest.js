@@ -11,10 +11,10 @@ const guest = {
   type: 'group',
   children: [
     {
-      id: ConfigRouter.listGuest,
+      id: ConfigRouter.listGuest.url,
       title: 'Danh sách đăng ký',
       type: 'item',
-      url: ConfigRouter.listGuest,
+      url: ConfigRouter.listGuest.url,
       icon: <UserOutlined />,
       target: false
     }

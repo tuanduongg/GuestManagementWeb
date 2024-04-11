@@ -524,11 +524,11 @@ const ListGuest = () => {
     <>
       <Loading loading={loading} />
       {contextHolder}
-      <Row>
+      {/* <Row>
         <Col style={{ marginTop: '5px' }} span={24}>
           <Title level={5}>{t('sidebar_manager_guest')}</Title>
         </Col>
-      </Row>
+      </Row> */}
       <div style={{ width: '100%', maxWidth: '100%' }}>
         <MainCard contentSX={{ p: 2, minHeight: '83vh' }}>
           <Tabs

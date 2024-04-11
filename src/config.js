@@ -11,7 +11,8 @@ const config = {
   themeDirection: 'ltr',
   dateFormat: 'DD/MM/YYYY',
   hourFormat: 'HH:mm',
-  colorLogo: '#005494'
+  colorLogo: '#005494',
+  urlImageSever: process.env.REACT_APP_PREFIX_IMAGE + '/'
 };
 
 export default config;
