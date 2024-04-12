@@ -2,10 +2,12 @@ import { Card, Button, Row, Col, Image } from 'antd';
 import './card_product.css';
 const { Meta } = Card;
 import { ShoppingCartOutlined, EyeOutlined } from '@ant-design/icons';
-import { truncateString } from 'utils/helper';
+import { formattingVND, truncateString } from 'utils/helper';
 import { Box } from '@mui/material';
+import config from 'config';
+import { urlFallBack } from 'pages/manager-product/manager-product.service';
 
-const CardProduct = ({ number, onClickProduct }) => {
+const CardProduct = ({ product, onClickProduct }) => {
   return (
     <>
       <Card
@@ -20,28 +22,25 @@ const CardProduct = ({ number, onClickProduct }) => {
             height={'150px'}
             preview={false}
             onClick={() => {
-              onClickProduct();
+              onClickProduct(product);
             }}
             alt={'image'}
-            style={{objectFit: 'cover',cursor: 'pointer'}}
-            src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
+            style={{ objectFit: 'contain', cursor: 'pointer' }}
+            src={product?.images[0] ? config.urlImageSever + product?.images[0]?.url : ''}
+            fallback={urlFallBack}
           />
         }
       >
         {/* 66 */}
         <Box
           onClick={() => {
-            onClickProduct();
+            onClickProduct(product);
           }}
           className="title-card-product"
         >
-          {truncateString('Product tittle infomation Product tittle infomation infomation ddasdfsadfsd asdfdf', 66)}
+          {truncateString(product?.productName, 66)}
         </Box>
-        {/* <div className="price-card-product">125.000đ</div> */}
-        <div className="price-card-product">1.250.000đ</div>
-        {/* <Button className="no-border-radius" icon={<EyeOutlined />} size="small"></Button> */}
-        {/* <div className="wrap-button-card">
-        </div> */}
+        <div className="price-card-product">{formattingVND(product?.price)}</div>
       </Card>
     </>
   );

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Tabs } from 'antd';
 import { Table, Row, Col, Typography, Segmented, Space, Button, message, Modal, Input, Dropdown, Select, Switch, Image } from 'antd';
 const { Search } = Input;
-import { isMobile, truncateString } from 'utils/helper';
+import { formattingVND, isMobile, truncateString } from 'utils/helper';
 import ForbidenPage from 'components/403/ForbidenPage';
 import { RouterAPI } from 'utils/routerAPI';
 import restApi from 'utils/restAPI';
@@ -29,7 +29,6 @@ const { Title, Link } = Typography;
 import './manager-product.css';
 import ModalAddProduct from 'components/modal/modal-add-product/ModalAddProduct';
 import ModalCategory from 'components/modal/category/ModalCategory';
-import ModalUnit from 'components/modal/modal-unit/ModalUnit';
 
 const ManagerProduct = () => {
   const [role, setRole] = useState(null);
@@ -40,21 +39,72 @@ const ManagerProduct = () => {
   const [openModalCategory, setOpenModalCategory] = useState(false);
   const [openModalUnit, setOpenModalUnit] = useState(false);
   const { t } = useTranslation();
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [listProduct, setListProduct] = useState([]);
   const [search, setSearch] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [categories, setCategories] = useState([]);
-  const [units, setUnits] = useState([]);
+  const [selectCategory, setSelectCatgory] = useState('');
   const [typeModal, setTypeModal] = useState('');
   const [currentRow, setCurrentRow] = useState(null);
 
+  const getAllProduct = async () => {
+    setLoading(true);
+    const obj = { page: +page - 1, rowsPerPage, search, categoryID: selectCategory };
+    const url = RouterAPI.getAllProduct;
+    const res = await restApi.post(url, obj);
+    if (res?.status === 200) {
+      setLoading(false);
+      const data = res?.data;
+      setTotal(data?.count);
+      setListProduct(data?.data);
+    } else {
+      setLoading(false);
+    }
+  };
+  /**
+   *
+   * @param  data array string ids
+   */
+  const handleClickDeleteAll = async (data) => {
+    const res = await restApi.post(RouterAPI.deleteProducts, { productIDs: data });
+    if (res?.status === 200) {
+      message.success('Delete successful');
+      getAllProduct();
+    } else {
+      message.error(res?.data?.message ?? 'Delete fail!');
+    }
+  };
   const handleMenuClick = (e) => {
     switch (e.key) {
       case 'importExcel':
         break;
-      case 'cancel':
+      case 'delete':
+        Modal.confirm({
+          title: t('msg_notification'),
+          content: t('Bạn có muốn xóa sản phẩm này ?'),
+          okText: t('yes'),
+          cancelText: t('close'),
+          centered: true,
+          icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
+          onOk: async () => {
+            handleClickDeleteAll([currentRow?.productID]);
+          }
+        });
+        break;
+      case 'deleteAll':
+        Modal.confirm({
+          title: t('msg_notification'),
+          content: t('Bạn có muốn xóa sản phẩm này ?'),
+          okText: t('yes'),
+          cancelText: t('close'),
+          centered: true,
+          icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
+          onOk: async () => {
+            handleClickDeleteAll(selectedRowKeys);
+          }
+        });
         break;
       case 'unit':
         setOpenModalUnit(true);
@@ -82,49 +132,47 @@ const ManagerProduct = () => {
         break;
     }
   };
-  const getAllUnit = async () => {
-    const res = await restApi.get(RouterAPI.getAllUnit);
-    if (res?.status === 200) {
-      setUnits(res?.data);
+  const onClickSwitch = async (data) => {
+    if (data) {
+      const rest = await restApi.post(RouterAPI.changePublicProduct, {
+        productID: data?.productID
+      });
+      if (rest?.status === 200) {
+        const dataNew = listProduct.map((item) => {
+          if (item?.productID === data?.productID) {
+            return { ...item, isShow: rest?.data?.isShow };
+          }
+          return item;
+        });
+        setListProduct(dataNew);
+        message.success('Change status successful!');
+        return;
+      }
+      message.error(rest?.data?.message ?? 'Change status fail!');
     }
   };
+  const onChangeStatus = async (checked) => {};
   const getAllCategory = async () => {
     const res = await restApi.get(RouterAPI.getAllCategory);
     if (res?.status === 200) {
       setCategories(res?.data);
     }
   };
-  const getAllProduct = async () => {
-    setLoading(true);
-    const obj = { page, rowsPerPage, search };
-    const url = RouterAPI.getAllProduct;
-    const res = await restApi.post(url, obj);
-    if (res?.status === 200) {
-      setLoading(false);
-      const data = res?.data;
-      setTotal(data?.count);
-      setListProduct(data?.data);
-    } else {
-      setLoading(false);
-    }
-  };
+
+  useEffect(() => {
+    // getAllProduct();
+    getAllCategory();
+  }, []);
   useEffect(() => {
     getAllProduct();
-    getAllCategory();
-    getAllUnit();
-  }, []);
+  }, [page, rowsPerPage, search, selectCategory]);
   const ITEMS = [
     {
       label: 'Danh mục',
       key: 'catgory',
       icon: <BarsOutlined />,
-      disabled: false
-    },
-    {
-      label: 'Đơn vị',
-      key: 'unit',
-      icon: <OneToOneOutlined />,
-      disabled: false
+      disabled: false,
+      hidden: false
     },
     {
       type: 'divider'
@@ -133,16 +181,19 @@ const ManagerProduct = () => {
       label: 'Import Excel',
       key: 'importExcel',
       icon: <ImportOutlined />,
-      disabled: false
+      disabled: false,
+      hidden: false
     },
     {
       label: 'Delete',
-      key: 'cancel',
+      key: 'deleteAll',
       icon: <CloseOutlined />,
-      disabled: false,
-      danger: true
+      disabled: selectedRowKeys?.length === 0,
+      danger: true,
+      hidden: false
     }
-  ];
+  ].filter((item) => !item.hidden);
+  //action of row on table
   const ITEMROWS = [
     {
       label: 'Sửa',
@@ -177,7 +228,7 @@ const ManagerProduct = () => {
         <>
           <Row style={{ display: 'flex', alignItems: 'center' }}>
             {!isMobile() && (
-              <Col xs={4}>
+              <Col xs={6}>
                 <Image
                   width={50}
                   height={50}
@@ -186,18 +237,12 @@ const ManagerProduct = () => {
                 />
               </Col>
             )}
-            <Col xs={24} sm={20}>
-              <Link style={{ marginLeft: '5px' }} onClick={() => {}}>
-                {data?.productName}
-              </Link>
+            <Col xs={24} sm={18}>
+              <Link onClick={() => {}}>{data?.productName}</Link>
             </Col>
           </Row>
         </>
       ),
-      filters: [],
-      filterMode: 'tree',
-      filterSearch: true,
-      onFilter: (value, record) => {},
       width: isMobile() ? '130px' : '35%'
     },
     {
@@ -205,17 +250,16 @@ const ManagerProduct = () => {
       key: 'price',
       title: 'Giá',
       dataIndex: 'price',
-      sorter: (a, b) => {
-        console.log('a', a);
-      },
+      render: (_, data) => <>{formattingVND(data?.price)}</>,
+      sorter: (a, b) => a?.price - b?.price,
       width: isMobile() ? '100px' : '15%'
     },
     {
-      key: 'unitName',
+      key: 'unit',
       title: 'Đơn vị',
-      dataIndex: 'unitName',
+      dataIndex: 'unit',
       align: 'center',
-      render: (_, data) => <>{data?.unit?.unitName}</>,
+      render: (_, data) => <>{data?.unit}</>,
       width: isMobile() ? '100px' : '10%'
     },
     {
@@ -223,16 +267,25 @@ const ManagerProduct = () => {
       title: 'Tồn Kho',
       dataIndex: 'inventory',
       align: 'center',
-      filters: [],
-      filterMode: 'tree',
-      filterSearch: true,
-      onFilter: (value, record) => {},
+      sorter: (a, b) => a?.inventory - b?.inventory,
       width: isMobile() ? '100px' : '10%'
     },
     {
       align: 'center',
       key: 'category',
       title: 'Danh mục',
+      filters:
+        categories?.length > 0
+          ? categories?.map((item) => {
+              return {
+                text: item?.categoryName,
+                value: item?.categoryID
+              };
+            })
+          : [],
+      filterMode: 'tree',
+      filterSearch: true,
+      onFilter: (value, record) => record?.category?.categoryID === value,
       render: (_, data) => <>{data?.category?.categoryName}</>,
       width: isMobile() ? '100px' : '15%'
     },
@@ -244,7 +297,16 @@ const ManagerProduct = () => {
       render: (_, data) => (
         <>
           {' '}
-          <Switch size="small" checkedChildren="On" unCheckedChildren="Off" checked={data?.isShow} onChange={() => {}} />
+          <Switch
+            onClick={() => {
+              onClickSwitch(data);
+            }}
+            size="small"
+            checkedChildren="On"
+            unCheckedChildren="Off"
+            checked={data?.isShow}
+            onChange={onChangeStatus}
+          />
         </>
       ),
       width: isMobile() ? '100px' : '10%'
@@ -322,38 +384,43 @@ const ManagerProduct = () => {
             {!isMobile() && <FunnelPlotOutlined style={{ fontSize: '20px', color: config.colorLogo }} />}
             {<div style={{ fontWeight: 'bold', margin: '0px 5px', minWidth: '71px' }}>Danh mục:</div>}
             <Select
-              defaultValue="lucy"
-              onChange={() => {}}
-              style={{ width: isMobile() ? '30%' : '150px' }}
-              options={[
-                {
-                  value: 'jack',
-                  label: 'Văn phòng phẩm'
-                },
-                {
-                  value: 'lucy',
-                  label: 'Phục vụ sản xuất'
-                },
-                {
-                  value: 'Yiminghe',
-                  label: 'yiminghe'
-                }
-              ]}
+              value={selectCategory}
+              onChange={(value) => {
+                setSelectCatgory(value);
+              }}
+              style={{ width: isMobile() ? '35%' : '150px' }}
+              options={
+                categories?.length > 0
+                  ? [
+                      {
+                        label: 'All',
+                        value: ''
+                      }
+                    ].concat(
+                      categories?.map((item) => {
+                        return {
+                          label: item?.categoryName,
+                          value: item?.categoryID
+                        };
+                      })
+                    )
+                  : []
+              }
             />
             <Search
               placeholder="Tên sản phẩm..."
               allowClear
               enterButton
-              style={{ width: isMobile() ? '50%' : '200px', marginLeft: '5px' }}
+              style={{ width: isMobile() ? '45%' : '200px', marginLeft: '5px' }}
               onSearch={(value) => {
-                alert(value);
+                setSearch(value);
               }}
             />
           </Col>
           <Col
             xs={24}
             sm={9}
-            style={{ display: 'flex', justifyContent: 'right', alignItems: 'center', marginTop: isMobile() ? '5px' : '0px' }}
+            style={{ display: 'flex', justifyContent: 'right', alignItems: 'center', marginTop: isMobile() ? '10px' : '0px' }}
           >
             <Button
               shape="round"
@@ -369,7 +436,7 @@ const ManagerProduct = () => {
             </Button>
             <Dropdown menu={menuProps}>
               <Button style={{ marginLeft: '5px' }} shape="round" icon={<DownOutlined />}>
-                More
+                Khác
               </Button>
             </Dropdown>
           </Col>
@@ -394,7 +461,18 @@ const ManagerProduct = () => {
               }
               columns={columns}
               dataSource={listProduct}
-              pagination={true}
+              pagination={{
+                current: page,
+                pageSize: rowsPerPage,
+                showSizeChanger: true,
+                pageSizeOptions: config.sizePageOption,
+                total: total,
+                responsive: true,
+                onChange: (page, pageSize) => {
+                  setPage(page);
+                  setRowsPerPage(pageSize);
+                }
+              }}
             ></Table>
           </Col>
         </Row>
@@ -404,7 +482,6 @@ const ManagerProduct = () => {
         afterDeleteImage={afterDeleteImage}
         typeModal={typeModal}
         setLoading={setLoading}
-        listUnit={units}
         open={openModalAdd}
         handleClose={() => {
           setOpenModalAdd(false);
@@ -412,12 +489,13 @@ const ManagerProduct = () => {
         categories={categories}
         onAfterSave={onAfterSaveProduct}
       />
-      <ModalCategory open={openModalCategory} handleClose={onCloseModalCategory} />
-      <ModalUnit
-        open={openModalUnit}
-        handleClose={() => {
-          setOpenModalUnit(false);
+      <ModalCategory
+        categories={categories}
+        afterSave={() => {
+          getAllCategory();
         }}
+        open={openModalCategory}
+        handleClose={onCloseModalCategory}
       />
     </>
   );

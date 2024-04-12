@@ -1,29 +1,12 @@
-import {
-  Box,
-  Button,
-  CardMedia,
-  Checkbox,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Divider,
-  FormControl,
-  FormControlLabel,
-  FormHelperText,
-  Grid,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  Typography
-} from '@mui/material';
+import { Box, Button, Dialog, DialogContent, DialogTitle, Divider, Grid, IconButton, TextField } from '@mui/material';
+import { message } from 'antd';
+
 import { useState } from 'react';
 import { useEffect } from 'react';
 import TableCategory from './component/TableCategory';
 import { CloseOutlined } from '@ant-design/icons';
+import { RouterAPI } from 'utils/routerAPI';
+import restApi from 'utils/restAPI';
 
 const initValidate = { err: false, msg: '' };
 
@@ -45,11 +28,6 @@ const initValidate = { err: false, msg: '' };
 //   }
 //   return '';
 // };
-const DATA = [
-  { categoryID: 1, categoryName: 'Văn phòng phẩm' },
-  { categoryID: 2, categoryName: 'Hàng sản xuất' },
-  { categoryID: 3, categoryName: 'Đồ ăn/Thức uống' }
-];
 const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, getAll }) => {
   const [loading, setLoading] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
@@ -69,31 +47,31 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
     setName(row?.categoryName ?? '');
   };
   const handleSave = async () => {
-    // let data = {};
-    // let url = DefineRouteApi.addCategory;
-    // let textSucces = '';
-    // if (selectedRow) {
-    //   textSucces = 'Update category success!';
-    //   data = { categoryID: selectedRow?.categoryID, categoryName: name };
-    //   url = DefineRouteApi.updateCategory;
-    // } else {
-    //   textSucces = 'Add new category success!';
-    //   data = { categoryName: name };
-    // }
-    // const res = await restApi.post(url, data);
-    // if (res?.status === 200) {
-    //   if (!selectedRow) {
-    //     setName('');
-    //   }
-    //   // getAll();
-    // }
-    // afterSave(res, textSucces);
+    let data = {};
+    let url = RouterAPI.addCategory;
+    let textSucces = '';
+    if (selectedRow) {
+      textSucces = 'Update category success!';
+      data = { categoryID: selectedRow?.categoryID, categoryName: name };
+      url = RouterAPI.updateCategory;
+    } else {
+      textSucces = 'Add new category success!';
+      data = { categoryName: name };
+    }
+    const res = await restApi.post(url, data);
+    if (res?.status === 200) {
+      if (!selectedRow) {
+        setName('');
+      }
+      afterSave();
+    }
+    message.success(textSucces);
   };
   const handleClickAdd = () => {
     if (name?.trim() === '') {
       setValidateName({ err: true, msg: 'Category is required.' });
     } else {
-      alert('pass');
+      handleSave();
     }
   };
   const handleClickDeleteRow = (row) => {
@@ -111,7 +89,7 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
         onClose={onClose}
         aria-labelledby="responsive-dialog-title"
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', minWidth: '500px' }}>
           <DialogTitle fontSize={'15px'} sx={{ padding: '10px' }}>
             Danh mục
           </DialogTitle>
@@ -122,8 +100,8 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
         <Divider />
         <DialogContent>
           <Box sx={{ width: '100%', height: '100%' }}>
-            <Grid container sx={{ display: 'flex', alignItems: 'center' }} spacing={2}>
-              <Grid item xs={9}>
+            <Grid container spacing={1}>
+              <Grid item xs={8} sm={9}>
                 <TextField
                   error={validateName?.err}
                   helperText={validateName?.msg}
@@ -142,10 +120,9 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
                   variant="outlined"
                 />
               </Grid>
-              <Grid item xs={3}>
+              <Grid sx={{ display: 'flex', alignItems: 'center', justifyContent: 'right' }} item xs={4} sm={3}>
                 <Button
-                  sx={{ height: '40px' }}
-                  size="medium"
+                  size="small"
                   variant="contained"
                   onClick={handleClickAdd}
                   color="primary"
@@ -155,12 +132,14 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
                   {selectedRow ? 'Cập nhật' : `Thêm mới`}
                 </Button>
               </Grid>
+            </Grid>
+            <Grid container>
               <Grid item xs={12}>
                 <TableCategory
                   onClickDelete={handleClickDeleteRow}
                   selectedRow={selectedRow}
                   changeSelectedRow={onChangeSelectedRow}
-                  listCategory={DATA}
+                  listCategory={categories}
                 />
               </Grid>
             </Grid>

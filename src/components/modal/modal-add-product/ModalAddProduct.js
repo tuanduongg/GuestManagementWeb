@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Draggable from 'react-draggable';
 import { Input, Modal, App, Row, Col, Typography, message, Flex, Form, Select, Button, Upload, Image } from 'antd';
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -46,7 +45,7 @@ const initialValuesForm = {
   category: '',
   desciption: ''
 };
-const ModalAddProduct = ({ open, handleClose, categories, listUnit, typeModal, setLoading, onAfterSave, currentRow, afterDeleteImage }) => {
+const ModalAddProduct = ({ open, handleClose, categories, typeModal, setLoading, onAfterSave, currentRow, afterDeleteImage }) => {
   const { t } = useTranslation();
   const [name, setName] = useState('');
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -70,7 +69,7 @@ const ModalAddProduct = ({ open, handleClose, categories, listUnit, typeModal, s
         name: currentRow?.productName,
         price: currentRow?.price,
         inventory: currentRow?.inventory,
-        unit: currentRow?.unit?.unitID,
+        unit: currentRow?.unit,
         category: currentRow?.category?.categoryID,
         desciption: currentRow?.description
       });
@@ -97,7 +96,7 @@ const ModalAddProduct = ({ open, handleClose, categories, listUnit, typeModal, s
       description: data?.desciption,
       inventory: data?.inventory,
       category: data?.category,
-      unitID: data?.unit
+      unit: data?.unit
     });
     var formData = new FormData();
     formData.append('data', dataSend);
@@ -150,13 +149,12 @@ const ModalAddProduct = ({ open, handleClose, categories, listUnit, typeModal, s
     setPreviewImage(file.url || file.preview);
     setPreviewOpen(true);
   };
-  console.log('fileList', fileList);
   const handleDeleteImage = async (id) => {
     if (id) {
       const data = await restApi.post(RouterAPI.deleteImageByID, { imageID: id });
       if (data?.status === 200) {
         message.success('Xóa thành công!');
-        afterDeleteImage(currentRow?.productID,id);
+        afterDeleteImage(currentRow?.productID, id);
         return;
       }
       message.error(data?.data?.message ?? 'Delete Fail');
@@ -269,19 +267,7 @@ const ModalAddProduct = ({ open, handleClose, categories, listUnit, typeModal, s
                     }
                   ]}
                 >
-                  <Select
-                    filterOption={(input, option) => {
-                      return (option?.children ?? '').toLowerCase().includes(input.toLowerCase());
-                    }}
-                    showSearch
-                    style={{ width: '100%' }}
-                  >
-                    {listUnit?.map((unit, index) => (
-                      <Select.Option key={index} value={unit?.unitID}>
-                        {unit?.unitName}
-                      </Select.Option>
-                    ))}
-                  </Select>
+                  <Input placeholder="Nhập đơn vị tính..." />
                 </Form.Item>
               </Col>
               <Col xs={12}>

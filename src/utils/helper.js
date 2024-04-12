@@ -326,7 +326,10 @@ export function isMdScreen() {
   }
   return false;
 }
-export const formattingVND = (num) => {
+function isString(x) {
+  return Object.prototype.toString.call(x) === '[object String]';
+}
+export const formattingVND = (num,label = 'vnđ') => {
   if (isString(num) && num?.includes('.')) {
     const rs = num + ' vnđ';
     return rs.replace(',', '.');
@@ -336,7 +339,7 @@ export const formattingVND = (num) => {
     return 0 + ' vnđ';
   }
   let result = number.toLocaleString('it-IT', { style: 'currency', currency: 'VND' });
-  return isMobile() ? result.replace('VND', 'đ') : result.replace('VND', 'vnđ');
+  return isMobile() ? result.replace('VND', 'đ') : result.replace('VND', label);
 };
 
 export const ROLE_ACC = {

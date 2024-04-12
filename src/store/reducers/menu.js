@@ -2,12 +2,16 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 // initial state
+const cartString = localStorage.getItem('CART');
+const cart = cartString ? JSON.parse(cartString) : [];
+
 const initialState = {
   openItem: ['dashboard'],
   defaultId: 'dashboard',
   openComponent: 'buttons',
   drawerOpen: false,
-  componentDrawerOpen: true
+  componentDrawerOpen: true,
+  cart: cart
 };
 
 // ==============================|| SLICE - MENU ||============================== //
@@ -30,10 +34,44 @@ const menu = createSlice({
 
     openComponentDrawer(state, action) {
       state.componentDrawerOpen = action.payload.componentDrawerOpen;
+    },
+    addToCart(state, action) {
+      const newProduct = action.payload.cart;
+      let isContain = false;
+      let findProduct = state.cart?.map((product) => {
+        if (product?.productID === newProduct?.productID) {
+          isContain = true;
+          return {
+            ...product,
+            quantity: parseInt(product?.quantity) + parseInt(newProduct?.quantity)
+          };
+        }
+        return product;
+      });
+      if (!isContain) {
+        findProduct = state?.cart?.concat([newProduct]);
+      }
+      localStorage.setItem('CART', JSON.stringify(findProduct));
+      state.cart = findProduct;
+    },
+    changeQuantityProduct(state, action) {
+      const { quantity, productID } = action.payload.product;
+      // let isContain = false;
+      let findProduct = state.cart?.map((product) => {
+        if (product?.productID === productID) {
+          return {
+            ...product,
+            quantity: quantity
+          };
+        }
+        return product;
+      });
+      localStorage.setItem('CART', JSON.stringify(findProduct));
+      state.cart = findProduct;
     }
   }
 });
 
 export default menu.reducer;
 
-export const { activeItem, activeComponent, openDrawer, openComponentDrawer } = menu.actions;
+export const { activeItem, activeComponent, openDrawer, openComponentDrawer, addToCart, changeQuantityProduct } = menu.actions;

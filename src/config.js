@@ -12,7 +12,8 @@ const config = {
   dateFormat: 'DD/MM/YYYY',
   hourFormat: 'HH:mm',
   colorLogo: '#005494',
-  urlImageSever: process.env.REACT_APP_PREFIX_IMAGE + '/'
+  urlImageSever: process.env.REACT_APP_PREFIX_IMAGE + '/',
+  sizePageOption: ['10', '30', '50', '100'],
 };
 
 export default config;

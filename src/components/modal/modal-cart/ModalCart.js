@@ -9,11 +9,18 @@ import { PlusOutlined, MinusOutlined, DeleteOutlined, DoubleRightOutlined } from
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import { useTranslation } from 'react-i18next';
-import { isMobile } from 'utils/helper';
+import { formattingVND, isMobile } from 'utils/helper';
 import './modalcart.css';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { changeQuantityProduct } from 'store/reducers/menu';
+
+import config from 'config';
 
 const ModalCart = ({ open, handleClose }) => {
   const [disabled, setDisabled] = useState(true);
+  const dispatch = useDispatch();
+
   const [bounds, setBounds] = useState({
     left: 0,
     top: 0,
@@ -39,28 +46,23 @@ const ModalCart = ({ open, handleClose }) => {
       bottom: clientHeight - (targetRect.bottom - uiData.y)
     });
   };
+  const { cart } = useSelector((state) => state.menu);
 
-  const products = [
-    {
-      image:
-        'https://www.baohoxanh.com/pub/media/catalog/product/cache/6777b4a684641b0f3702baec659d116f/g/a/gang-tay-cao-su-nitrile-gps0002.jpg',
-      title: 'Găng tay cao su 123',
-      price: 123567,
-      unit: 'Cái'
-    },
-    {
-      image: 'https://moriitalia.com/images/thumbs/001/0010959_moi-binh-giu-nhiet-la-fonte-500ml-mau-den-180695_700.jpeg',
-      title: '[MỚI] Bình giữ nhiệt La Fonte 500ml màu đen - 180695',
-      price: 120000,
-      unit: 'Chai'
-    },
-    {
-      image: 'https://moriitalia.com/images/thumbs/001/0010959_moi-binh-giu-nhiet-la-fonte-500ml-mau-den-180695_700.jpeg',
-      title: '[MỚI] Bình giữ nhiệt La Fonte 500ml màu đen - 180695',
-      price: 120000,
-      unit: 'Chai'
+  const onChangeQuantity = (type, item) => {
+    switch (type) {
+      case 'minus':
+        dispatch(changeQuantityProduct({ product: { productID: item?.productID, quantity: parseInt(item?.quantity) - 1 } }));
+
+        break;
+      case 'plus':
+        dispatch(changeQuantityProduct({ product: { productID: item?.productID, quantity: parseInt(item?.quantity) + 1 } }));
+
+        break;
+
+      default:
+        break;
     }
-  ];
+  };
 
   return (
     <>
@@ -93,7 +95,7 @@ const ModalCart = ({ open, handleClose }) => {
             onBlur={() => {}}
             // end
           >
-            Cart Shopping
+            Your Cart
           </div>
         }
         open={open}
@@ -111,7 +113,17 @@ const ModalCart = ({ open, handleClose }) => {
             <Flex style={{ paddingTop: '10px' }} justify="space-between" align="center">
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <Text style={{ fontSize: '17px', fontWeight: 'bold' }}>Total: </Text>
-                <Text style={{ fontSize: '17px', color: '#005494', fontWeight: 'bold' }}>14.000.000đ</Text>
+                <Text style={{ fontSize: '17px', color: '#005494', fontWeight: 'bold' }}>
+                  {cart
+                    ? formattingVND(
+                        cart.reduce(
+                          (accumulator, currentValue) => accumulator + parseInt(currentValue?.price) * parseInt(currentValue?.quantity),
+                          0
+                        ),
+                        'đ'
+                      )
+                    : ''}
+                </Text>
               </div>
               <div>
                 {/* <CancelBtn /> */}
@@ -158,7 +170,7 @@ const ModalCart = ({ open, handleClose }) => {
           </Row>
           {/* <Divider style={{ margin: '0px', color: '#ddd' }} /> */}
           <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-            {products.map((item, index) => (
+            {cart?.map((item, index) => (
               <Row key={index} style={{ display: 'flex', alignItems: 'center', padding: '5px 0px', borderBottom: '1px solid #ddd' }}>
                 <Col xs={2}>
                   <Flex align={'center'}>
@@ -167,7 +179,12 @@ const ModalCart = ({ open, handleClose }) => {
                 </Col>
                 <Col xs={12} sm={6}>
                   <Flex align={'center'}>
-                    <Avatar shape="square" style={{ width: 60 }} size={60} src={<img src={item.image} alt="avatar" />} />
+                    <Avatar
+                      shape="square"
+                      style={{ width: 60 }}
+                      size={60}
+                      src={<img src={item?.images[0] ? config.urlImageSever + item?.images[0]?.url : ''} alt="avatar" />}
+                    />
                     <div style={{ marginLeft: '10px' }}>
                       <div style={{ fontSize: '15px', fontWeight: 'bold' }}>{item.title}</div>
                       <Text type="secondary">{isMobile() ? `${item.price}/${item.unit}` : item.unit}</Text>
@@ -176,7 +193,14 @@ const ModalCart = ({ open, handleClose }) => {
                 </Col>
                 <Col xs={8}>
                   <Flex justify={'center'} align={'center'}>
-                    <Button size="small" icon={<MinusOutlined />} shape="circle"></Button>
+                    <Button
+                      onClick={() => {
+                        onChangeQuantity('plus');
+                      }}
+                      size="small"
+                      icon={<MinusOutlined />}
+                      shape="circle"
+                    ></Button>
                     <input
                       style={{
                         width: '30px',
@@ -186,18 +210,25 @@ const ModalCart = ({ open, handleClose }) => {
                         border: '1px solid #ddd',
                         outline: 'none'
                       }}
-                      value={10}
+                      value={item?.quantity}
                     />
-                    <Button size="small" icon={<PlusOutlined />} shape="circle"></Button>
+                    <Button
+                      onClick={() => {
+                        onChangeQuantity('minus', item);
+                      }}
+                      size="small"
+                      icon={<PlusOutlined />}
+                      shape="circle"
+                    ></Button>
                   </Flex>
                 </Col>
                 {!isMobile() && (
                   <>
                     <Col style={{ textAlign: 'right' }} xs={3}>
-                      <Text strong>{item.price}</Text>
+                      <Text strong>{formattingVND(item.price, '')}</Text>
                     </Col>
                     <Col style={{ textAlign: 'right' }} xs={3}>
-                      <Text strong>4.155.000</Text>
+                      <Text strong>{formattingVND(parseInt(item.price) * parseInt(item?.quantity), '')}</Text>
                     </Col>
                   </>
                 )}

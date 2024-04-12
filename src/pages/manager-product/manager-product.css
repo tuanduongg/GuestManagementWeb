@@ -1,19 +1,24 @@
 .ant-image-preview-mask {
-    z-index: 2000 !important;
+  z-index: 2000 !important;
 }
-.ant-image-preview-wrap{
-    z-index: 2001 !important;
+.ant-image-preview-wrap {
+  z-index: 2001 !important;
 }
 .ant-image-preview-operations-wrapper {
-    
-    z-index: 2001 !important;
+  z-index: 2001 !important;
 }
 .trancated-text {
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
- .ant-image-preview-operations {
-    background-color: #333 !important;
- }
+.ant-image-preview-operations {
+  background-color: #333 !important;
+}
+
+@media only screen and (max-width: 576px) {
+  .ant-pagination .ant-pagination-options {
+    display: block;
+  }
+}

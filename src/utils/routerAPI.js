@@ -38,13 +38,20 @@ export const RouterAPI = {
   addProduct: '/product/add',
   editProduct: '/product/edit',
   updateProduct: '/product/update',
-  deleteProduct: '/product/delete',
+  deleteProducts: '/product/delete',
   changePublicProduct: '/product/changePublic',
   upLoadExcel: '/product/uploadExcel',
 
   getAllUnit: '/unit/all',
 
-  getAllCategory: 'category/all',
+
+  allDepartment: '/department/all',
+  addDepartment: '/department/add',
+  updateDepartment: '/department/update',
+
+  getAllCategory: '/category/all',
+  addCategory: '/category/add',
+  updateCategory: '/category/update',
 
   deleteImageByID: 'image/delete'
 };

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
-import { Input, Modal, App, Row, Col, Typography, Image, Flex, Button } from 'antd';
+import { Input, Modal, App, Row, Col, Typography, Image, Flex, Button, message } from 'antd';
 const { Title } = Typography;
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination } from 'swiper/modules';
@@ -9,17 +9,23 @@ import 'swiper/css/pagination';
 // assets
 import { PlusOutlined, MinusOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { ROLE_ACC, STATUS_ACC, isMobile } from 'utils/helper';
-import restApi from 'utils/restAPI';
-import { RouterAPI } from 'utils/routerAPI';
 import { useTranslation } from 'react-i18next';
 import './detail_product.css';
-const ModalDetailProduct = ({ open, handleClose }) => {
+import config from 'config';
+import { addToCart } from 'store/reducers/menu';
+import { useDispatch, useSelector } from 'react-redux';
+
+const ModalDetailProduct = ({ open, handleClose, product }) => {
   const [quantity, setQuantity] = useState(1);
   const [openModalAdd, setOpenModalAdd] = useState(false);
   const { modal } = App.useApp();
   const { t } = useTranslation();
+  const { cart } = useSelector((state) => state.menu);
+  const dispatch = useDispatch();
+
   const handleOk = (e) => {};
   const handleCancel = (e) => {
+    setQuantity(1);
     handleClose();
   };
   const onChangeInput = (e) => {};
@@ -27,6 +33,8 @@ const ModalDetailProduct = ({ open, handleClose }) => {
     if (parseInt(quantity) < 1 || isNaN(parseInt(quantity))) {
       setQuantity(1);
     }
+    dispatch(addToCart({ cart: { ...product, quantity: quantity } }));
+    message.success('Add to cart successful!');
   };
 
   return (
@@ -49,26 +57,25 @@ const ModalDetailProduct = ({ open, handleClose }) => {
           <Row style={{ height: '100%' }} gutter={24}>
             <Col style={{ height: '100%' }} xs={24} sm={12}>
               <Swiper pagination={true} modules={[Pagination]} className="mySwiper">
-                <SwiperSlide>
-                  <Image
-                    height={'100%'}
-                    alt={'image'}
-                    style={{ objectFit: 'cover', cursor: 'pointer' }}
-                    src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-                  />
-                </SwiperSlide>
+                {product?.images?.map((item, index) => (
+                  <SwiperSlide key={index}>
+                    <Image
+                      height={'100%'}
+                      alt={item?.title}
+                      style={{ objectFit: 'cover', cursor: 'pointer' }}
+                      src={config.urlImageSever + item?.url}
+                    />
+                  </SwiperSlide>
+                ))}
               </Swiper>
             </Col>
             <Col xs={24} style={{ position: 'relative' }} sm={12}>
-              <Title level={4}>Editable text with a custom enter icon in edit field</Title>
+              <Title level={4}>{product?.productName}</Title>
               <Title style={{ color: '#005494', fontWeight: 'bold' }} level={4}>
-                5.125.000 vnđ/Cái
+                {`${product?.price}/${product?.unit}`}
               </Title>
               <Title level={5}>Description:</Title>
-              <div>
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the standard dummy text ever
-                since the 1500s,
-              </div>
+              <div>{product?.description}</div>
               <Row style={{ position: isMobile() ? '' : 'absolute', bottom: 20, margin: '10px 0px' }} gutter={16}>
                 <Col xs={10}>
                   <Flex justify={'center'} align={'center'}>
@@ -140,7 +147,6 @@ const ModalDetailProduct = ({ open, handleClose }) => {
           </Row>
         </div>
       </Modal>
-     
     </>
   );
 };
