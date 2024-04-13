@@ -3,9 +3,10 @@ import Draggable from 'react-draggable';
 import { Input, Modal, App, Row, Col, Typography, Image, Flex, Button, message } from 'antd';
 const { Title } = Typography;
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper/modules';
+import { Pagination,Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 // assets
 import { PlusOutlined, MinusOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { ROLE_ACC, STATUS_ACC, isMobile } from 'utils/helper';
@@ -56,7 +57,7 @@ const ModalDetailProduct = ({ open, handleClose, product }) => {
         <div style={{ minWidth: '100%', height: 'auto', minHeight: '400px' }}>
           <Row style={{ height: '100%' }} gutter={24}>
             <Col style={{ height: '100%' }} xs={24} sm={12}>
-              <Swiper pagination={true} modules={[Pagination]} className="mySwiper">
+              <Swiper pagination={true} navigation={true} modules={[Pagination,Navigation]} className="mySwiper">
                 {product?.images?.map((item, index) => (
                   <SwiperSlide key={index}>
                     <Image

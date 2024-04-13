@@ -49,9 +49,10 @@ const ModalCart = ({ open, handleClose }) => {
   const { cart } = useSelector((state) => state.menu);
 
   const onChangeQuantity = (type, item) => {
+    const newQuantityMinus = parseInt(item?.quantity) - 1;
     switch (type) {
       case 'minus':
-        dispatch(changeQuantityProduct({ product: { productID: item?.productID, quantity: parseInt(item?.quantity) - 1 } }));
+        dispatch(changeQuantityProduct({ product: { productID: item?.productID, quantity: newQuantityMinus < 0 ? 1 : newQuantityMinus } }));
 
         break;
       case 'plus':
@@ -61,6 +62,17 @@ const ModalCart = ({ open, handleClose }) => {
 
       default:
         break;
+    }
+  };
+
+  const onChangeInputQuantity = (e, item) => {
+    const { value } = e.target;
+    if (/^\d*$/g.test(value)) {
+      let valueNum = parseInt(value);
+      if (isNaN(valueNum)) {
+        valueNum = 1;
+      }
+      dispatch(changeQuantityProduct({ product: { productID: item?.productID, quantity: valueNum } }));
     }
   };
 
@@ -169,7 +181,7 @@ const ModalCart = ({ open, handleClose }) => {
             <Col style={{ textTransform: 'uppercase', textAlign: 'right' }} xs={1}></Col>
           </Row>
           {/* <Divider style={{ margin: '0px', color: '#ddd' }} /> */}
-          <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+          <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
             {cart?.map((item, index) => (
               <Row key={index} style={{ display: 'flex', alignItems: 'center', padding: '5px 0px', borderBottom: '1px solid #ddd' }}>
                 <Col xs={2}>
@@ -195,13 +207,16 @@ const ModalCart = ({ open, handleClose }) => {
                   <Flex justify={'center'} align={'center'}>
                     <Button
                       onClick={() => {
-                        onChangeQuantity('plus');
+                        onChangeQuantity('minus', item);
                       }}
                       size="small"
                       icon={<MinusOutlined />}
                       shape="circle"
                     ></Button>
                     <input
+                      onChange={(e) => {
+                        onChangeInputQuantity(e, item);
+                      }}
                       style={{
                         width: '30px',
                         margin: '0px 10px',
@@ -214,7 +229,7 @@ const ModalCart = ({ open, handleClose }) => {
                     />
                     <Button
                       onClick={() => {
-                        onChangeQuantity('minus', item);
+                        onChangeQuantity('plus', item);
                       }}
                       size="small"
                       icon={<PlusOutlined />}
