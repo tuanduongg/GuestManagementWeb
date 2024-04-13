@@ -5,9 +5,15 @@
 .ant-modal-footer {
     /* display: none; */
 }
-.detail-modal > .ant-modal-content {
+
+.detail-modal>.ant-modal-content {
     padding: 10px !important;
 }
+
 .no-border-radius {
-    border-radius: 0; /* Set border-radius to 0 */
-  }
+    border-radius: 0;
+    /* Set border-radius to 0 */
+}
+.swiper-slide {
+    min-height: 500px;
+}

@@ -54,6 +54,11 @@ const menu = createSlice({
       localStorage.setItem('CART', JSON.stringify(findProduct));
       state.cart = findProduct;
     },
+    setCart(state, action) {
+      const newCart = action.payload.cart;
+      localStorage.setItem('CART', JSON.stringify(newCart));
+      state.cart = newCart;
+    },
     changeQuantityProduct(state, action) {
       const { quantity, productID } = action.payload.product;
       // let isContain = false;
@@ -74,4 +79,4 @@ const menu = createSlice({
 
 export default menu.reducer;
 
-export const { activeItem, activeComponent, openDrawer, openComponentDrawer, addToCart, changeQuantityProduct } = menu.actions;
+export const { activeItem, activeComponent, openDrawer, openComponentDrawer, addToCart, changeQuantityProduct,setCart } = menu.actions;

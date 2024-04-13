@@ -1,7 +1,11 @@
 .card-product>.ant-card-body {
-    padding: 0px !important;
-    background-color: #fafafb;
+    padding: 5px !important;
+    background-color: #FFFF;
     border: none;
+}
+
+.card-product {
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
 }
 
 .title-card-product {
@@ -35,7 +39,7 @@
 .card-product {
     border-radius: 0px;
     border: none;
-    background-color: #fafafb;
+    background-color: #FFFF;
 }
 
 .ant-card-cover img {

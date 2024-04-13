@@ -68,7 +68,7 @@ const Header = ({ open, handleDrawerToggle, showLogo }) => {
           <Logo />
         </div>
       )}
-      <div style={{ fontSize: '15px', minWidth: '200px', fontWeight: '500' }}>{t(`${currentPage}`)}</div>
+      <div style={{ fontSize: '15px', minWidth: '200px', fontWeight: '500',marginLeft:'5px' }}>{t(`${currentPage}`)}</div>
       {/* {(isMdScreen() || isMobile()) && (
         <IconButton
           disableRipple

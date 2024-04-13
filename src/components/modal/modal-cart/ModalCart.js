@@ -13,12 +13,18 @@ import { formattingVND, isMobile } from 'utils/helper';
 import './modalcart.css';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { changeQuantityProduct } from 'store/reducers/menu';
+import { addToCart, changeQuantityProduct, setCart } from 'store/reducers/menu';
 
 import config from 'config';
 
+const initialValidate = { err: false, message: '' };
+
 const ModalCart = ({ open, handleClose }) => {
   const [disabled, setDisabled] = useState(true);
+  const [name, setName] = useState('');
+  const [validateName, setValidateName] = useState(initialValidate);
+  const [department, setDepartment] = useState('');
+  const [validateDepartment, setValidateDepartment] = useState(initialValidate);
   const dispatch = useDispatch();
 
   const [bounds, setBounds] = useState({
@@ -30,7 +36,11 @@ const ModalCart = ({ open, handleClose }) => {
   const draggleRef = useRef(null);
 
   const { t } = useTranslation();
-  const handleCancel = (e) => {
+  const handleCancel = () => {
+    setValidateDepartment(initialValidate);
+    setValidateName(initialValidate);
+    setName('');
+    setDepartment('');
     handleClose();
   };
   const onStart = (_event, uiData) => {
@@ -52,27 +62,57 @@ const ModalCart = ({ open, handleClose }) => {
     const newQuantityMinus = parseInt(item?.quantity) - 1;
     switch (type) {
       case 'minus':
-        dispatch(changeQuantityProduct({ product: { productID: item?.productID, quantity: newQuantityMinus < 0 ? 1 : newQuantityMinus } }));
-
+        dispatch(changeQuantityProduct({ product: { productID: item?.productID, quantity: newQuantityMinus < 1 ? 1 : newQuantityMinus } }));
         break;
       case 'plus':
         dispatch(changeQuantityProduct({ product: { productID: item?.productID, quantity: parseInt(item?.quantity) + 1 } }));
-
         break;
 
       default:
         break;
     }
   };
+  const onDeleteRowOnCart = (prop) => {
+    const newArr = cart?.filter((item) => item?.productID !== prop?.productID);
+    dispatch(setCart({ cart: newArr }));
+  };
 
   const onChangeInputQuantity = (e, item) => {
     const { value } = e.target;
     if (/^\d*$/g.test(value)) {
       let valueNum = parseInt(value);
-      if (isNaN(valueNum)) {
+      if (isNaN(valueNum) || valueNum < 1) {
         valueNum = 1;
       }
       dispatch(changeQuantityProduct({ product: { productID: item?.productID, quantity: valueNum } }));
+    }
+  };
+  const onOrder = () => {
+    let check = false;
+    if (name?.trim() === '') {
+      check = true;
+      setValidateName({ err: true, message: 'Họ tên không được để trống!' })
+    }
+    if (department?.trim() === '') {
+      check = true;
+      setValidateDepartment({ err: true, message: 'Bộ phận không được để trống!' })
+    }
+    if (!check) {
+      alert('pass')
+    }
+  };
+  const onChangeInput = (e) => {
+    const { name, value } = e.target;
+    switch (name) {
+      case 'name':
+        setName(value);
+        break;
+      case 'department':
+        setDepartment(value);
+        break;
+
+      default:
+        break;
     }
   };
 
@@ -85,7 +125,7 @@ const ModalCart = ({ open, handleClose }) => {
         okText={t('Order now')}
         cancelText={t('close')}
         zIndex={1300}
-        width={800}
+        width={900}
         maskClosable={false}
         title={
           <div
@@ -103,17 +143,17 @@ const ModalCart = ({ open, handleClose }) => {
             }}
             // fix eslintjsx-a11y/mouse-events-have-key-events
             // https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/master/docs/rules/mouse-events-have-key-events.md
-            onFocus={() => {}}
-            onBlur={() => {}}
-            // end
+            onFocus={() => { }}
+            onBlur={() => { }}
+          // end
           >
             Your Cart
           </div>
         }
         open={open}
-        onOk={() => {}}
+        onOk={onOrder}
         onCancel={() => {
-          handleClose();
+          handleCancel();
         }}
         modalRender={(modal) => (
           <Draggable disabled={disabled} bounds={bounds} nodeRef={draggleRef} onStart={(event, uiData) => onStart(event, uiData)}>
@@ -128,12 +168,12 @@ const ModalCart = ({ open, handleClose }) => {
                 <Text style={{ fontSize: '17px', color: '#005494', fontWeight: 'bold' }}>
                   {cart
                     ? formattingVND(
-                        cart.reduce(
-                          (accumulator, currentValue) => accumulator + parseInt(currentValue?.price) * parseInt(currentValue?.quantity),
-                          0
-                        ),
-                        'đ'
-                      )
+                      cart.reduce(
+                        (accumulator, currentValue) => accumulator + parseInt(currentValue?.price) * parseInt(currentValue?.quantity),
+                        0
+                      ),
+                      'đ'
+                    )
                     : ''}
                 </Text>
               </div>
@@ -149,11 +189,25 @@ const ModalCart = ({ open, handleClose }) => {
           <Row gutter={24}>
             <Col xs={12}>
               Họ tên(<span style={{ color: 'red' }}>*</span>)
-              <Input placeholder="Nhập họ tên..." />
+              <Input
+                status={validateName?.err ? 'error' : ''}
+                value={name}
+                name="name"
+                onChange={onChangeInput}
+                placeholder="Nhập họ tên..."
+              />
+              {validateName?.err && <div style={{ color: 'red', marginLeft: '3px' }}>{validateName?.message}</div>}
             </Col>
             <Col xs={12}>
               Bộ phận(<span style={{ color: 'red' }}>*</span>)
-              <Input placeholder="Nhập bộ phận..." />
+              <Input
+                status={validateDepartment?.err ? 'error' : ''}
+                value={department}
+                name="department"
+                onChange={onChangeInput}
+                placeholder="Nhập bộ phận..."
+              />
+              {validateDepartment.err && <div style={{ color: 'red', marginLeft: '3px' }}>{validateDepartment?.message}</div>}
             </Col>
           </Row>
         </Card>
@@ -198,7 +252,7 @@ const ModalCart = ({ open, handleClose }) => {
                       src={<img src={item?.images[0] ? config.urlImageSever + item?.images[0]?.url : ''} alt="avatar" />}
                     />
                     <div style={{ marginLeft: '10px' }}>
-                      <div style={{ fontSize: '15px', fontWeight: 'bold' }}>{item.title}</div>
+                      <div style={{ fontSize: '15px', fontWeight: 'bold' }}>{item.productName}</div>
                       <Text type="secondary">{isMobile() ? `${item.price}/${item.unit}` : item.unit}</Text>
                     </div>
                   </Flex>
@@ -248,7 +302,15 @@ const ModalCart = ({ open, handleClose }) => {
                   </>
                 )}
                 <Col style={{ textTransform: 'uppercase', textAlign: 'right' }} xs={2}>
-                  <Button danger icon={<DeleteOutlined />} size="small" type="text"></Button>
+                  <Button
+                    danger
+                    onClick={() => {
+                      onDeleteRowOnCart(item);
+                    }}
+                    icon={<DeleteOutlined />}
+                    size="small"
+                    type="text"
+                  ></Button>
                 </Col>
               </Row>
             ))}

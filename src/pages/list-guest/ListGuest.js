@@ -215,7 +215,7 @@ const ListGuest = () => {
       key: 'guest_info',
       title: 'nameGuest_col',
       dataIndex: 'guest_info',
-      width: isMobile() ? 150 : role?.IS_ACCEPT ? '20%' : '33%',
+      width: isMobile() ? 150 : !role?.IS_ACCEPT ? '20%' : '33%',
       fixed: 'left',
 
       render: (_, data) => (

@@ -25,7 +25,7 @@ const CardProduct = ({ product, onClickProduct }) => {
               onClickProduct(product);
             }}
             alt={'image'}
-            style={{ objectFit: 'contain', cursor: 'pointer' }}
+            style={{ objectFit: 'cover', cursor: 'pointer' }}
             src={product?.images[0] ? config.urlImageSever + product?.images[0]?.url : ''}
             fallback={urlFallBack}
           />
