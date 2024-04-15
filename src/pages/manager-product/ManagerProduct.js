@@ -1,6 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Tabs } from 'antd';
-import { Table, Row, Col, Typography, Segmented, Space, Button, message, Modal, Input, Dropdown, Select, Switch, Image } from 'antd';
+import {
+  Table,
+  Row,
+  Col,
+  Typography,
+  Segmented,
+  Space,
+  Button,
+  message,
+  Modal,
+  Input,
+  Dropdown,
+  Select,
+  Switch,
+  Image,
+  notification
+} from 'antd';
 const { Search } = Input;
 import { formattingVND, isMobile, truncateString } from 'utils/helper';
 import ForbidenPage from 'components/403/ForbidenPage';
@@ -29,12 +45,13 @@ const { Title, Link } = Typography;
 import './manager-product.css';
 import ModalAddProduct from 'components/modal/modal-add-product/ModalAddProduct';
 import ModalCategory from 'components/modal/category/ModalCategory';
+import ExcelJS from 'exceljs';
 
 const ManagerProduct = () => {
   const [role, setRole] = useState(null);
   const [openModalAdd, setOpenModalAdd] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [messageApi, contextHolder] = message.useMessage();
+  const [messageApi] = message.useMessage();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [openModalCategory, setOpenModalCategory] = useState(false);
   const [openModalUnit, setOpenModalUnit] = useState(false);
@@ -48,6 +65,8 @@ const ManagerProduct = () => {
   const [selectCategory, setSelectCatgory] = useState('');
   const [typeModal, setTypeModal] = useState('');
   const [currentRow, setCurrentRow] = useState(null);
+  const inputRef = useRef();
+  const [api, contextHolder] = notification.useNotification();
 
   const getAllProduct = async () => {
     setLoading(true);
@@ -79,6 +98,7 @@ const ManagerProduct = () => {
   const handleMenuClick = (e) => {
     switch (e.key) {
       case 'importExcel':
+        inputRef?.current?.click();
         break;
       case 'delete':
         Modal.confirm({
@@ -117,7 +137,7 @@ const ManagerProduct = () => {
           cancelText: t('close'),
           centered: true,
           icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
-          onOk: async () => {}
+          onOk: async () => { }
         });
         break;
       case 'catgory':
@@ -151,12 +171,125 @@ const ManagerProduct = () => {
       message.error(rest?.data?.message ?? 'Change status fail!');
     }
   };
-  const onChangeStatus = async (checked) => {};
+  const onChangeStatus = async (checked) => { };
   const getAllCategory = async () => {
     const res = await restApi.get(RouterAPI.getAllCategory);
     if (res?.status === 200) {
       setCategories(res?.data);
     }
+  };
+  const openNotificationWithIcon = (description) => {
+    const key = `open${Date.now()}`;
+    const btn = (
+      <Space>
+        <Button type="link" size="small" onClick={() => api.destroy()}>
+          Clear All
+        </Button>
+      </Space>
+    );
+    api['error']({
+      message: 'Thông báo',
+      description: description,
+      placement: 'bottomRight',
+      duration: 0,
+      btn
+    });
+  };
+
+  const handleSave = async (data) => {
+    const rest = await restApi.post(RouterAPI.upLoadExcelProduct, data);
+    console.log('rest', rest)
+  }
+
+  const handleFileUploadExcel = (event) => {
+    const file = event.target.files[0];
+    event.target.value = '';
+
+    // Ensure a file is selected
+    if (!file) {
+      return;
+    }
+    // Read the uploaded Excel file
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      let filesUpload = e.target.result;
+      const data = new Uint8Array(filesUpload);
+
+      // Parse the Excel file
+      const workbook = new ExcelJS.Workbook();
+      workbook.xlsx.load(data).then(async () => {
+        var formData = new FormData();
+        const worksheet = workbook.getWorksheet(1);
+        // workbook.eachSheet((worksheet, sheetId) => {
+        for (const image of worksheet.getImages()) {
+          // fetch the media item with the data (it seems the imageId matches up with m.index?)
+          const img = workbook.model.media.find((m) => m.index === image.imageId);
+          img.name = image.range.tl.nativeRow + '_' + img.name;
+          console.log('img',img)
+          // Chuyển đổi dữ liệu buffer của ảnh thành Uint8Array
+          const imageData = new Uint8Array(img.buffer.data);
+
+          // Tạo Blob từ Uint8Array
+          const imageBlob = new Blob(imageData, { type: `image/${img.extension}` }); // Tạo Blob từ Uint8Array
+
+          // Thêm blob vào FormData
+          formData.append('files', imageBlob, `${img.name}.jpg`);
+
+          // console.log(`${image.range.tl.nativeRow}.${image.range.tl.nativeCol}.${img.name}.${img.extension}`, img.buffer);
+        }
+        // console.log('count', worksheet.rowCount)
+        const rowData = [];
+
+        for (let rowNumber = 1; rowNumber <= worksheet.rowCount; rowNumber++) {
+          const row = worksheet.getRow(rowNumber);
+          const values = row.values;
+          let check = true;
+
+          if (rowNumber >= 6) {
+            if (values?.length === 9) {
+              const nameProduct = row.getCell('B').value; //4
+              const unit = row.getCell('C').value; //3
+              const price = parseFloat(row.getCell('D').value); //5
+              const inventory = parseInt(row.getCell('E').value); //8
+              // const image = row.getCell('F').value; //6
+              const desciption = row.getCell('G').value; //7
+              const category = row.getCell('H').value; //7
+              if (isNaN(price)) {
+                openNotificationWithIcon(`Sai định dạng tại cột D,Hàng ${rowNumber}`);
+                check = false;
+                return false;
+              }
+              if (isNaN(inventory)) {
+                openNotificationWithIcon(`Sai định dạng tại cột E,Hàng ${rowNumber}`);
+                check = false;
+                return false;
+              }
+              rowData.push({
+                productName: nameProduct,
+                price: `${price}`,
+                description: desciption,
+                inventory: +inventory,
+                categoryID: category,
+                unit: unit,
+                isShow: true
+              });
+            } else {
+              openNotificationWithIcon(`File không đúng định dạng tại Hàng ${rowNumber}`);
+              return;
+            }
+
+          }
+          if (!check) {
+            break;
+          }
+          // sai format
+        }
+        formData.append('data', JSON.stringify(rowData));
+        const rest = await restApi.post(RouterAPI.upLoadExcelProduct, formData);
+        console.log('rest', rest)
+      });
+    };
+    reader.readAsArrayBuffer(file);
   };
 
   useEffect(() => {
@@ -238,7 +371,7 @@ const ManagerProduct = () => {
               </Col>
             )}
             <Col xs={24} sm={18}>
-              <Link onClick={() => {}}>{data?.productName}</Link>
+              <Link onClick={() => { }}>{data?.productName}</Link>
             </Col>
           </Row>
         </>
@@ -277,11 +410,11 @@ const ManagerProduct = () => {
       filters:
         categories?.length > 0
           ? categories?.map((item) => {
-              return {
-                text: item?.categoryName,
-                value: item?.categoryID
-              };
-            })
+            return {
+              text: item?.categoryName,
+              value: item?.categoryID
+            };
+          })
           : [],
       filterMode: 'tree',
       filterSearch: true,
@@ -392,18 +525,18 @@ const ManagerProduct = () => {
               options={
                 categories?.length > 0
                   ? [
-                      {
-                        label: 'All',
-                        value: ''
-                      }
-                    ].concat(
-                      categories?.map((item) => {
-                        return {
-                          label: item?.categoryName,
-                          value: item?.categoryID
-                        };
-                      })
-                    )
+                    {
+                      label: 'All',
+                      value: ''
+                    }
+                  ].concat(
+                    categories?.map((item) => {
+                      return {
+                        label: item?.categoryName,
+                        value: item?.categoryID
+                      };
+                    })
+                  )
                   : []
               }
             />
@@ -454,9 +587,9 @@ const ManagerProduct = () => {
               scroll={
                 isMobile()
                   ? {
-                      x: '100vh',
-                      y: '65vh'
-                    }
+                    x: '100vh',
+                    y: '65vh'
+                  }
                   : { x: null, y: '55vh' }
               }
               columns={columns}
@@ -489,6 +622,7 @@ const ManagerProduct = () => {
         categories={categories}
         onAfterSave={onAfterSaveProduct}
       />
+      <input type="file" ref={inputRef} hidden onChange={handleFileUploadExcel} />
       <ModalCategory
         categories={categories}
         afterSave={() => {

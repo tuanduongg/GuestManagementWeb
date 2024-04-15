@@ -163,6 +163,7 @@ const ModalAddProduct = ({ open, handleClose, categories, typeModal, setLoading,
   };
   const onRemoveImage = (file) => {
     modal.confirm({
+      centered: true,
       title: 'Thông báo',
       content: 'Bạn chắc chắn muốn xóa ảnh này',
       okText: 'Yes',
@@ -309,7 +310,7 @@ const ModalAddProduct = ({ open, handleClose, categories, typeModal, setLoading,
             >
               <TextArea rows={2} />
             </Form.Item>
-            <Form.Item label="Upload" valuePropName="fileList" getValueFromEvent={normFile}>
+            <Form.Item label="Hình ảnh" valuePropName="fileList" getValueFromEvent={normFile}>
               <Upload
                 onRemove={onRemoveImage}
                 fileList={fileList}

@@ -133,7 +133,7 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
                 </Button>
               </Grid>
             </Grid>
-            <Grid container>
+            <Grid container sx={{marginTop:'10px'}}>
               <Grid item xs={12}>
                 <TableCategory
                   onClickDelete={handleClickDeleteRow}

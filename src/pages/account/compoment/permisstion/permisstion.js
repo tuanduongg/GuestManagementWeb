@@ -53,7 +53,7 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
             return (
               <>
                 <Row key={index}>
-                  <Col span={9}>{roleItem?.permisstions[index]?.SCREEN}</Col>
+                  <Col span={3}>{roleItem?.permisstions[index]?.SCREEN}</Col>
                   <Col className="center-text" span={SPAN}>
                     <Checkbox
                       onChange={(e) => {
@@ -88,6 +88,24 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
                       }}
                       name="IS_DELETE"
                       checked={roleItem?.permisstions[index]?.IS_DELETE}
+                    />
+                  </Col>
+                  <Col className="center-text" span={SPAN}>
+                    <Checkbox
+                      onChange={(e) => {
+                        onChangeCheckbox(e, index, roleItem?.ROLE_ID);
+                      }}
+                      name="IS_IMPORT"
+                      checked={roleItem?.permisstions[index]?.IS_IMPORT}
+                    />
+                  </Col>
+                  <Col className="center-text" span={SPAN}>
+                    <Checkbox
+                      onChange={(e) => {
+                        onChangeCheckbox(e, index, roleItem?.ROLE_ID);
+                      }}
+                      name="IS_EXPORT"
+                      checked={roleItem?.permisstions[index]?.IS_EXPORT}
                     />
                   </Col>
                   <Col className="center-text" span={SPAN}>
@@ -130,7 +148,7 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
     <>
       {contextHolder}
       <Row style={{ marginBottom: '5px' }}>
-        <Col span={9}>
+        <Col span={SPAN}>
           <strong style={{ marginLeft: '10px' }}></strong>
         </Col>
         <Col className="center-text" span={SPAN}>
@@ -144,6 +162,12 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
         </Col>
         <Col className="center-text" span={SPAN}>
           <strong>Delete</strong>
+        </Col>
+        <Col className="center-text" span={SPAN}>
+          <strong>Import</strong>
+        </Col>
+        <Col className="center-text" span={SPAN}>
+          <strong>Export</strong>
         </Col>
         <Col className="center-text" span={SPAN}>
           <strong>Accept</strong>

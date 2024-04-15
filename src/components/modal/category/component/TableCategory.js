@@ -13,6 +13,12 @@ const columns = [
     label: 'Department',
     // minWidth: 170,
     align: 'left'
+  },
+  {
+    id: 'copy',
+    label: '',
+    // minWidth: 170,
+    align: 'center'
   }
 ];
 
@@ -65,6 +71,7 @@ const TableCategory = ({ listCategory, changeSelectedRow, selectedRow, onClickDe
                     >
                       <TableCell sx={{ padding: '5px', textAlign: 'center' }}>{index + 1}</TableCell>
                       <TableCell sx={{ padding: '5px', textAlign: 'left' }}>{row?.categoryName}</TableCell>
+                      <TableCell sx={{ padding: '5px', textAlign: 'center' }}>copy</TableCell>
                     </TableRow>
                   );
                 })

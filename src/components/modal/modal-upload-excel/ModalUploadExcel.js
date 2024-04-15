@@ -252,7 +252,6 @@ const ModalUploadExcel = ({ open, handleClose, afterSave, setLoading }) => {
           name="file"
           accept=".xlsx"
           beforeUpload={(file) => {
-            console.log('file', file);
             if (!checkIsExcelFile(file?.type)) {
               message.error('Only Excel files (.xlsx) are allowed!');
               return Upload.LIST_IGNORE;

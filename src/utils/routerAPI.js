@@ -40,7 +40,7 @@ export const RouterAPI = {
   updateProduct: '/product/update',
   deleteProducts: '/product/delete',
   changePublicProduct: '/product/changePublic',
-  upLoadExcel: '/product/uploadExcel',
+  upLoadExcelProduct: '/product/uploadExcel',
 
   getAllUnit: '/unit/all',
 
