@@ -201,7 +201,7 @@ const ManagerProduct = () => {
     console.log('rest', rest)
   }
 
-  const handleFileUploadExcel = (event) => {
+  const handleFileUploadExcel = async (event) => {
     const file = event.target.files[0];
     event.target.value = '';
 
@@ -209,87 +209,92 @@ const ManagerProduct = () => {
     if (!file) {
       return;
     }
+    var formData = new FormData();
+    formData.append('file', file);
+    const rest = await restApi.post(RouterAPI.upLoadExcelProduct, formData);
+    console.log('rest', rest)
     // Read the uploaded Excel file
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      let filesUpload = e.target.result;
-      const data = new Uint8Array(filesUpload);
+    // const reader = new FileReader();
+    // reader.onload = (e) => {
+    //   let filesUpload = e.target.result;
+    //   const data = new Uint8Array(filesUpload);
 
-      // Parse the Excel file
-      const workbook = new ExcelJS.Workbook();
-      workbook.xlsx.load(data).then(async () => {
-        var formData = new FormData();
-        const worksheet = workbook.getWorksheet(1);
-        // workbook.eachSheet((worksheet, sheetId) => {
-        for (const image of worksheet.getImages()) {
-          // fetch the media item with the data (it seems the imageId matches up with m.index?)
-          const img = workbook.model.media.find((m) => m.index === image.imageId);
-          img.name = image.range.tl.nativeRow + '_' + img.name;
-          console.log('img',img)
-          // Chuyển đổi dữ liệu buffer của ảnh thành Uint8Array
-          const imageData = new Uint8Array(img.buffer.data);
+    //   // Parse the Excel file
+    //   const workbook = new ExcelJS.Workbook();
+    //   workbook.xlsx.load(data).then(async () => {
+    //     var formData = new FormData();
+    //     const worksheet = workbook.getWorksheet(1);
+    //     // workbook.eachSheet((worksheet, sheetId) => {
+    //     for (const image of worksheet.getImages()) {
+    //       // fetch the media item with the data (it seems the imageId matches up with m.index?)
+    //       const img = workbook.model.media.find((m) => m.index === image.imageId);
+    //       img.name = image.range.tl.nativeRow + '_' + img.name;
+    //       console.log('image',image)
+    //       // Chuyển đổi dữ liệu buffer của ảnh thành Uint8Array
+    //       const imageData = new Uint8Array(img.buffer.data);
+    //       const base64ImageData = image.image;
+    //       // Tạo Blob từ Uint8Array
+    //       console.log('base64ImageData',base64ImageData)
+    //       const imageBlob = new Blob(imageData, { type: `image/${img.extension}` }); // Tạo Blob từ Uint8Array
 
-          // Tạo Blob từ Uint8Array
-          const imageBlob = new Blob(imageData, { type: `image/${img.extension}` }); // Tạo Blob từ Uint8Array
+    //       // Thêm blob vào FormData
+    //       formData.append('files', imageBlob, `${img.name}.jpg`);
 
-          // Thêm blob vào FormData
-          formData.append('files', imageBlob, `${img.name}.jpg`);
+    //       // console.log(`${image.range.tl.nativeRow}.${image.range.tl.nativeCol}.${img.name}.${img.extension}`, img.buffer);
+    //     }
+    //     // console.log('count', worksheet.rowCount)
+    //     const rowData = [];
 
-          // console.log(`${image.range.tl.nativeRow}.${image.range.tl.nativeCol}.${img.name}.${img.extension}`, img.buffer);
-        }
-        // console.log('count', worksheet.rowCount)
-        const rowData = [];
+    //     for (let rowNumber = 1; rowNumber <= worksheet.rowCount; rowNumber++) {
+    //       const row = worksheet.getRow(rowNumber);
+    //       const values = row.values;
+    //       let check = true;
 
-        for (let rowNumber = 1; rowNumber <= worksheet.rowCount; rowNumber++) {
-          const row = worksheet.getRow(rowNumber);
-          const values = row.values;
-          let check = true;
+    //       if (rowNumber >= 6) {
+    //         if (values?.length === 9) {
+    //           const nameProduct = row.getCell('B').value; //4
+    //           const unit = row.getCell('C').value; //3
+    //           const price = parseFloat(row.getCell('D').value); //5
+    //           const inventory = parseInt(row.getCell('E').value); //8
+    //           // const image = row.getCell('F').value; //6
+    //           const desciption = row.getCell('G').value; //7
+    //           const category = row.getCell('H').value; //7
+    //           if (isNaN(price)) {
+    //             openNotificationWithIcon(`Sai định dạng tại cột D,Hàng ${rowNumber}`);
+    //             check = false;
+    //             return false;
+    //           }
+    //           if (isNaN(inventory)) {
+    //             openNotificationWithIcon(`Sai định dạng tại cột E,Hàng ${rowNumber}`);
+    //             check = false;
+    //             return false;
+    //           }
+    //           rowData.push({
+    //             productName: nameProduct,
+    //             price: `${price}`,
+    //             description: desciption,
+    //             inventory: +inventory,
+    //             categoryID: category,
+    //             unit: unit,
+    //             isShow: true
+    //           });
+    //         } else {
+    //           openNotificationWithIcon(`File không đúng định dạng tại Hàng ${rowNumber}`);
+    //           return;
+    //         }
 
-          if (rowNumber >= 6) {
-            if (values?.length === 9) {
-              const nameProduct = row.getCell('B').value; //4
-              const unit = row.getCell('C').value; //3
-              const price = parseFloat(row.getCell('D').value); //5
-              const inventory = parseInt(row.getCell('E').value); //8
-              // const image = row.getCell('F').value; //6
-              const desciption = row.getCell('G').value; //7
-              const category = row.getCell('H').value; //7
-              if (isNaN(price)) {
-                openNotificationWithIcon(`Sai định dạng tại cột D,Hàng ${rowNumber}`);
-                check = false;
-                return false;
-              }
-              if (isNaN(inventory)) {
-                openNotificationWithIcon(`Sai định dạng tại cột E,Hàng ${rowNumber}`);
-                check = false;
-                return false;
-              }
-              rowData.push({
-                productName: nameProduct,
-                price: `${price}`,
-                description: desciption,
-                inventory: +inventory,
-                categoryID: category,
-                unit: unit,
-                isShow: true
-              });
-            } else {
-              openNotificationWithIcon(`File không đúng định dạng tại Hàng ${rowNumber}`);
-              return;
-            }
-
-          }
-          if (!check) {
-            break;
-          }
-          // sai format
-        }
-        formData.append('data', JSON.stringify(rowData));
-        const rest = await restApi.post(RouterAPI.upLoadExcelProduct, formData);
-        console.log('rest', rest)
-      });
-    };
-    reader.readAsArrayBuffer(file);
+    //       }
+    //       if (!check) {
+    //         break;
+    //       }
+    //       // sai format
+    //     }
+    //     // formData.append('data', JSON.stringify(rowData));
+    //     // const rest = await restApi.post(RouterAPI.upLoadExcelProduct, formData);
+    //     // console.log('rest', rest)
+    //   });
+    // };
+    // reader.readAsArrayBuffer(file);
   };
 
   useEffect(() => {

@@ -117,7 +117,7 @@ export const translate = {
       timeIn_col: 'Time in',
       timeOut_col: 'Time out',
       reason_col: 'Reason',
-      personSeowon_col: 'Person in charge',
+      personSeowon_col: 'Guarantor',
       department_col: 'Department',
       status_col: 'Status',
       action_col: 'Action',

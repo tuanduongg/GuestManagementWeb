@@ -51,6 +51,7 @@ import ModalHistoryGuest from 'components/modal/modal-history-guest/ModalHistory
 import { useTranslation } from 'react-i18next';
 import ModalUploadExcel from 'components/modal/modal-upload-excel/ModalUploadExcel';
 import axios from 'axios';
+import ModalTableAddGuest from 'components/modal/modal-add-guest/ModalTableAddGuest';
 
 const today = dayjs(); // Get the current date using dayjs
 // console.log('getAllDateOfWeek', getAllDateOfWeek());
@@ -253,13 +254,13 @@ const ListGuest = () => {
       width: isMobile() ? 130 : '11%',
       filters: tableData
         ? tableData
-            .map((item) => {
-              return {
-                text: item?.COMPANY,
-                value: item?.COMPANY
-              };
-            })
-            .filter((v, i, a) => v.value !== '' && a.findIndex((v2) => v2.value === v.value) === i)
+          .map((item) => {
+            return {
+              text: item?.COMPANY,
+              value: item?.COMPANY
+            };
+          })
+          .filter((v, i, a) => v.value !== '' && a.findIndex((v2) => v2.value === v.value) === i)
         : [],
       // {
       //   text: 'Category 2',
@@ -277,13 +278,13 @@ const ListGuest = () => {
       width: isMobile() ? 130 : '11%',
       filters: tableData
         ? tableData
-            .map((item) => {
-              return {
-                text: item?.CAR_NUMBER,
-                value: item?.CAR_NUMBER
-              };
-            })
-            .filter((v, i, a) => v.value !== '' && a.findIndex((v2) => v2.value === v.value) === i)
+          .map((item) => {
+            return {
+              text: item?.CAR_NUMBER,
+              value: item?.CAR_NUMBER
+            };
+          })
+          .filter((v, i, a) => v.value !== '' && a.findIndex((v2) => v2.value === v.value) === i)
         : [],
       // {
       //   text: 'Category 2',
@@ -606,9 +607,9 @@ const ListGuest = () => {
             rowSelection={
               role?.IS_DELETE
                 ? {
-                    selectedRowKeys,
-                    onChange: onSelectChange
-                  }
+                  selectedRowKeys,
+                  onChange: onSelectChange
+                }
                 : null
             }
             bordered
@@ -617,9 +618,9 @@ const ListGuest = () => {
                 ? null
                 : isMobile()
                   ? {
-                      x: '100vh',
-                      y: '100vh'
-                    }
+                    x: '100vh',
+                    y: '100vh'
+                  }
                   : null
             }
             columns={columns.filter((item) => !item?.hidden)}
@@ -636,6 +637,8 @@ const ListGuest = () => {
         open={openModalInfo}
         handleClose={handleCloseModalInfo}
       />
+      {/* <ModalTableAddGuest open={openModalAdd}
+        onClose={handleCloseModalAdd} /> */}
       <ModalAddGuest
         setLoading={setLoading}
         typeModal={typeModalAdd}
