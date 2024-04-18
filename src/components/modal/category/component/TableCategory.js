@@ -1,6 +1,8 @@
-import { Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from '@mui/material';
+import { Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Button } from '@mui/material';
 import { useState } from 'react';
-
+import {
+  message,
+} from 'antd';
 const columns = [
   {
     id: 'STT',
@@ -23,6 +25,9 @@ const columns = [
 ];
 
 const TableCategory = ({ listCategory, changeSelectedRow, selectedRow, onClickDelete }) => {
+  const [messageApi,contextHolder] = message.useMessage();
+
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -33,6 +38,7 @@ const TableCategory = ({ listCategory, changeSelectedRow, selectedRow, onClickDe
   };
   return (
     <>
+      {contextHolder}
       <Box sx={{ backgroundColor: 'white' }}>
         <TableContainer sx={{ height: '350px' }}>
           <Table stickyHeader aria-label="sticky table">
@@ -71,7 +77,9 @@ const TableCategory = ({ listCategory, changeSelectedRow, selectedRow, onClickDe
                     >
                       <TableCell sx={{ padding: '5px', textAlign: 'center' }}>{index + 1}</TableCell>
                       <TableCell sx={{ padding: '5px', textAlign: 'left' }}>{row?.categoryName}</TableCell>
-                      <TableCell sx={{ padding: '5px', textAlign: 'center' }}>copy</TableCell>
+                      <TableCell sx={{ padding: '5px', textAlign: 'center' }}>
+                        {row?.categoryID === selectedRow?.categoryID && (<Button onClick={() => { navigator.clipboard.writeText(row?.categoryID);message.success('Copy scuccessful!') }} size="small">Copy</Button>)}
+                      </TableCell>
                     </TableRow>
                   );
                 })
