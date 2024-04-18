@@ -26,6 +26,7 @@ import {
   ImportOutlined,
   UnorderedListOutlined,
   DownOutlined,
+  FileImageOutlined,
   InfoCircleOutlined
 } from '@ant-design/icons';
 import './list-guest.css';
@@ -216,7 +217,7 @@ const ListGuest = () => {
       key: 'guest_info',
       title: 'nameGuest_col',
       dataIndex: 'guest_info',
-      width: isMobile() ? 150 : !role?.IS_ACCEPT ? '20%' : '33%',
+      width: isMobile() ? 150 : !role?.IS_ACCEPT ? '30%' : '33%',
       fixed: 'left',
 
       render: (_, data) => (
@@ -428,6 +429,40 @@ const ListGuest = () => {
       });
     }
   };
+  const handleExportImage = async () => {
+    try {
+      setLoading(true);
+      const response = await restApi.post(RouterAPI.exportImageGuest, { id: selectedRowKeys });
+      setLoading(false);
+      if (response?.data.error) {
+        messageApi.open({
+          type: 'warning',
+          content: response?.data?.error ?? 'Export fail!'
+        });
+      }
+      const date = new Date();
+      const nameFile = `${date.getDate()}${date.getMonth() + 1}${date.getFullYear()}`;
+      const dataBuffer = response?.data;
+      dataBuffer.map((buffer, index) => {
+        const uint8Array = new Uint8Array(buffer?.data);
+        // Convert Uint8Array to Blob
+        const blob = new Blob([uint8Array], { type: 'image/png' });
+        // Create URL from Blob
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `export${nameFile}_${index + 1}.png`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      });
+    } catch (error) {
+      messageApi.open({
+        type: 'warning',
+        content: error ?? 'Export image fail!'
+      });
+    }
+  };
   const handleExportExcel = async () => {
     try {
       setLoading(true);
@@ -484,6 +519,19 @@ const ListGuest = () => {
           }
         });
         break;
+      case 'exportImage':
+        Modal.confirm({
+          title: t('msg_notification'),
+          content: t('msg_confirm_image'),
+          okText: t('yes'),
+          cancelText: t('close'),
+          centered: true,
+          icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
+          onOk: async () => {
+            handleExportImage();
+          }
+        });
+        break;
 
       default:
         break;
@@ -491,21 +539,36 @@ const ListGuest = () => {
   };
   const ITEMS = [
     {
-      label: 'Import Excel',
+      label: t('importExcel'),
       key: 'importExcel',
-      icon: <UploadOutlined />,
+      icon: <UploadOutlined style={{ color: '#4096ff' }} />,
       disabled: !role?.IS_IMPORT,
       hidden: false
     },
     {
-      label: 'Export Excel',
+      type: 'divider',
+      hidden: false
+    },
+    {
+      label: t('exportExcel'),
       key: 'exportExcel',
-      icon: <ImportOutlined />,
+      icon: <ImportOutlined style={{ color: '#4096ff' }} />,
       disabled: selectedRowKeys?.length < 1,
       hidden: !role?.IS_EXPORT
     },
     {
-      label: 'Canel',
+      label: t('exportPNG'),
+      key: 'exportImage',
+      icon: <FileImageOutlined style={{ color: '#4096ff' }} />,
+      disabled: selectedRowKeys?.length < 1,
+      hidden: !role?.IS_EXPORT
+    },
+    {
+      type: 'divider',
+      hidden: false
+    },
+    {
+      label: t('canelBTN'),
       key: 'cancel',
       icon: <CloseOutlined />,
       disabled: disabledBtnCancel,
@@ -595,7 +658,7 @@ const ListGuest = () => {
                 {(role?.IS_DELETE || role?.IS_IMPORT || role?.IS_EXPORT) && (
                   <Dropdown menu={menuProps}>
                     <Button style={{ marginLeft: '5px' }} shape="round" icon={<DownOutlined />}>
-                      More
+                      {t('btnMore')}
                     </Button>
                   </Dropdown>
                 )}

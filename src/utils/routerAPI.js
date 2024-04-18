@@ -11,6 +11,7 @@ export const RouterAPI = {
   allGuest: 'guest/all',
 
   exportGuest: '/guest/export',
+  exportImageGuest: '/guest/export-image',
 
   updateGuestInfo: 'guest-info/update',
   deleteGuestInfo: 'guest-info/delete',

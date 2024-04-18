@@ -72,7 +72,13 @@ export const translate = {
       title_modal_add_new_account: 'Thêm mới tài khoản',
       unauthorizeMsgPage: 'Bạn không có quyền truy cập!',
       btn_backToHome: 'Về trang chủ',
-      msg_confirm_export: 'Bạn muốn xuất file Excel không?'
+      msg_confirm_export: 'Bạn muốn xuất file Excel không?',
+      msg_confirm_image: 'Bạn muốn xuất file PNG không?',
+      exportExcel: 'Xuất Excel',
+      exportPNG: 'Xuất PNG',
+      importExcel: 'Nhập Excel',
+      downloadSampleFile: 'Tải file mẫu',
+      btnMore:'Khác',
     }
   },
   en: {
@@ -148,7 +154,13 @@ export const translate = {
       title_modal_add_new_account: 'Add new account',
       unauthorizeMsgPage: 'Unauthorized!',
       btn_backToHome: 'Back to home',
-      msg_confirm_export: 'Do you want to export Excel file?'
+      msg_confirm_export: 'Do you want to export Excel file?',
+      msg_confirm_image: 'Do you want to export PNG file?',
+      exportExcel: 'Export Excel',
+      exportPNG: 'Export PNG',
+      importExcel: 'Import Excel',
+      downloadSampleFile: 'Download sample file',
+      btnMore:'More',
     }
   },
   ko: {
@@ -224,7 +236,13 @@ export const translate = {
       title_modal_add_new_account: '새 계정 추가',
       unauthorizeMsgPage: 'Unauthorized!',
       btn_backToHome: 'Back to home',
-      msg_confirm_export: 'Do you want to export Excel file?'
+      msg_confirm_export: 'Do you want to export Excel file?',
+      msg_confirm_image: 'Do you want to export PNG file?',
+      exportExcel: 'Export Excel',
+      exportPNG: 'Export PNG',
+      importExcel: 'Import Excel',
+      downloadSampleFile: 'Download sample file',
+      btnMore:'More',
     }
   }
 };

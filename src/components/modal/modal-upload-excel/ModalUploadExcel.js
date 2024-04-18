@@ -228,7 +228,7 @@ const ModalUploadExcel = ({ open, handleClose, afterSave, setLoading }) => {
       <Modal
         okButtonProps={{ type: 'link', icon: <VerticalAlignBottomOutlined /> }}
         centered
-        okText="File mẫu"
+        okText={t('downloadSampleFile')}
         cancelText="Đóng"
         zIndex={1300}
         maskClosable={false}
