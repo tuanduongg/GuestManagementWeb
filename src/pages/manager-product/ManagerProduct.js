@@ -103,7 +103,7 @@ const ManagerProduct = () => {
       case 'delete':
         Modal.confirm({
           title: t('msg_notification'),
-          content: t('Bạn có muốn xóa sản phẩm này ?'),
+          content: t('deleteProduct'),
           okText: t('yes'),
           cancelText: t('close'),
           centered: true,
@@ -116,7 +116,7 @@ const ManagerProduct = () => {
       case 'deleteAll':
         Modal.confirm({
           title: t('msg_notification'),
-          content: t('Bạn có muốn xóa sản phẩm này ?'),
+          content: t('deleteProduct'),
           okText: t('yes'),
           cancelText: t('close'),
           centered: true,
@@ -137,7 +137,7 @@ const ManagerProduct = () => {
           cancelText: t('close'),
           centered: true,
           icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
-          onOk: async () => { }
+          onOk: async () => {}
         });
         break;
       case 'catgory':
@@ -171,7 +171,7 @@ const ManagerProduct = () => {
       message.error(rest?.data?.message ?? 'Change status fail!');
     }
   };
-  const onChangeStatus = async (checked) => { };
+  const onChangeStatus = async (checked) => {};
   const getAllCategory = async () => {
     const res = await restApi.get(RouterAPI.getAllCategory);
     if (res?.status === 200) {
@@ -215,7 +215,6 @@ const ManagerProduct = () => {
     }
     var formData = new FormData();
     formData.append('file', file);
-    console.log('file', file);
     setLoading(true);
     const rest = await restApi.post(RouterAPI.upLoadExcelProduct, formData);
     setLoading(false);
@@ -224,7 +223,6 @@ const ManagerProduct = () => {
       getAllProduct();
     } else {
       message.error(rest?.data?.message || 'Upload excel fail!');
-
     }
   };
 
@@ -237,7 +235,7 @@ const ManagerProduct = () => {
   }, [page, rowsPerPage, search, selectCategory]);
   const ITEMS = [
     {
-      label: 'Danh mục',
+      label: t('category'),
       key: 'catgory',
       icon: <BarsOutlined />,
       disabled: false,
@@ -247,14 +245,14 @@ const ManagerProduct = () => {
       type: 'divider'
     },
     {
-      label: 'Import Excel',
+      label: t('importExcel'),
       key: 'importExcel',
       icon: <ImportOutlined />,
       disabled: false,
       hidden: false
     },
     {
-      label: 'Delete',
+      label: t('delete'),
       key: 'deleteAll',
       icon: <CloseOutlined />,
       disabled: selectedRowKeys?.length === 0,
@@ -265,13 +263,13 @@ const ManagerProduct = () => {
   //action of row on table
   const ITEMROWS = [
     {
-      label: 'Sửa',
+      label: t('btnEdit'),
       key: 'edit',
       icon: <EditOutlined />,
       disabled: false
     },
     {
-      label: 'Delete',
+      label: t('delete'),
       key: 'delete',
       icon: <DeleteOutlined />,
       disabled: false,
@@ -290,24 +288,24 @@ const ManagerProduct = () => {
     {
       align: 'left',
       key: 'productName',
-      title: 'Tên sản phẩm',
+      title: 'product',
       fixed: 'left',
 
       render: (_, data) => (
         <>
-          <Row style={{ display: 'flex', alignItems: 'center' }}>
+          <Row style={{ display: 'flex', alignItems: 'center' }} gutter={8}>
             {!isMobile() && (
-              <Col xs={6}>
+              <Col xs={4} lg={4}>
                 <Image
-                  width={50}
+                  width={'100%'}
                   height={50}
                   src={data?.images[0] ? config.urlImageSever + data?.images[0]?.url : ''}
                   fallback={urlFallBack}
                 />
               </Col>
             )}
-            <Col xs={24} sm={18}>
-              <Link onClick={() => { }}>{data?.productName}</Link>
+            <Col xs={24} sm={20} lg={20}>
+              <Link onClick={() => {}}>{data?.productName}</Link>
             </Col>
           </Row>
         </>
@@ -317,7 +315,7 @@ const ManagerProduct = () => {
     {
       align: 'center',
       key: 'price',
-      title: 'Giá',
+      title: 'price',
       dataIndex: 'price',
       render: (_, data) => <>{formattingVND(data?.price)}</>,
       sorter: (a, b) => a?.price - b?.price,
@@ -325,7 +323,7 @@ const ManagerProduct = () => {
     },
     {
       key: 'unit',
-      title: 'Đơn vị',
+      title: 'unit',
       dataIndex: 'unit',
       align: 'center',
       render: (_, data) => <>{data?.unit}</>,
@@ -333,7 +331,7 @@ const ManagerProduct = () => {
     },
     {
       key: 'inventory',
-      title: 'Tồn Kho',
+      title: 'inventory',
       dataIndex: 'inventory',
       align: 'center',
       sorter: (a, b) => a?.inventory - b?.inventory,
@@ -342,15 +340,15 @@ const ManagerProduct = () => {
     {
       align: 'center',
       key: 'category',
-      title: 'Danh mục',
+      title: 'category',
       filters:
         categories?.length > 0
           ? categories?.map((item) => {
-            return {
-              text: item?.categoryName,
-              value: item?.categoryID
-            };
-          })
+              return {
+                text: item?.categoryName,
+                value: item?.categoryID
+              };
+            })
           : [],
       filterMode: 'tree',
       filterSearch: true,
@@ -360,7 +358,7 @@ const ManagerProduct = () => {
     },
     {
       key: 'isShow',
-      title: 'Trạng thái',
+      title: 'status',
       dataIndex: 'isShow',
       align: 'center',
       render: (_, data) => (
@@ -451,7 +449,7 @@ const ManagerProduct = () => {
         <Row>
           <Col xs={24} sm={15} style={{ display: 'flex', alignItems: 'center' }}>
             {!isMobile() && <FunnelPlotOutlined style={{ fontSize: '20px', color: config.colorLogo }} />}
-            {<div style={{ fontWeight: 'bold', margin: '0px 5px', minWidth: '71px' }}>Danh mục:</div>}
+            {<div style={{ fontWeight: 'bold', margin: '0px 5px', minWidth: '71px' }}>{t('category')}:</div>}
             <Select
               value={selectCategory}
               onChange={(value) => {
@@ -461,23 +459,23 @@ const ManagerProduct = () => {
               options={
                 categories?.length > 0
                   ? [
-                    {
-                      label: 'All',
-                      value: ''
-                    }
-                  ].concat(
-                    categories?.map((item) => {
-                      return {
-                        label: item?.categoryName,
-                        value: item?.categoryID
-                      };
-                    })
-                  )
+                      {
+                        label: 'All',
+                        value: ''
+                      }
+                    ].concat(
+                      categories?.map((item) => {
+                        return {
+                          label: item?.categoryName,
+                          value: item?.categoryID
+                        };
+                      })
+                    )
                   : []
               }
             />
             <Search
-              placeholder="Tên sản phẩm..."
+              placeholder={t('searchByProductName')}
               allowClear
               enterButton
               style={{ width: isMobile() ? '45%' : '200px', marginLeft: '5px' }}
@@ -501,11 +499,11 @@ const ManagerProduct = () => {
               icon={<PlusOutlined />}
               type="primary"
             >
-              {t('new')}
+              {t('btn_new')}
             </Button>
             <Dropdown menu={menuProps}>
               <Button style={{ marginLeft: '5px' }} shape="round" icon={<DownOutlined />}>
-                Khác
+                {t('btnMore')}
               </Button>
             </Dropdown>
           </Col>
@@ -523,9 +521,9 @@ const ManagerProduct = () => {
               scroll={
                 isMobile()
                   ? {
-                    x: '100vh',
-                    y: '65vh'
-                  }
+                      x: '100vh',
+                      y: '65vh'
+                    }
                   : { x: null, y: '55vh' }
               }
               columns={columns}

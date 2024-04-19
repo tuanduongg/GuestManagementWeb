@@ -15,6 +15,8 @@ import './detail_product.css';
 import config from 'config';
 import { addToCart } from 'store/reducers/menu';
 import { useDispatch, useSelector } from 'react-redux';
+import { urlFallBack } from 'pages/manager-product/manager-product.service';
+
 
 const ModalDetailProduct = ({ open, handleClose, product }) => {
   const [quantity, setQuantity] = useState(1);
@@ -56,7 +58,7 @@ const ModalDetailProduct = ({ open, handleClose, product }) => {
       >
         <div style={{ minWidth: '100%', height: 'auto', minHeight: '400px' }}>
           <Row style={{ height: '100%' }} gutter={24}>
-            <Col style={{ height: '100%' }} xs={24} sm={12}>
+            <Col style={{ height: '100%', minHeight: '390px' }} xs={24} sm={12}>
               <Swiper pagination={true} navigation={true} modules={[Pagination, Navigation]} className="mySwiper">
                 {product?.images?.map((item, index) => (
                   <SwiperSlide key={index}>
@@ -64,8 +66,9 @@ const ModalDetailProduct = ({ open, handleClose, product }) => {
                       height={'100%'}
                       width={'100%'}
                       alt={item?.title}
-                      style={{ objectFit: 'cover', cursor: 'pointer' }}
+                      style={{ objectFit: 'cover', cursor: 'pointer', minHeight: '400px' }}
                       src={config.urlImageSever + item?.url}
+                      fallback={urlFallBack}
                     />
                   </SwiperSlide>
                 ))}

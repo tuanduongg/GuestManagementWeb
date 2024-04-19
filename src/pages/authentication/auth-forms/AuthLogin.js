@@ -66,12 +66,8 @@ const AuthLogin = () => {
           submit: null
         }}
         validationSchema={Yup.object().shape({
-          username: Yup.string()
-            .max(255)
-            .required(`${t('errorEmptyUsername')}`),
-          password: Yup.string()
-            .max(255)
-            .required(`${t('errorEmptyPassword')}`)
+          username: Yup.string().max(255).required(`errorEmptyUsername`),
+          password: Yup.string().max(255).required('errorEmptyPassword')
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           try {
@@ -100,7 +96,7 @@ const AuthLogin = () => {
           }
         }}
       >
-        {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
+        {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setErrors }) => (
           <form noValidate onSubmit={handleSubmit}>
             <Loading loading={loading} />
             <Grid container spacing={3}>
@@ -118,7 +114,7 @@ const AuthLogin = () => {
                     fullWidth
                     error={Boolean(touched.username && errors.username)}
                   />
-                  {touched.username && errors.username && <FormHelperText error>{errors.username}</FormHelperText>}
+                  {touched.username && errors.username && <FormHelperText error>{t(errors.username)}</FormHelperText>}
                 </Stack>
               </Grid>
               <Grid item xs={12}>
@@ -149,7 +145,7 @@ const AuthLogin = () => {
                   />
                   {touched.password && errors.password && (
                     <FormHelperText error id="standard-weight-helper-text-password-login">
-                      {errors.password}
+                      {t(errors.password)}
                     </FormHelperText>
                   )}
                 </Stack>
@@ -162,6 +158,7 @@ const AuthLogin = () => {
                     value={language}
                     label={t('language')}
                     onChange={(event) => {
+                      console.log('errors', errors);
                       setLanguage(event.target.value);
                       localStorage.setItem('LANGUAGE', event.target.value);
                       i18n.changeLanguage(event.target.value);

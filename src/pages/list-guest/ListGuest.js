@@ -684,7 +684,9 @@ const ListGuest = () => {
                     x: '100vh',
                     y: '100vh'
                   }
-                  : null
+                  : {
+                    y: '60vh'
+                  }
             }
             columns={columns.filter((item) => !item?.hidden)}
             dataSource={tableData}

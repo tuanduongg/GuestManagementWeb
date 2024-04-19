@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
-import { Input, Modal, App, Row, Col, Card, Button, Flex, Avatar, Typography } from 'antd';
+import { Input, Modal, App, Row, Empty, Col, Card, Button, Flex, Avatar, Typography } from 'antd';
 const { TextArea } = Input;
 const { Text, Title } = Typography;
 
@@ -23,6 +23,8 @@ const ModalCart = ({ open, handleClose }) => {
   const [disabled, setDisabled] = useState(true);
   const [name, setName] = useState('');
   const [validateName, setValidateName] = useState(initialValidate);
+  const [note, setNote] = useState('');
+  const [validateNote, setValidateNote] = useState(initialValidate);
   const [department, setDepartment] = useState('');
   const [validateDepartment, setValidateDepartment] = useState(initialValidate);
   const dispatch = useDispatch();
@@ -39,6 +41,8 @@ const ModalCart = ({ open, handleClose }) => {
   const handleCancel = () => {
     setValidateDepartment(initialValidate);
     setValidateName(initialValidate);
+    setValidateNote(initialValidate);
+    setNote('');
     setName('');
     setDepartment('');
     handleClose();
@@ -59,13 +63,17 @@ const ModalCart = ({ open, handleClose }) => {
   const { cart } = useSelector((state) => state.menu);
 
   const onChangeQuantity = (type, item) => {
-    const newQuantityMinus = parseInt(item?.quantity) - 1;
+    let quantityNum = parseInt(item?.quantity);
+    if (isNaN(quantityNum)) {
+      quantityNum = 0;
+    }
+    const newQuantityMinus = quantityNum - 1;
     switch (type) {
       case 'minus':
         dispatch(changeQuantityProduct({ product: { productID: item?.productID, quantity: newQuantityMinus < 1 ? 1 : newQuantityMinus } }));
         break;
       case 'plus':
-        dispatch(changeQuantityProduct({ product: { productID: item?.productID, quantity: parseInt(item?.quantity) + 1 } }));
+        dispatch(changeQuantityProduct({ product: { productID: item?.productID, quantity: quantityNum + 1 } }));
         break;
 
       default:
@@ -80,6 +88,10 @@ const ModalCart = ({ open, handleClose }) => {
   const onChangeInputQuantity = (e, item) => {
     const { value } = e.target;
     if (/^\d*$/g.test(value)) {
+      if (value === '') {
+        dispatch(changeQuantityProduct({ product: { productID: item?.productID, quantity: value } }));
+        return;
+      }
       let valueNum = parseInt(value);
       if (isNaN(valueNum) || valueNum < 1) {
         valueNum = 1;
@@ -91,28 +103,47 @@ const ModalCart = ({ open, handleClose }) => {
     let check = false;
     if (name?.trim() === '') {
       check = true;
-      setValidateName({ err: true, message: 'Họ tên không được để trống!' })
+      setValidateName({ err: true, message: 'requiredField' });
     }
     if (department?.trim() === '') {
       check = true;
-      setValidateDepartment({ err: true, message: 'Bộ phận không được để trống!' })
+      setValidateDepartment({ err: true, message: 'requiredField' });
     }
     if (!check) {
-      alert('pass')
+      alert('pass');
+      console.log('cart', cart);
     }
   };
   const onChangeInput = (e) => {
     const { name, value } = e.target;
     switch (name) {
       case 'name':
+        if (validateName?.err) {
+          setValidateName(initialValidate);
+        }
         setName(value);
         break;
       case 'department':
+        if (validateDepartment?.err) {
+          setValidateDepartment(initialValidate);
+        }
         setDepartment(value);
+        break;
+      case 'note':
+        if (validateNote?.err) {
+          setValidateNote(initialValidate);
+        }
+        setNote(value);
         break;
 
       default:
         break;
+    }
+  };
+  const onBlurInput = (e, item) => {
+    const { value } = e.target;
+    if (item?.quantity === '' || item?.quantity < 1) {
+      dispatch(changeQuantityProduct({ product: { productID: item?.productID, quantity: 1 } }));
     }
   };
 
@@ -122,7 +153,7 @@ const ModalCart = ({ open, handleClose }) => {
         centered
         okButtonProps={{ icon: <DoubleRightOutlined /> }}
         className="modal-cart"
-        okText={t('Order now')}
+        okText={t('btnOrderNow')}
         cancelText={t('close')}
         zIndex={1300}
         width={900}
@@ -147,7 +178,7 @@ const ModalCart = ({ open, handleClose }) => {
             onBlur={() => { }}
           // end
           >
-            Your Cart
+            {t('yourCart')}
           </div>
         }
         open={open}
@@ -164,7 +195,7 @@ const ModalCart = ({ open, handleClose }) => {
           <>
             <Flex style={{ paddingTop: '10px' }} justify="space-between" align="center">
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Text style={{ fontSize: '17px', fontWeight: 'bold' }}>Total: </Text>
+                <Text style={{ fontSize: '17px', fontWeight: 'bold', marginRight: '5px' }}>{t('total')}: </Text>
                 <Text style={{ fontSize: '17px', color: '#005494', fontWeight: 'bold' }}>
                   {cart
                     ? formattingVND(
@@ -188,26 +219,41 @@ const ModalCart = ({ open, handleClose }) => {
         <Card className="cart-info">
           <Row gutter={24}>
             <Col xs={12}>
-              Họ tên(<span style={{ color: 'red' }}>*</span>)
+              {t('name')}(<span style={{ color: 'red' }}>*</span>)
               <Input
                 status={validateName?.err ? 'error' : ''}
                 value={name}
                 name="name"
                 onChange={onChangeInput}
-                placeholder="Nhập họ tên..."
+                placeholder={t('name') + '...'}
               />
-              {validateName?.err && <div style={{ color: 'red', marginLeft: '3px' }}>{validateName?.message}</div>}
+              {validateName?.err && <div style={{ color: 'red', marginLeft: '3px' }}>{t(validateName?.message)}</div>}
             </Col>
             <Col xs={12}>
-              Bộ phận(<span style={{ color: 'red' }}>*</span>)
+              {t('department')}(<span style={{ color: 'red' }}>*</span>)
               <Input
                 status={validateDepartment?.err ? 'error' : ''}
                 value={department}
                 name="department"
                 onChange={onChangeInput}
-                placeholder="Nhập bộ phận..."
+                placeholder={t('department') + '...'}
               />
-              {validateDepartment.err && <div style={{ color: 'red', marginLeft: '3px' }}>{validateDepartment?.message}</div>}
+              {validateDepartment.err && <div style={{ color: 'red', marginLeft: '3px' }}>{t(validateDepartment?.message)}</div>}
+            </Col>
+            <Col style={{ marginTop: '5px' }} xs={24}>
+              {t('note')}
+              <TextArea
+                status={validateNote?.err ? 'error' : ''}
+                value={note}
+                name="note"
+                onChange={onChangeInput}
+                placeholder={t('note') + '...'}
+                autoSize={{
+                  minRows: 2,
+                  maxRows: 6,
+                }}
+              />
+              {validateNote.err && <div style={{ color: 'red', marginLeft: '3px' }}>{t(validateNote?.message)}</div>}
             </Col>
           </Row>
         </Card>
@@ -217,103 +263,117 @@ const ModalCart = ({ open, handleClose }) => {
               <Text style={{ textTransform: 'uppercase' }}>#</Text>
             </Col>
             <Col xs={12} sm={6}>
-              <Text style={{ textTransform: 'uppercase' }}>Product Details</Text>
+              <Text style={{ textTransform: 'uppercase' }}>{t('product')}</Text>
             </Col>
             <Col style={{ textTransform: 'uppercase', textAlign: 'center' }} xs={8}>
-              <Text>Quantity</Text>
+              <Text>{t('quantity')}</Text>
             </Col>
             {!isMobile() && (
               <>
                 <Col style={{ textTransform: 'uppercase', textAlign: 'right' }} xs={3}>
-                  <Text>Price</Text>
+                  <Text>{t('price')}</Text>
                 </Col>
                 <Col style={{ textTransform: 'uppercase', textAlign: 'right' }} xs={3}>
-                  <Text>Total</Text>
+                  <Text>{t('total')}</Text>
                 </Col>
               </>
             )}
             <Col style={{ textTransform: 'uppercase', textAlign: 'right' }} xs={1}></Col>
           </Row>
-          {/* <Divider style={{ margin: '0px', color: '#ddd' }} /> */}
           <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-            {cart?.map((item, index) => (
-              <Row key={index} style={{ display: 'flex', alignItems: 'center', padding: '5px 0px', borderBottom: '1px solid #ddd' }}>
-                <Col xs={2}>
-                  <Flex align={'center'}>
-                    <Text strong>{index + 1}</Text>
-                  </Flex>
-                </Col>
-                <Col xs={12} sm={6}>
-                  <Flex align={'center'}>
-                    <Avatar
-                      shape="square"
-                      style={{ width: 60 }}
-                      size={60}
-                      src={<img src={item?.images[0] ? config.urlImageSever + item?.images[0]?.url : ''} alt="avatar" />}
-                    />
-                    <div style={{ marginLeft: '10px' }}>
-                      <div style={{ fontSize: '15px', fontWeight: 'bold' }}>{item.productName}</div>
-                      <Text type="secondary">{isMobile() ? `${item.price}/${item.unit}` : item.unit}</Text>
-                    </div>
-                  </Flex>
-                </Col>
-                <Col xs={8}>
-                  <Flex justify={'center'} align={'center'}>
+            {cart?.length > 0 ? (
+              cart?.map((item, index) => (
+                <Row
+                  key={index}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '5px 0px',
+                    borderBottom: index === cart?.length - 1 ? '' : '1px solid #ddd'
+                  }}
+                >
+                  <Col xs={2}>
+                    <Flex align={'center'}>
+                      <Text strong>{index + 1}</Text>
+                    </Flex>
+                  </Col>
+                  <Col xs={12} sm={6}>
+                    <Flex align={'center'}>
+                      <Avatar
+                        shape="square"
+                        style={{ width: 60 }}
+                        size={60}
+                        src={<img src={item?.images[0] ? config.urlImageSever + item?.images[0]?.url : ''} alt="avatar" />}
+                      />
+                      <div style={{ marginLeft: '10px' }}>
+                        <div style={{ fontSize: '15px', fontWeight: 'bold' }}>{item.productName}</div>
+                        <Text type="secondary">{isMobile() ? `${formattingVND(item.price)}/${item.unit}` : item.unit}</Text>
+                      </div>
+                    </Flex>
+                  </Col>
+                  <Col xs={8}>
+                    <Flex justify={'center'} align={'center'}>
+                      <Button
+                        onClick={() => {
+                          onChangeQuantity('minus', item);
+                        }}
+                        size="small"
+                        icon={<MinusOutlined />}
+                        shape="circle"
+                      ></Button>
+                      <input
+                        onBlur={(e) => {
+                          onBlurInput(e, item);
+                        }}
+                        onChange={(e) => {
+                          onChangeInputQuantity(e, item);
+                        }}
+                        style={{
+                          width: '30px',
+                          margin: '0px 10px',
+                          height: '25px',
+                          textAlign: 'center',
+                          border: '1px solid #ddd',
+                          outline: 'none'
+                        }}
+                        value={item?.quantity}
+                      />
+                      <Button
+                        onClick={() => {
+                          onChangeQuantity('plus', item);
+                        }}
+                        size="small"
+                        icon={<PlusOutlined />}
+                        shape="circle"
+                      ></Button>
+                    </Flex>
+                  </Col>
+                  {!isMobile() && (
+                    <>
+                      <Col style={{ textAlign: 'right' }} xs={3}>
+                        <Text strong>{formattingVND(item.price, '')}</Text>
+                      </Col>
+                      <Col style={{ textAlign: 'right' }} xs={3}>
+                        <Text strong>{formattingVND(parseInt(item.price) * parseInt(item?.quantity), '')}</Text>
+                      </Col>
+                    </>
+                  )}
+                  <Col style={{ textTransform: 'uppercase', textAlign: 'right' }} xs={2}>
                     <Button
+                      danger
                       onClick={() => {
-                        onChangeQuantity('minus', item);
+                        onDeleteRowOnCart(item);
                       }}
+                      icon={<DeleteOutlined />}
                       size="small"
-                      icon={<MinusOutlined />}
-                      shape="circle"
+                      type="text"
                     ></Button>
-                    <input
-                      onChange={(e) => {
-                        onChangeInputQuantity(e, item);
-                      }}
-                      style={{
-                        width: '30px',
-                        margin: '0px 10px',
-                        height: '25px',
-                        textAlign: 'center',
-                        border: '1px solid #ddd',
-                        outline: 'none'
-                      }}
-                      value={item?.quantity}
-                    />
-                    <Button
-                      onClick={() => {
-                        onChangeQuantity('plus', item);
-                      }}
-                      size="small"
-                      icon={<PlusOutlined />}
-                      shape="circle"
-                    ></Button>
-                  </Flex>
-                </Col>
-                {!isMobile() && (
-                  <>
-                    <Col style={{ textAlign: 'right' }} xs={3}>
-                      <Text strong>{formattingVND(item.price, '')}</Text>
-                    </Col>
-                    <Col style={{ textAlign: 'right' }} xs={3}>
-                      <Text strong>{formattingVND(parseInt(item.price) * parseInt(item?.quantity), '')}</Text>
-                    </Col>
-                  </>
-                )}
-                <Col style={{ textTransform: 'uppercase', textAlign: 'right' }} xs={2}>
-                  <Button
-                    danger
-                    onClick={() => {
-                      onDeleteRowOnCart(item);
-                    }}
-                    icon={<DeleteOutlined />}
-                    size="small"
-                    type="text"
-                  ></Button>
-                </Col>
-              </Row>
-            ))}
+                  </Col>
+                </Row>
+              ))
+            ) : (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            )}
           </div>
         </Card>
       </Modal>

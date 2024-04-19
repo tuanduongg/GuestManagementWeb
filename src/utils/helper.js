@@ -329,7 +329,7 @@ export function isMdScreen() {
 function isString(x) {
   return Object.prototype.toString.call(x) === '[object String]';
 }
-export const formattingVND = (num,label = 'vnđ') => {
+export const formattingVND = (num, label = 'vnđ') => {
   if (isString(num) && num?.includes('.')) {
     const rs = num + ' vnđ';
     return rs.replace(',', '.');
@@ -393,21 +393,32 @@ export const delete_cookie = (name) => {
   document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 };
 
-export const logout = () => {
-  Modal.confirm({
-    okText: i18next.t('logout'),
-    cancelText: i18next.t('close'),
-    centered: true,
-    title: i18next.t('msg_notification'),
-    content: i18next.t('msg_logout'),
-    onOk: () => {
-      handleLogout();
-    }
-  });
+export const logout = (showCancel = true) => {
+  if (location.href.includes(ConfigRouter.login.url)) {
+    Modal.destroyAll();
+  } else {
+    Modal.confirm({
+      okText: i18next.t('logout'),
+      cancelButtonProps: { style: { display: showCancel ? ' ' : 'none' } },
+      cancelText: i18next.t('close'),
+      centered: true,
+      title: i18next.t('msg_notification'),
+      content: i18next.t('msg_logout'),
+      onOk: () => {
+        handleLogout();
+      },
+      onCancel: () => {
+        if (!showCancel) {
+          handleLogout();
+        }
+      }
+    });
+  }
 };
-export const handleLogout = () => {
+export const handleLogout = async () => {
   delete_cookie('ASSET_TOKEN');
   setCookie('ASSET_TOKEN', '', 1);
+  await restApi.post(RouterAPI.logout);
   location.href = ConfigRouter.login.url;
 };
 

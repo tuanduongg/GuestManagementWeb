@@ -95,7 +95,8 @@ const DrawerContent = () => {
         onClick={onClick}
         style={{
           width: drawerWidth ?? 250,
-          height: '90vh'
+          height: '90vh',
+          overflowX: 'hidden'
         }}
         selectedKeys={openItem}
         onOpenChange={(openKeys) => {

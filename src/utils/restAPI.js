@@ -29,9 +29,8 @@ restApi.interceptors.response.use(
     return response;
   },
   async function (error) {
-    console.log('err', error);
     if (error?.response?.status === 401 && assToken) {
-      logout();
+      logout(false);
     }
     return error.response;
   }

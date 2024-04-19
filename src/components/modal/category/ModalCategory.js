@@ -1,12 +1,13 @@
 import { Box, Button, Dialog, DialogContent, DialogTitle, Divider, Grid, IconButton, TextField } from '@mui/material';
 import { message } from 'antd';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { useEffect } from 'react';
 import TableCategory from './component/TableCategory';
 import { CloseOutlined } from '@ant-design/icons';
 import { RouterAPI } from 'utils/routerAPI';
 import restApi from 'utils/restAPI';
+import { useTranslation } from 'react-i18next';
 
 const initValidate = { err: false, msg: '' };
 
@@ -29,6 +30,7 @@ const initValidate = { err: false, msg: '' };
 //   return '';
 // };
 const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, getAll }) => {
+  const {t} = useTranslation();
   const [loading, setLoading] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [name, setName] = useState('');
@@ -91,7 +93,7 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', minWidth: '500px' }}>
           <DialogTitle fontSize={'15px'} sx={{ padding: '10px' }}>
-            Danh mục
+            {t('category')}
           </DialogTitle>
           <IconButton onClick={onClose}>
             <CloseOutlined />
@@ -127,13 +129,13 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
                   onClick={handleClickAdd}
                   color="primary"
                   autoFocus
-                  // endIcon={selectedRow ? <SaveIcon /> : <AddIcon />}
+                // endIcon={selectedRow ? <SaveIcon /> : <AddIcon />}
                 >
                   {selectedRow ? 'Cập nhật' : `Thêm mới`}
                 </Button>
               </Grid>
             </Grid>
-            <Grid container sx={{marginTop:'10px'}}>
+            <Grid container sx={{ marginTop: '10px' }}>
               <Grid item xs={12}>
                 <TableCategory
                   onClickDelete={handleClickDeleteRow}

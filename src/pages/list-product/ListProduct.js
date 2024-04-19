@@ -101,7 +101,7 @@ const ListProduct = () => {
           <Col sm={10} md={18} xs={15}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <Button style={{}} type="link" icon={<FilterOutlined style={{ fontSize: '17px' }} />} />
-              <div style={{ fontWeight: 'bold', marginRight: '5px' }}>Category:</div>
+              <div style={{ fontWeight: 'bold', marginRight: '5px' }}>{t('category')}:</div>
               <Dropdown
                 menu={{
                   onClick: onClickDropdownItem,
@@ -125,7 +125,7 @@ const ListProduct = () => {
                 onSearch={(value) => {
                   setSearch(value);
                 }}
-                placeholder="Tên sản phẩm..."
+                placeholder={t('searchByProductName')}
                 allowClear
                 enterButton
               />
@@ -147,7 +147,7 @@ const ListProduct = () => {
               setRowsPerPage(size);
             }}
             total={total}
-            showTotal={(total, range) => `${range[0]}-${range[1]}/${total} sản phẩm`}
+            showTotal={(total, range) => `${range[0]}-${range[1]}/${total} ${t('product')}`}
             pageSize={rowsPerPage}
             showSizeChanger={true}
             pageSizeOptions={config.sizePageOption}

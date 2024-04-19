@@ -1,5 +1,6 @@
 export const RouterAPI = {
   login: 'auth/login',
+  logout: 'user/logout',
   profile: 'auth/profile',
   notifi_subscribe: 'notification/subscription',
 
