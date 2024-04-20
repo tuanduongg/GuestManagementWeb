@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
-import { Input, Modal, App, Row, Empty, Col, Card, Button, Flex, Avatar, Typography } from 'antd';
+import { Input, Modal, App, Row, Empty, Col, Card, Button, Flex, Avatar, Typography, Image } from 'antd';
 const { TextArea } = Input;
 const { Text, Title } = Typography;
 
@@ -16,6 +16,7 @@ import { useDispatch } from 'react-redux';
 import { addToCart, changeQuantityProduct, setCart } from 'store/reducers/menu';
 
 import config from 'config';
+import { urlFallBack } from 'pages/manager-product/manager-product.service';
 
 const initialValidate = { err: false, message: '' };
 
@@ -250,7 +251,7 @@ const ModalCart = ({ open, handleClose }) => {
                 placeholder={t('note') + '...'}
                 autoSize={{
                   minRows: 2,
-                  maxRows: 6,
+                  maxRows: 6
                 }}
               />
               {validateNote.err && <div style={{ color: 'red', marginLeft: '3px' }}>{t(validateNote?.message)}</div>}
@@ -259,26 +260,26 @@ const ModalCart = ({ open, handleClose }) => {
         </Card>
         <Card className="cart-list-product">
           <Row style={{ display: 'flex', alignItems: 'center', padding: '5px 0px', borderBottom: '1px solid #ddd', paddingRight: '10px' }}>
-            <Col xs={2}>
+            <Col xs={2} sm={1}>
               <Text style={{ textTransform: 'uppercase' }}>#</Text>
             </Col>
-            <Col xs={12} sm={6}>
+            <Col style={{ textAlign: 'center' }} xs={22} sm={10}>
               <Text style={{ textTransform: 'uppercase' }}>{t('product')}</Text>
             </Col>
-            <Col style={{ textTransform: 'uppercase', textAlign: 'center' }} xs={8}>
+            <Col style={{ textTransform: 'uppercase', textAlign: 'center' }} xs={0} sm={5}>
               <Text>{t('quantity')}</Text>
             </Col>
             {!isMobile() && (
               <>
-                <Col style={{ textTransform: 'uppercase', textAlign: 'right' }} xs={3}>
-                  <Text>{t('price')}</Text>
+                <Col style={{ textTransform: 'uppercase', textAlign: 'right', marginRight: '3px' }} xs={0} sm={3}>
+                  <Text style={{ marginRight: '12px' }}>{t('price')}</Text>
                 </Col>
-                <Col style={{ textTransform: 'uppercase', textAlign: 'right' }} xs={3}>
-                  <Text>{t('total')}</Text>
+                <Col style={{ textTransform: 'uppercase', textAlign: 'right', marginRight: '3px' }} xs={0} sm={3}>
+                  <Text style={{ marginRight: '12px' }}>{t('total')}</Text>
                 </Col>
               </>
             )}
-            <Col style={{ textTransform: 'uppercase', textAlign: 'right' }} xs={1}></Col>
+            <Col style={{ textTransform: 'uppercase', textAlign: 'right' }} xs={2}></Col>
           </Row>
           <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
             {cart?.length > 0 ? (
@@ -292,26 +293,79 @@ const ModalCart = ({ open, handleClose }) => {
                     borderBottom: index === cart?.length - 1 ? '' : '1px solid #ddd'
                   }}
                 >
-                  <Col xs={2}>
+                  <Col xs={2} sm={1}>
                     <Flex align={'center'}>
                       <Text strong>{index + 1}</Text>
                     </Flex>
                   </Col>
-                  <Col xs={12} sm={6}>
+                  <Col xs={22} sm={10}>
                     <Flex align={'center'}>
-                      <Avatar
-                        shape="square"
-                        style={{ width: 60 }}
-                        size={60}
-                        src={<img src={item?.images[0] ? config.urlImageSever + item?.images[0]?.url : ''} alt="avatar" />}
+                      <Image
+                        alt={item?.title}
+                        style={{
+                          objectFit: 'cover',
+                          cursor: 'pointer',
+                          height: '60px',
+                          width: '60px'
+                        }}
+                        src={item?.images[0] ? config.urlImageSever + item?.images[0]?.url : ''}
+                        fallback={urlFallBack}
                       />
-                      <div style={{ marginLeft: '10px' }}>
+                      <div style={{ marginLeft: '10px', width: '100%' }}>
                         <div style={{ fontSize: '15px', fontWeight: 'bold' }}>{item.productName}</div>
                         <Text type="secondary">{isMobile() ? `${formattingVND(item.price)}/${item.unit}` : item.unit}</Text>
+                        {isMobile() && (
+                          <Flex justify={'space-between'} align={'center'}>
+                            <Flex justify={'left'} align={'center'}>
+                              <Button
+                                onClick={() => {
+                                  onChangeQuantity('minus', item);
+                                }}
+                                size="small"
+                                icon={<MinusOutlined />}
+                                shape="circle"
+                              ></Button>
+                              <input
+                                onBlur={(e) => {
+                                  onBlurInput(e, item);
+                                }}
+                                onChange={(e) => {
+                                  onChangeInputQuantity(e, item);
+                                }}
+                                style={{
+                                  width: '30px',
+                                  margin: '0px 10px',
+                                  height: '25px',
+                                  textAlign: 'center',
+                                  border: '1px solid #ddd',
+                                  outline: 'none'
+                                }}
+                                value={item?.quantity}
+                              />
+                              <Button
+                                onClick={() => {
+                                  onChangeQuantity('plus', item);
+                                }}
+                                size="small"
+                                icon={<PlusOutlined />}
+                                shape="circle"
+                              ></Button>
+                            </Flex>
+                            <Button
+                              danger
+                              onClick={() => {
+                                onDeleteRowOnCart(item);
+                              }}
+                              icon={<DeleteOutlined />}
+                              size="small"
+                              type="text"
+                            ></Button>
+                          </Flex>
+                        )}
                       </div>
                     </Flex>
                   </Col>
-                  <Col xs={8}>
+                  <Col xs={0} sm={5}>
                     <Flex justify={'center'} align={'center'}>
                       <Button
                         onClick={() => {
@@ -358,7 +412,7 @@ const ModalCart = ({ open, handleClose }) => {
                       </Col>
                     </>
                   )}
-                  <Col style={{ textTransform: 'uppercase', textAlign: 'right' }} xs={2}>
+                  <Col style={{ textTransform: 'uppercase', textAlign: 'right' }} xs={0} sm={2}>
                     <Button
                       danger
                       onClick={() => {

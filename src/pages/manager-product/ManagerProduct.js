@@ -137,7 +137,7 @@ const ManagerProduct = () => {
           cancelText: t('close'),
           centered: true,
           icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
-          onOk: async () => {}
+          onOk: async () => { }
         });
         break;
       case 'catgory':
@@ -171,7 +171,7 @@ const ManagerProduct = () => {
       message.error(rest?.data?.message ?? 'Change status fail!');
     }
   };
-  const onChangeStatus = async (checked) => {};
+  const onChangeStatus = async (checked) => { };
   const getAllCategory = async () => {
     const res = await restApi.get(RouterAPI.getAllCategory);
     if (res?.status === 200) {
@@ -284,7 +284,17 @@ const ManagerProduct = () => {
     items: ITEMROWS,
     onClick: handleMenuClick
   };
+  // số thứ tự = (trang_hiện_tại - 1) * số_bản_ghi_trên_mỗi_trang + số_đang_xem
   const columns = [
+    {
+      align: 'center',
+      key: 'index',
+      title: '#',
+      // fixed: 'left',
+
+      render: (_, data, index) => <>{(page - 1) * rowsPerPage + index}</>,
+      width: isMobile() ? '30px' : '3%'
+    },
     {
       align: 'left',
       key: 'productName',
@@ -305,7 +315,7 @@ const ManagerProduct = () => {
               </Col>
             )}
             <Col xs={24} sm={20} lg={20}>
-              <Link onClick={() => {}}>{data?.productName}</Link>
+              <Link onClick={() => { }}>{data?.productName}</Link>
             </Col>
           </Row>
         </>
@@ -344,11 +354,11 @@ const ManagerProduct = () => {
       filters:
         categories?.length > 0
           ? categories?.map((item) => {
-              return {
-                text: item?.categoryName,
-                value: item?.categoryID
-              };
-            })
+            return {
+              text: item?.categoryName,
+              value: item?.categoryID
+            };
+          })
           : [],
       filterMode: 'tree',
       filterSearch: true,
@@ -459,18 +469,18 @@ const ManagerProduct = () => {
               options={
                 categories?.length > 0
                   ? [
-                      {
-                        label: 'All',
-                        value: ''
-                      }
-                    ].concat(
-                      categories?.map((item) => {
-                        return {
-                          label: item?.categoryName,
-                          value: item?.categoryID
-                        };
-                      })
-                    )
+                    {
+                      label: 'All',
+                      value: ''
+                    }
+                  ].concat(
+                    categories?.map((item) => {
+                      return {
+                        label: item?.categoryName,
+                        value: item?.categoryID
+                      };
+                    })
+                  )
                   : []
               }
             />
@@ -480,6 +490,7 @@ const ManagerProduct = () => {
               enterButton
               style={{ width: isMobile() ? '45%' : '200px', marginLeft: '5px' }}
               onSearch={(value) => {
+                setPage(1)
                 setSearch(value);
               }}
             />
@@ -521,10 +532,10 @@ const ManagerProduct = () => {
               scroll={
                 isMobile()
                   ? {
-                      x: '100vh',
-                      y: '65vh'
-                    }
-                  : { x: null, y: '55vh' }
+                    x: '100vh',
+                    y: '65vh'
+                  }
+                  : { x: null, y: '65vh' }
               }
               columns={columns}
               dataSource={listProduct}

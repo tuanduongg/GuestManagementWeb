@@ -8,6 +8,7 @@ import { CloseOutlined } from '@ant-design/icons';
 import { RouterAPI } from 'utils/routerAPI';
 import restApi from 'utils/restAPI';
 import { useTranslation } from 'react-i18next';
+import { isMobile } from 'utils/helper';
 
 const initValidate = { err: false, msg: '' };
 
@@ -30,7 +31,7 @@ const initValidate = { err: false, msg: '' };
 //   return '';
 // };
 const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, getAll }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [name, setName] = useState('');
@@ -86,12 +87,12 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
         disableEscapeKeyDown={true}
         maxWidth={'sm'}
         sx={{ minHeight: '90vh' }}
-        fullScreen={fullScreen}
+        fullScreen={fullScreen }
         open={open}
         onClose={onClose}
         aria-labelledby="responsive-dialog-title"
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', minWidth: '500px' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', minWidth: isMobile() ? 'auto' : '500px' }}>
           <DialogTitle fontSize={'15px'} sx={{ padding: '10px' }}>
             {t('category')}
           </DialogTitle>

@@ -1,8 +1,8 @@
 import { Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Button } from '@mui/material';
 import { useState } from 'react';
-import {
-  message,
-} from 'antd';
+import copy from 'copy-to-clipboard';
+
+import { message } from 'antd';
 const columns = [
   {
     id: 'STT',
@@ -25,8 +25,7 @@ const columns = [
 ];
 
 const TableCategory = ({ listCategory, changeSelectedRow, selectedRow, onClickDelete }) => {
-  const [messageApi,contextHolder] = message.useMessage();
-
+  const [messageApi, contextHolder] = message.useMessage();
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -78,7 +77,17 @@ const TableCategory = ({ listCategory, changeSelectedRow, selectedRow, onClickDe
                       <TableCell sx={{ padding: '5px', textAlign: 'center' }}>{index + 1}</TableCell>
                       <TableCell sx={{ padding: '5px', textAlign: 'left' }}>{row?.categoryName}</TableCell>
                       <TableCell sx={{ padding: '5px', textAlign: 'center' }}>
-                        {row?.categoryID === selectedRow?.categoryID && (<Button onClick={() => { navigator.clipboard.writeText(row?.categoryID);message.success('Copy scuccessful!') }} size="small">Copy</Button>)}
+                        {row?.categoryID === selectedRow?.categoryID && (
+                          <Button
+                            onClick={() => {
+                              copy(row?.categoryID, { message: false, });
+                              message.success('Copy scuccessful!')
+                            }}
+                            size="small"
+                          >
+                            Copy
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   );

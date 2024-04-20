@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Row, Col, Typography, Card, Pagination, Input, Space, Dropdown, message, Button, FloatButton, Drawer } from 'antd';
+import { Table, Row, Col, Typography, Card, Pagination, Input, Space, Dropdown, message, Button, FloatButton, Empty } from 'antd';
 const { Title, Link, Text } = Typography;
 const { Meta } = Card;
 import './list-product.css';
@@ -133,13 +133,13 @@ const ListProduct = () => {
           </Col>
         </Row>
         <div className="wrap_list_item">
-          {listProduct?.map((item, index) => (
+          {listProduct?.length > 0 ? listProduct?.map((item, index) => (
             <div key={index} style={{ width: isMobile() ? `${100 / 2}%` : isTablet() ? `${100 / 4}%` : `${100 / 5}%`, padding: '10px' }}>
               <CardProduct onClickProduct={onClickProduct} product={item} />
             </div>
-          ))}
+          )) : (<Empty style={{ width: '100%' }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)}
         </div>
-        <div className="wrap-pagination">
+        {listProduct?.length > 0 && (<div className="wrap-pagination">
           <Pagination
             current={page}
             onChange={(page, size) => {
@@ -153,7 +153,7 @@ const ListProduct = () => {
             pageSizeOptions={config.sizePageOption}
             responsive={true}
           />
-        </div>
+        </div>)}
         <FloatButton
           onClick={() => {
             setOpenModalCart(true);

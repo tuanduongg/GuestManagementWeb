@@ -67,7 +67,7 @@ const MainCard = forwardRef(
         {darkTitle && title && <CardHeader sx={headerSX} title={<Typography variant="h3">{title}</Typography>} action={secondary} />}
 
         {/* card content */}
-        {content && <CardContent sx={contentSX}>{children}</CardContent>}
+        {content && <CardContent sx={{ ...contentSX, height: `calc(100vh - 78px)` }}>{children}</CardContent>}
         {!content && children}
 
         {/* card footer - clipboard & highlighter  */}

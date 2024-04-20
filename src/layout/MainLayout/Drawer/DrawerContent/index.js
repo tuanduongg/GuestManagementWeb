@@ -94,9 +94,10 @@ const DrawerContent = () => {
       <Menu
         onClick={onClick}
         style={{
-          width: drawerWidth ?? 250,
+          width: 249,
           height: '90vh',
-          overflowX: 'hidden'
+          overflowX: 'hidden',
+          borderInlineEnd: 'none'
         }}
         selectedKeys={openItem}
         onOpenChange={(openKeys) => {

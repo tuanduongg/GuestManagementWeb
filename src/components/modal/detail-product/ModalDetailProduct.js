@@ -17,7 +17,6 @@ import { addToCart } from 'store/reducers/menu';
 import { useDispatch, useSelector } from 'react-redux';
 import { urlFallBack } from 'pages/manager-product/manager-product.service';
 
-
 const ModalDetailProduct = ({ open, handleClose, product }) => {
   const [quantity, setQuantity] = useState(1);
   const [openModalAdd, setOpenModalAdd] = useState(false);
@@ -26,12 +25,12 @@ const ModalDetailProduct = ({ open, handleClose, product }) => {
   const { cart } = useSelector((state) => state.menu);
   const dispatch = useDispatch();
 
-  const handleOk = (e) => { };
+  const handleOk = (e) => {};
   const handleCancel = (e) => {
     setQuantity(1);
     handleClose();
   };
-  const onChangeInput = (e) => { };
+  const onChangeInput = (e) => {};
   const onClickAddToCart = () => {
     if (parseInt(quantity) < 1 || isNaN(parseInt(quantity))) {
       setQuantity(1);
@@ -60,18 +59,28 @@ const ModalDetailProduct = ({ open, handleClose, product }) => {
           <Row style={{ height: '100%' }} gutter={24}>
             <Col style={{ height: '100%', minHeight: '390px' }} xs={24} sm={12}>
               <Swiper pagination={true} navigation={true} modules={[Pagination, Navigation]} className="mySwiper">
-                {product?.images?.map((item, index) => (
-                  <SwiperSlide key={index}>
-                    <Image
-                      height={'100%'}
-                      width={'100%'}
-                      alt={item?.title}
-                      style={{ objectFit: 'cover', cursor: 'pointer', minHeight: '400px' }}
-                      src={config.urlImageSever + item?.url}
-                      fallback={urlFallBack}
-                    />
-                  </SwiperSlide>
-                ))}
+                {product?.images?.length > 0 ? (
+                  product?.images?.map((item, index) => (
+                    <SwiperSlide key={index}>
+                      <Image
+                        height={'100%'}
+                        width={'100%'}
+                        alt={item?.title}
+                        style={{ objectFit: 'cover', cursor: 'pointer', minHeight: '400px' }}
+                        src={config.urlImageSever + item?.url}
+                        fallback={urlFallBack}
+                        />
+                    </SwiperSlide>
+                  ))
+                ) : (
+                  <Image
+                  preview={false}
+                    height={'100%'}
+                    width={'100%'}
+                    style={{ objectFit: 'cover', cursor: 'pointer', minHeight: '400px' }}
+                    src={urlFallBack}
+                  />
+                )}
               </Swiper>
             </Col>
             <Col xs={24} style={{ position: 'relative' }} sm={12}>
