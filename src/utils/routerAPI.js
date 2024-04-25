@@ -36,16 +36,20 @@ export const RouterAPI = {
   storeToken: 'firebase/store-token',
 
   getProductPubic: '/product/public',
-  getAllProduct: '/product/all',
   addProduct: '/product/add',
   editProduct: '/product/edit',
   updateProduct: '/product/update',
   deleteProducts: '/product/delete',
+  getAllProduct: '/product/all',
   changePublicProduct: '/product/changePublic',
   upLoadExcelProduct: '/product/uploadExcel',
 
-  getAllUnit: '/unit/all',
+  getAllOrder: '/order/all',
+  addNewOrder: '/order/add',
+  cancelOrder: '/order/cancel',
+  changeStatusOrder: '/order/change-status',
 
+  getAllUnit: '/unit/all',
 
   allDepartment: '/department/all',
   addDepartment: '/department/add',

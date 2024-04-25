@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
-import { Input, Modal, App, Row, Empty, Col, Card, Button, Flex, Avatar, Typography, Image } from 'antd';
+import { Input, Modal, App, Row, Empty, Col, Card, Button, Flex, message, Typography, Image } from 'antd';
 const { TextArea } = Input;
 const { Text, Title } = Typography;
 
 // assets
-import { PlusOutlined, MinusOutlined, DeleteOutlined, DoubleRightOutlined } from '@ant-design/icons';
+import { PlusOutlined, MinusOutlined, DeleteOutlined, DoubleRightOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +20,8 @@ import { urlFallBack } from 'pages/manager-product/manager-product.service';
 
 const initialValidate = { err: false, message: '' };
 
-const ModalCart = ({ open, handleClose }) => {
+const ModalCart = ({ open, handleClose, setLoading }) => {
+  const [messageApi, contextHolder] = message.useMessage();
   const [disabled, setDisabled] = useState(true);
   const [name, setName] = useState('');
   const [validateName, setValidateName] = useState(initialValidate);
@@ -37,6 +38,14 @@ const ModalCart = ({ open, handleClose }) => {
     right: 0
   });
   const draggleRef = useRef(null);
+
+  useEffect(() => {
+    if (open) {
+      const USERSTRING = localStorage.getItem('DATA_USER');
+      const DATAUSER = USERSTRING ? JSON.parse(USERSTRING) : null;
+      setDepartment(DATAUSER?.department?.departName ?? '');
+    }
+  }, [open]);
 
   const { t } = useTranslation();
   const handleCancel = () => {
@@ -110,9 +119,43 @@ const ModalCart = ({ open, handleClose }) => {
       check = true;
       setValidateDepartment({ err: true, message: 'requiredField' });
     }
+    if (cart?.length < 1) {
+      check = true;
+    }
     if (!check) {
-      alert('pass');
-      console.log('cart', cart);
+      Modal.confirm({
+        title: t('msg_notification'),
+        content: t('msg_confirm_save'),
+        okText: t('yes'),
+        cancelText: t('close'),
+        centered: true,
+        icon: <InfoCircleOutlined style={{ color: '#4096ff' }} />,
+        onOk: async () => {
+          handleSave();
+        }
+      });
+    }
+  };
+  const handleSave = async () => {
+    setLoading(true);
+    const res = await restApi.post(RouterAPI.addNewOrder, {
+      reciever: name,
+      note: note,
+      products: JSON.stringify(cart)
+    });
+    setLoading(false);
+    if (res?.status === 200) {
+      dispatch(setCart({ cart: [] }));
+      handleCancel();
+      messageApi.open({
+        type: 'success',
+        content: t('msg_add_new_order')
+      });
+    } else {
+      messageApi.open({
+        type: 'warning',
+        content: res?.data?.error ?? t('msg_add_new_order_fail')
+      });
     }
   };
   const onChangeInput = (e) => {
@@ -150,9 +193,10 @@ const ModalCart = ({ open, handleClose }) => {
 
   return (
     <>
+      {contextHolder}
       <Modal
         centered
-        okButtonProps={{ icon: <DoubleRightOutlined /> }}
+        okButtonProps={{ icon: <DoubleRightOutlined />, disabled: cart?.length === 0 }}
         className="modal-cart"
         okText={t('btnOrderNow')}
         cancelText={t('close')}
@@ -175,9 +219,9 @@ const ModalCart = ({ open, handleClose }) => {
             }}
             // fix eslintjsx-a11y/mouse-events-have-key-events
             // https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/master/docs/rules/mouse-events-have-key-events.md
-            onFocus={() => { }}
-            onBlur={() => { }}
-          // end
+            onFocus={() => {}}
+            onBlur={() => {}}
+            // end
           >
             {t('yourCart')}
           </div>
@@ -200,12 +244,12 @@ const ModalCart = ({ open, handleClose }) => {
                 <Text style={{ fontSize: '17px', color: '#005494', fontWeight: 'bold' }}>
                   {cart
                     ? formattingVND(
-                      cart.reduce(
-                        (accumulator, currentValue) => accumulator + parseInt(currentValue?.price) * parseInt(currentValue?.quantity),
-                        0
-                      ),
-                      'đ'
-                    )
+                        cart.reduce(
+                          (accumulator, currentValue) => accumulator + parseInt(currentValue?.price) * parseInt(currentValue?.quantity),
+                          0
+                        ),
+                        'đ'
+                      )
                     : ''}
                 </Text>
               </div>
@@ -231,28 +275,13 @@ const ModalCart = ({ open, handleClose }) => {
               {validateName?.err && <div style={{ color: 'red', marginLeft: '3px' }}>{t(validateName?.message)}</div>}
             </Col>
             <Col xs={12}>
-              {t('department')}(<span style={{ color: 'red' }}>*</span>)
-              <Input
-                status={validateDepartment?.err ? 'error' : ''}
-                value={department}
-                name="department"
-                onChange={onChangeInput}
-                placeholder={t('department') + '...'}
-              />
-              {validateDepartment.err && <div style={{ color: 'red', marginLeft: '3px' }}>{t(validateDepartment?.message)}</div>}
-            </Col>
-            <Col style={{ marginTop: '5px' }} xs={24}>
               {t('note')}
-              <TextArea
+              <Input
                 status={validateNote?.err ? 'error' : ''}
                 value={note}
                 name="note"
                 onChange={onChangeInput}
                 placeholder={t('note') + '...'}
-                autoSize={{
-                  minRows: 2,
-                  maxRows: 6
-                }}
               />
               {validateNote.err && <div style={{ color: 'red', marginLeft: '3px' }}>{t(validateNote?.message)}</div>}
             </Col>

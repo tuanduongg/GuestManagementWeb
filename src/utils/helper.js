@@ -300,11 +300,6 @@ export const getColorChipStatus = (status, deleteAt) => {
   }
 
   return <Badge color={color} count={i18next.t(message)} />;
-  // return (
-  //   <Tag color={color} key={status}>
-  //     {message}
-  //   </Tag>
-  // );
 };
 
 export function isMobile() {
@@ -538,3 +533,18 @@ export function getAllDatesInRange(startDate, endDate) {
 
   return dates;
 }
+
+export const concatNameProductsOnOrder = (arrProduct = [], character = ',') => {
+  const length = arrProduct.length;
+  let text = '';
+  if (length > 0) {
+    arrProduct.map((item, index) => {
+      if (index === length - 1) {
+        character = '';
+      }
+      text += item?.product?.productName + character;
+    });
+  }
+
+  return text;
+};

@@ -55,8 +55,13 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
 
   const [status, setStatus] = useState(true);
   const [validateStatus, setValidateStatus] = useState(initialValidate);
+  const [validateDepartmenId, setValidateDepartmentId] = useState(initialValidate);
+
+  const [optionSelectDepartment, setOptionSelectDepartment] = useState([]);
+  const [valueSelectDepart, setValueSelectDepart] = useState('');
 
   const [roleSelect, setRoleSelect] = useState(listRole ? listRole[0]?.ROLE_ID : '');
+  const [validateRole, setValidateRole] = useState(initialValidate);
   const [loading, setLoading] = useState(false);
 
   const draggleRef = useRef(null);
@@ -64,7 +69,15 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
     let check = false;
     if (username?.trim() === '') {
       check = true;
-      setValidateUsername({ error: true, message: 'errorEmptyUsername' });
+      setValidateUsername({ error: true, message: 'requirdField' });
+    }
+    if (roleSelect?.trim() === '') {
+      check = true;
+      setValidateRole({ error: true, message: 'requirdField' });
+    }
+    if (valueSelectDepart?.trim() === '') {
+      check = true;
+      setValidateDepartmentId({ error: true, message: 'requirdField' });
     }
     if (username?.includes(' ')) {
       check = true;
@@ -74,7 +87,7 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
       // modal add
       if (password?.trim() === '') {
         check = true;
-        setValidatePassword({ error: true, message: 'errorEmptyPassword' });
+        setValidatePassword({ error: true, message: 'requirdField' });
       }
       if (password.includes(' ')) {
         check = true;
@@ -96,25 +109,7 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
         }
       }
     }
-    const handleSave = async () => {
-      setLoading(true);
-      let url = RouterAPI.addUser;
-      if (typeModal === 'EDIT') {
-        url = RouterAPI.editUser;
-      }
-      const res = await restApi.post(url, {
-        USER_ID: dataSelect?.USER_ID ? dataSelect?.USER_ID : '',
-        USERNAME: username,
-        PASSWORD: password,
-        role: roleSelect,
-        ACTIVE: status
-      });
-      setLoading(false);
-      if (res?.status === 200) {
-        handleCancel();
-      }
-      afterSave(res);
-    };
+
     if (!check) {
       Modal.confirm({
         title: t('msg_notification'),
@@ -129,6 +124,43 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
       });
     }
   };
+  const handleSave = async () => {
+    setLoading(true);
+    let url = RouterAPI.addUser;
+    if (typeModal === 'EDIT') {
+      url = RouterAPI.editUser;
+    }
+    const res = await restApi.post(url, {
+      USER_ID: dataSelect?.USER_ID ? dataSelect?.USER_ID : '',
+      USERNAME: username,
+      PASSWORD: password,
+      role: roleSelect,
+      ACTIVE: status,
+      deparmentID: valueSelectDepart
+    });
+    setLoading(false);
+    if (res?.status === 200) {
+      handleCancel();
+    }
+    afterSave(res);
+  };
+  const getDepartments = async () => {
+    const res = await restApi.get(RouterAPI.allDepartment);
+    if (res?.status === 200) {
+      const data = res?.data?.map((item) => {
+        return {
+          value: item?.departID,
+          label: `${item?.departName}`
+        };
+      });
+      setOptionSelectDepartment(data);
+    }
+  };
+  useEffect(() => {
+    if (open) {
+      getDepartments();
+    }
+  }, [open]);
 
   useEffect(() => {
     if (open) {
@@ -142,9 +174,12 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
     setPassword('');
     setRoleSelect(initRole(listRole));
     setStatus(STATUS_ACC.ACTIVE);
+    setValueSelectDepart('');
+    setValidateDepartmentId(initialValidate);
     setValidateUsername(initialValidate);
     setValidatePassword(initialValidate);
     setValidateStatus(initialValidate);
+    setValidateRole(initialValidate);
     handleClose();
   };
   const onStart = (_event, uiData) => {
@@ -271,6 +306,26 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
             />
             {validateUsername.error && <p className="message-err">(*){t(validateUsername.message)}</p>}
           </Col>
+          <Col span={24}>
+            <p className="custom-label-input">
+              {t('department')}(<span className="color-red">*</span>)
+            </p>
+            <Select
+              disabled={typeModal === 'VIEW'}
+              value={valueSelectDepart}
+              style={{
+                width: '100%'
+              }}
+              onChange={(value) => {
+                if (validateDepartmenId.error) {
+                  setValidateDepartmentId(initialValidate);
+                }
+                setValueSelectDepart(value);
+              }}
+              options={optionSelectDepartment}
+            />
+            {validateDepartmenId.error && <p className="message-err">(*){t(validateDepartmenId.message)}</p>}
+          </Col>
           <Col span={12}>
             <p className="custom-label-input">
               {t('role')}(<span className="color-red">*</span>)
@@ -282,10 +337,14 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
                 width: '100%'
               }}
               onChange={(value) => {
+                if (validateRole.error) {
+                  setValidateRole(initialValidate);
+                }
                 setRoleSelect(value);
               }}
               options={optionSelect}
             />
+            {validateRole.error && <p className="message-err">(*){t(validateRole.message)}</p>}
           </Col>
           <Col span={12}>
             <p className="custom-label-input">

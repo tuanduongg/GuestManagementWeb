@@ -32,7 +32,7 @@ const Account = ({ role, listRole, onClickEdit, dataACC, setTypeBtnBlock, setSel
       key: 'stt',
       title: '#',
       dataIndex: 'stt',
-      width: 70,
+      width: isMobile() ? 70 : '5%',
       render: (id, record, index) => {
         ++index;
         return index;
@@ -43,37 +43,34 @@ const Account = ({ role, listRole, onClickEdit, dataACC, setTypeBtnBlock, setSel
       key: 'USERNAME',
       title: 'username',
       dataIndex: 'USERNAME',
-      width: 130,
+      width: isMobile() ? 130 : '26%',
       fixed: 'left',
       render: (_, data) => (
         <>
-          <Button
-            type="link"
-            onClick={() => {
-              setDataSelect(data);
-              setTypeModal('VIEW');
-              setOpenModal(true);
-            }}
-          >
-            {data?.USERNAME}
-          </Button>
+          <span style={{ color: '#1677ff' }}>{data?.USERNAME}</span>
         </>
       )
     },
-
+    {
+      align: 'left',
+      key: 'department',
+      title: 'department',
+      width: isMobile() ? 130 : '24%',
+      render: (_, data) => <>{data?.department?.departName}</>
+    },
     {
       key: 'ROLE_NAME',
       title: 'role',
       render: (_, { role }) => <>{role.ROLE_NAME}</>,
       align: 'center',
-      width: 130
+      width: isMobile() ? 130 : '12%'
     },
     {
       key: 'ACTIVE',
       align: 'center',
       title: 'status_col',
       dataIndex: 'ACTIVE',
-      width: 130,
+      width: isMobile() ? 130 : '10%',
       render: (_, { ACTIVE }) => <>{getChipStatusAcc(ACTIVE)}</>
     },
     {
@@ -81,14 +78,14 @@ const Account = ({ role, listRole, onClickEdit, dataACC, setTypeBtnBlock, setSel
       title: 'time_create',
       dataIndex: 'CREATE_AT',
       align: 'center',
-      width: 130,
+      width: isMobile() ? 130 : '15%',
       render: (_, { CREATE_AT }) => <>{formatDateFromDB(CREATE_AT)}</>
     },
     {
       key: 'ACTION',
-      title: 'action_col',
+      title: '',
       align: 'center',
-      width: 80,
+      width: isMobile() ? 80 : '7%',
       hidden: role?.IS_UPDATE ? false : true,
       render: (_, data) => (
         <>
@@ -133,7 +130,9 @@ const Account = ({ role, listRole, onClickEdit, dataACC, setTypeBtnBlock, setSel
                 x: 'max-content',
                 y: '70vh'
               }
-            : null
+            : {
+                y: '64vh'
+              }
         }
         columns={columns.filter((item) => !item?.hidden)}
         dataSource={tableData}

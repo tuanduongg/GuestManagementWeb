@@ -9,7 +9,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 // assets
 import { PlusOutlined, MinusOutlined, ShoppingCartOutlined } from '@ant-design/icons';
-import { ROLE_ACC, STATUS_ACC, isMobile } from 'utils/helper';
+import { ROLE_ACC, STATUS_ACC, formattingVND, isMobile } from 'utils/helper';
 import { useTranslation } from 'react-i18next';
 import './detail_product.css';
 import config from 'config';
@@ -36,7 +36,7 @@ const ModalDetailProduct = ({ open, handleClose, product }) => {
       setQuantity(1);
     }
     dispatch(addToCart({ cart: { ...product, quantity: quantity } }));
-    message.success('Add to cart successful!');
+    message.success(t('msg_add_to_cart'));
   };
 
   return (
@@ -63,18 +63,18 @@ const ModalDetailProduct = ({ open, handleClose, product }) => {
                   product?.images?.map((item, index) => (
                     <SwiperSlide key={index}>
                       <Image
-                        height={'100%'}
+                        height={'500px'}
                         width={'100%'}
                         alt={item?.title}
                         style={{ objectFit: 'cover', cursor: 'pointer', minHeight: '400px' }}
                         src={config.urlImageSever + item?.url}
                         fallback={urlFallBack}
-                        />
+                      />
                     </SwiperSlide>
                   ))
                 ) : (
                   <Image
-                  preview={false}
+                    preview={false}
                     height={'100%'}
                     width={'100%'}
                     style={{ objectFit: 'cover', cursor: 'pointer', minHeight: '400px' }}
@@ -86,9 +86,9 @@ const ModalDetailProduct = ({ open, handleClose, product }) => {
             <Col xs={24} style={{ position: 'relative' }} sm={12}>
               <Title level={4}>{product?.productName}</Title>
               <Title style={{ color: '#005494', fontWeight: 'bold' }} level={4}>
-                {`${product?.price}/${product?.unit}`}
+                {`${formattingVND(product?.price, 'đ')}/${product?.unit}`}
               </Title>
-              <Title level={5}>Description:</Title>
+              <Title level={5}>{t('description')}:</Title>
               <div>{product?.description}</div>
               <Row style={{ position: isMobile() ? '' : 'absolute', bottom: 20, margin: '10px 0px' }} gutter={16}>
                 <Col xs={10}>
@@ -153,7 +153,7 @@ const ModalDetailProduct = ({ open, handleClose, product }) => {
                     type="primary"
                     icon={<ShoppingCartOutlined />}
                   >
-                    Add to cart
+                    {t('btn_add_to_cart')}
                   </Button>
                 </Col>
               </Row>

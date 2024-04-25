@@ -133,27 +133,33 @@ const ListProduct = () => {
           </Col>
         </Row>
         <div className="wrap_list_item">
-          {listProduct?.length > 0 ? listProduct?.map((item, index) => (
-            <div key={index} style={{ width: isMobile() ? `${100 / 2}%` : isTablet() ? `${100 / 4}%` : `${100 / 5}%`, padding: '10px' }}>
-              <CardProduct onClickProduct={onClickProduct} product={item} />
-            </div>
-          )) : (<Empty style={{ width: '100%' }} image={Empty.PRESENTED_IMAGE_SIMPLE} />)}
+          {listProduct?.length > 0 ? (
+            listProduct?.map((item, index) => (
+              <div key={index} style={{ width: isMobile() ? `${100 / 2}%` : isTablet() ? `${100 / 4}%` : `${100 / 5}%`, padding: '10px' }}>
+                <CardProduct onClickProduct={onClickProduct} product={item} />
+              </div>
+            ))
+          ) : (
+            <Empty style={{ width: '100%' }} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          )}
         </div>
-        {listProduct?.length > 0 && (<div className="wrap-pagination">
-          <Pagination
-            current={page}
-            onChange={(page, size) => {
-              setPage(page);
-              setRowsPerPage(size);
-            }}
-            total={total}
-            showTotal={(total, range) => `${range[0]}-${range[1]}/${total} ${t('product')}`}
-            pageSize={rowsPerPage}
-            showSizeChanger={true}
-            pageSizeOptions={config.sizePageOption}
-            responsive={true}
-          />
-        </div>)}
+        {listProduct?.length > 0 && (
+          <div className="wrap-pagination">
+            <Pagination
+              current={page}
+              onChange={(page, size) => {
+                setPage(page);
+                setRowsPerPage(size);
+              }}
+              total={total}
+              showTotal={(total, range) => `${range[0]}-${range[1]}/${total} ${t('product')}`}
+              pageSize={rowsPerPage}
+              showSizeChanger={true}
+              pageSizeOptions={config.sizePageOption}
+              responsive={true}
+            />
+          </div>
+        )}
         <FloatButton
           onClick={() => {
             setOpenModalCart(true);
@@ -166,6 +172,7 @@ const ListProduct = () => {
           icon={<ShoppingCartOutlined />}
         />
         <ModalCart
+          setLoading={setLoading}
           open={openModalCart}
           handleClose={() => {
             setOpenModalCart(false);

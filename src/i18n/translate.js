@@ -95,7 +95,12 @@ export const translate = {
       status: 'Trạng thái',
       delete: 'Xóa',
       btnEdit: 'Edit',
+      btn_add_to_cart: 'Thêm vào giỏ',
+      msg_add_new_order: 'Đặt hàng thành công!',
+      msg_add_to_cart: 'Thêm vào giỏ hành thành công!',
+      msg_add_new_order_fail: 'Đặt hàng thất bại!',
       deleteProduct: 'Bạn muốn xóa sản phẩm đã chọn?',
+      listProduct: 'Danh sách sản phẩm'
     }
   },
   en: {
@@ -136,7 +141,7 @@ export const translate = {
       canelBTN: 'Cancel',
       nameGuest_col: 'Guest name',
       company_col: 'Company',
-      carNum_col: 'Number plate',
+      carNum_col: 'Car number',
       timeIn_col: 'Time in',
       timeOut_col: 'Time out',
       reason_col: 'Reason',
@@ -194,7 +199,12 @@ export const translate = {
       status: 'Status',
       delete: 'Delete',
       deleteProduct: 'Do you want to delete this product?',
+      listProduct: 'List product',
       btnEdit: 'Edit',
+      btn_add_to_cart: 'Add to cart',
+      msg_add_new_order: 'Add new order successful!',
+      msg_add_to_cart: 'Add to cart successful!',
+      msg_add_new_order_fail: 'Add new order fail!'
     }
   },
   ko: {
@@ -293,7 +303,12 @@ export const translate = {
       status: 'Status',
       delete: 'Delete',
       deleteProduct: 'Do you want to delete this product?',
+      listProduct: 'List product',
       btnEdit: 'Edit',
+      btn_add_to_cart: 'Add to cart',
+      msg_add_new_order: 'Add new order successful!',
+      msg_add_to_cart: 'Add to cart successful!',
+      msg_add_new_order_fail: 'Add new order fail!'
     }
   }
 };
