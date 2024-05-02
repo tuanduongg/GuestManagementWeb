@@ -316,7 +316,7 @@ const Order = () => {
                     // backgroundColor: 'hwb(205 6% 9%)'
                     backgroundColor: 'green'
                   }}
-                  count={5}
+                  count={0}
                   offset={[15, -5]}
                 >
                   <span>{t(TABS_ORDER.NEW_TAB.title)}</span>
