@@ -534,16 +534,22 @@ export function getAllDatesInRange(startDate, endDate) {
   return dates;
 }
 
-export const concatNameProductsOnOrder = (arrProduct = [], character = ',') => {
+export const concatNameProductsOnOrder = (arrProduct = [], character = ',', moreCharacter = ' ...') => {
   const length = arrProduct.length;
   let text = '';
   if (length > 0) {
-    arrProduct.map((item, index) => {
-      if (index === length - 1) {
-        character = '';
+    if (length > 2) {
+      text = arrProduct[0]?.product?.productName + character + arrProduct[1]?.product?.productName + moreCharacter;
+      return text;
+    } else {
+      for (let index = 0; index < length; index++) {
+        const item = arrProduct[index];
+        if (index === length - 1) {
+          character = '';
+        }
+        text += item?.product?.productName + character;
       }
-      text += item?.product?.productName + character;
-    });
+    }
   }
 
   return text;

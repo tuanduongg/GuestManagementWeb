@@ -22,13 +22,14 @@ import { useTranslation } from 'react-i18next';
 import config from 'config';
 import { TABS_ORDER, getBadgeStatus } from './order.service';
 import './order.css';
+import ModalDetailOrder from 'components/modal/modal-detail-order/ModalDetailOrder';
 
 const Order = () => {
   const [role, setRole] = useState(null);
-  const [openModalAdd, setOpenModalAdd] = useState(false);
+  const [openModalDetail, setOpenModalDetail] = useState(false);
   const [valueTab, setValueTab] = useState(TABS_ORDER.ALL_TAB.ID);
   const [loading, setLoading] = useState(false);
-  const [messageApi] = message.useMessage();
+  const [messageApi, contextHolder] = message.useMessage();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [openModalCategory, setOpenModalCategory] = useState(false);
   const { t } = useTranslation();
@@ -39,12 +40,12 @@ const Order = () => {
   const [typeModal, setTypeModal] = useState('');
   const [currentRow, setCurrentRow] = useState(null);
   const [totalOrders, setTotalOrders] = useState([]);
-  const [api, contextHolder] = notification.useNotification();
+  const [api] = notification.useNotification();
 
   const handleAccept = async () => {
     if (!currentRow) {
       messageApi.open({
-        type: 'warning',
+        type: 'error',
         content: 'You must choose a row!'
       });
       return;
@@ -61,16 +62,15 @@ const Order = () => {
       getAllOrder();
     } else {
       messageApi.open({
-        type: 'warning',
+        type: 'error',
         content: res?.data?.message ?? 'Change status order fail!'
       });
     }
-    console.log('res', res);
   };
   const handleCancel = async () => {
     if (!currentRow) {
       messageApi.open({
-        type: 'warning',
+        type: 'error',
         content: 'You must choose a row!'
       });
       return;
@@ -88,7 +88,7 @@ const Order = () => {
       getAllOrder();
     } else {
       messageApi.open({
-        type: 'warning',
+        type: 'error',
         content: res?.data?.message ?? 'Cancel order fail!'
       });
     }
@@ -126,25 +126,6 @@ const Order = () => {
         break;
     }
   };
-  const ITEMROWS = [
-    {
-      label: t('accept'),
-      key: 'accept',
-      icon: <CheckOutlined />,
-      disabled: false
-    },
-    {
-      label: t('cancel'),
-      key: 'cancel',
-      icon: <CloseOutlined />,
-      disabled: false,
-      danger: true
-    }
-  ];
-  const menuPropsRow = {
-    items: ITEMROWS,
-    onClick: handleMenuClick
-  };
   const getAllOrder = async () => {
     setLoading(true);
     const obj = { page: +page - 1, rowsPerPage, search, type: valueTab };
@@ -152,7 +133,7 @@ const Order = () => {
     const res = await restApi.post(url, obj);
     setLoading(false);
     if (res?.status === 200) {
-      const data = res?.data;
+      const data = res?.data?.data;
       setTotalOrders(data);
     }
   };
@@ -171,10 +152,17 @@ const Order = () => {
       align: 'left',
       fixed: 'left',
       key: 'orderNumber',
-      title: 'Order Number',
+      title: 'Order number',
       render: (_, data) => (
         <>
-          <Button style={{ padding: '0px' }} type="link">
+          <Button
+            onClick={() => {
+              setCurrentRow(data);
+              setOpenModalDetail(true);
+            }}
+            style={{ padding: '0px' }}
+            type="link"
+          >
             {data?.code}
           </Button>
         </>
@@ -185,14 +173,13 @@ const Order = () => {
       align: 'left',
       key: 'product',
       title: 'Product',
-
       render: (_, data) => <>{concatNameProductsOnOrder(data?.orderDetail, '; ')}</>,
       width: isMobile() ? '130px' : '19%'
     },
 
     {
       key: 'reciever',
-      title: 'reciever',
+      title: 'Reciever',
       dataIndex: 'reciever',
       align: 'center',
       render: (_, data) => <>{data?.reciever}</>,
@@ -221,13 +208,20 @@ const Order = () => {
       title: 'Ngày tạo',
       dataIndex: 'created_at',
       render: (_, data) => <>{formatDateFromDB(data?.created_at)}</>,
-      sorter: (a, b) => a?.created_at - b?.created_at,
+      sorter: (a, b) => {
+        const dateA = new Date(a?.created_at);
+        const dateB = new Date(b?.created_at);
+        if (dateA && dateB) {
+          return dateA.getTime() - dateB.getTime();
+        }
+        return 0;
+      },
       width: isMobile() ? '100px' : '10%'
     },
     {
       align: 'center',
       key: 'status',
-      title: 'status',
+      title: 'Trạng thái',
       render: (_, data) => <>{getBadgeStatus(data?.status)}</>,
       width: isMobile() ? '100px' : '10%'
     },
@@ -238,18 +232,33 @@ const Order = () => {
       render: (_, data) => {
         return (
           <>
-            <Dropdown disabled={data?.disable} trigger={['click']} placement="left" menu={menuPropsRow}>
-              <Button
-                disabled={data?.disable}
-                onClick={() => {
-                  if (data?.disable) {
-                    messageApi.open({
-                      type: 'warning',
-                      content: 'Cannot change status!'
-                    });
-                  } else {
-                    setCurrentRow(data);
+            <Dropdown
+              disabled={!data?.disable?.accept && !data?.disable?.cancel}
+              trigger={['click']}
+              placement="left"
+              menu={{
+                items: [
+                  {
+                    label: t('accept'),
+                    key: 'accept',
+                    icon: <CheckOutlined />,
+                    disabled: !data?.disable?.accept
+                  },
+                  {
+                    label: t('cancel'),
+                    key: 'cancel',
+                    icon: <CloseOutlined />,
+                    disabled: !data?.disable?.cancel,
+                    danger: true
                   }
+                ],
+                onClick: handleMenuClick
+              }}
+            >
+              <Button
+                disabled={!data?.disable?.accept && !data?.disable?.cancel}
+                onClick={() => {
+                  setCurrentRow(data);
                 }}
                 type="text"
                 icon={<MoreOutlined />}
@@ -286,8 +295,8 @@ const Order = () => {
   };
   return (
     <>
-      <Loading loading={loading} />
       {contextHolder}
+      <Loading loading={loading} />
       <MainCard contentSX={{ p: isMobile() ? 0.5 : 2, minHeight: '83vh' }}>
         <Tabs
           value={valueTab}
@@ -353,7 +362,7 @@ const Order = () => {
                       x: '100vh',
                       y: '65vh'
                     }
-                  : { x: null, y: '63vh' }
+                  : { x: null, y: '58vh' }
               }
               columns={columns}
               dataSource={totalOrders}
@@ -374,6 +383,12 @@ const Order = () => {
           </Col>
         </Row>
       </MainCard>
+      <ModalDetailOrder
+        open={openModalDetail}
+        handleClose={() => {
+          setOpenModalDetail(false);
+        }}
+      />
     </>
   );
 };

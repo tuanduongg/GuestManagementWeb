@@ -5,11 +5,11 @@ export const getBadgeStatus = (status) => {
     return <Badge color={'#f5222d'} count={'Cancel'} />;
   }
   let color = '';
-  switch (status?.level) {
-    case 0:
+  switch (status?.statusName.toLowerCase()) {
+    case 'new':
       color = '#16a34a'; //success color
       break;
-    case -1:
+    case 'cancel':
       color = '#f5222d'; //cancel
       break;
 
