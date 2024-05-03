@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Modal, Row, Col, Flex, Typography, Tabs, Image } from 'antd';
+import { Button, Modal, Row, Col, Flex, Typography, Tabs, Image, Segmented } from 'antd';
 import {
   PicLeftOutlined,
   FileImageOutlined,
@@ -8,7 +8,9 @@ import {
   CloseOutlined,
   CheckOutlined,
   AppleOutlined,
-  AndroidOutlined
+  AndroidOutlined,
+  BarsOutlined,
+  AppstoreOutlined
 } from '@ant-design/icons';
 const { Title, Text } = Typography;
 import './modal_info_guest.css';

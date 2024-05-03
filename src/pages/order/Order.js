@@ -40,7 +40,9 @@ const Order = () => {
   const [typeModal, setTypeModal] = useState('');
   const [currentRow, setCurrentRow] = useState(null);
   const [totalOrders, setTotalOrders] = useState([]);
+  const [detailOrder, setDetailOrder] = useState(null);
   const [api] = notification.useNotification();
+  const [itemSteps, setItemSteps] = useState([]);
 
   const handleAccept = async () => {
     if (!currentRow) {
@@ -137,6 +139,47 @@ const Order = () => {
       setTotalOrders(data);
     }
   };
+
+  const getStatus = async (departmentID) => {
+    const res = await restApi.post(RouterAPI.findStatusByDepartment, { departmentID }); ///
+    if (res?.status === 200) {
+      const levelOrder = detailOrder?.status?.level;
+      if (res?.data?.length > 0 && levelOrder) {
+        const newItems = res?.data.map((each) => {
+          if (each?.level <= levelOrder) {
+            return {
+              title: each?.statusName,
+              status: 'finish'
+            };
+          } else {
+            return {
+              title: each?.statusName,
+              status: 'wait'
+            };
+          }
+        });
+        setItemSteps(newItems);
+      }
+    }
+  };
+
+  const onShowDetail = async (data) => {
+    setCurrentRow(data);
+    const orderID = data?.orderID;
+    if (orderID) {
+      getStatus(data?.departmentID);
+      const res = await restApi.post(RouterAPI.detailOrder, { orderID });
+      if (res?.status === 200) {
+        setDetailOrder(res?.data);
+        setOpenModalDetail(true);
+      } else {
+        messageApi.open({
+          type: 'error',
+          content: res?.data?.message ?? 'Get order fail!'
+        });
+      }
+    }
+  };
   useEffect(() => {
     getAllOrder();
   }, [valueTab]);
@@ -157,8 +200,7 @@ const Order = () => {
         <>
           <Button
             onClick={() => {
-              setCurrentRow(data);
-              setOpenModalDetail(true);
+              onShowDetail(data);
             }}
             style={{ padding: '0px' }}
             type="link"
@@ -167,7 +209,7 @@ const Order = () => {
           </Button>
         </>
       ),
-      width: isMobile() ? '130px' : '15%'
+      width: isMobile() ? '137px' : '15%'
     },
     {
       align: 'left',
@@ -384,6 +426,8 @@ const Order = () => {
         </Row>
       </MainCard>
       <ModalDetailOrder
+        ItemProp={itemSteps}
+        detailOrder={detailOrder}
         open={openModalDetail}
         handleClose={() => {
           setOpenModalDetail(false);

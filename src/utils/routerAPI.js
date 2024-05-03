@@ -45,10 +45,12 @@ export const RouterAPI = {
   upLoadExcelProduct: '/product/uploadExcel',
 
   getAllOrder: '/order/all',
+  detailOrder: '/order/detail',
   addNewOrder: '/order/add',
   cancelOrder: '/order/cancel',
   changeStatusOrder: '/order/change-status',
 
+  findStatusByDepartment: '/status/findByDepartment',
   getAllUnit: '/unit/all',
 
   allDepartment: '/department/all',

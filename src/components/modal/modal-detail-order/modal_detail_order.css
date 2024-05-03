@@ -1,3 +1,16 @@
 .card-table > .ant-card-body {
     padding: 0px;
 }
+/* .ant-steps.ant-steps-inline .ant-steps-item-process .ant-steps-item-container .ant-steps-item-content .ant-steps-item-title {
+    color: rgba(0, 0, 0, 0.88);
+}
+.ant-steps.ant-steps-inline .ant-steps-item-error .ant-steps-item-container .ant-steps-item-content .ant-steps-item-title {
+    color: #ff4d4f;
+}
+.ant-steps.ant-steps-inline .ant-steps-item-finish .ant-steps-item-container .ant-steps-item-content .ant-steps-item-title {
+
+    color: rgba(0, 0, 0, 0.88);
+}
+.ant-steps .ant-steps-item-process>.ant-steps-item-container>.ant-steps-item-tail::after {
+    background-color: #1677ff;
+} */

@@ -13,7 +13,7 @@ export const getBadgeStatus = (status) => {
       color = '#f5222d'; //cancel
       break;
 
-    default: //process
+    default: //Wait
       color = '#0ea5e9';
       break;
   }
