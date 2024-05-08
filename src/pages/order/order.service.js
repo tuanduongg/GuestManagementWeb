@@ -12,6 +12,9 @@ export const getBadgeStatus = (status) => {
     case 'cancel':
       color = '#f5222d'; //cancel
       break;
+    case 'wait':
+      color = '#d97706'; //wait
+      break;
 
     default: //Wait
       color = '#0ea5e9';

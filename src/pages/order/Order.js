@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Tabs } from 'antd';
-import { Table, Row, Col, Button, message, Input, Dropdown, notification, Badge, Modal } from 'antd';
+import { Table, Row, Col, Button, message, Input, Dropdown, notification, Badge, Modal, Tooltip, Select } from 'antd';
 const { Search } = Input;
-import { concatNameProductsOnOrder, formatDateFromDB, formattingVND, isMobile, truncateString } from 'utils/helper';
+import { concatNameProductsOnOrder, formatDateFromDB, formattingVND, getDataUserFromLocal, isMobile, truncateString } from 'utils/helper';
 import { RouterAPI } from 'utils/routerAPI';
 import restApi from 'utils/restAPI';
+import { useTheme } from '@mui/material/styles';
+
 import {
   MoreOutlined,
   CheckOutlined,
@@ -14,7 +16,8 @@ import {
   SignatureOutlined,
   StopOutlined,
   InfoCircleOutlined,
-  ExclamationCircleFilled
+  ExclamationCircleFilled,
+  UserOutlined
 } from '@ant-design/icons';
 import Loading from 'components/Loading';
 import MainCard from 'components/MainCard';
@@ -41,8 +44,17 @@ const Order = () => {
   const [currentRow, setCurrentRow] = useState(null);
   const [totalOrders, setTotalOrders] = useState([]);
   const [detailOrder, setDetailOrder] = useState(null);
+  const [dataUser, setDataUser] = useState({});
   const [api] = notification.useNotification();
   const [itemSteps, setItemSteps] = useState([]);
+  const theme = useTheme();
+
+  useEffect(() => {
+    const data = getDataUserFromLocal();
+    if (data) {
+      setDataUser(data);
+    }
+  }, []);
 
   const handleAccept = async () => {
     if (!currentRow) {
@@ -137,40 +149,62 @@ const Order = () => {
     if (res?.status === 200) {
       const data = res?.data?.data;
       setTotalOrders(data);
+      setTotal(res?.data?.count);
     }
   };
 
-  const getStatus = async (departmentID) => {
+  const getStatus = async (departmentID, detailOrderProp) => {
     const res = await restApi.post(RouterAPI.findStatusByDepartment, { departmentID }); ///
     if (res?.status === 200) {
-      const levelOrder = detailOrder?.status?.level;
-      if (res?.data?.length > 0 && levelOrder) {
-        const newItems = res?.data.map((each) => {
-          if (each?.level <= levelOrder) {
-            return {
-              title: each?.statusName,
-              status: 'finish'
-            };
-          } else {
-            return {
-              title: each?.statusName,
-              status: 'wait'
-            };
+      if (detailOrderProp?.cancel_at) {
+        setItemSteps([
+          {
+            title: 'New',
+            status: 'finish'
+          },
+          {
+            title: detailOrderProp?.cancel_by,
+            status: 'error'
+          },
+          {
+            title: 'Done',
+            status: 'wait'
           }
-        });
-        setItemSteps(newItems);
+        ]);
+      } else {
+        const levelOrder = detailOrderProp?.status?.level;
+        if (res?.data?.length > 0 && levelOrder) {
+          const newItems = res?.data.map((each) => {
+            if (each?.level >= 0) {
+              if (each?.level <= levelOrder) {
+                return {
+                  title: each?.statusName,
+                  status: 'finish'
+                };
+              } else {
+                return {
+                  title: each?.statusName,
+                  status: 'wait'
+                };
+              }
+            }
+          });
+          setItemSteps(newItems);
+        }
       }
     }
   };
 
   const onShowDetail = async (data) => {
+    setLoading(true);
     setCurrentRow(data);
     const orderID = data?.orderID;
     if (orderID) {
-      getStatus(data?.departmentID);
       const res = await restApi.post(RouterAPI.detailOrder, { orderID });
       if (res?.status === 200) {
         setDetailOrder(res?.data);
+        await getStatus(data?.departmentID, res?.data);
+        setLoading(false);
         setOpenModalDetail(true);
       } else {
         messageApi.open({
@@ -182,20 +216,20 @@ const Order = () => {
   };
   useEffect(() => {
     getAllOrder();
-  }, [valueTab]);
+  }, [valueTab, page, search, rowsPerPage]);
   const columns = [
     {
       align: 'center',
       key: 'index',
       title: '#',
-      render: (_, data, index) => <>{(page - 1) * rowsPerPage + index}</>,
-      width: isMobile() ? '30px' : '3%'
+      render: (_, data, index) => <>{(page - 1) * rowsPerPage + index + 1}</>,
+      width: isMobile() ? '30px' : '5%'
     },
     {
       align: 'left',
       fixed: 'left',
       key: 'orderNumber',
-      title: 'Order number',
+      title: 'Số hóa đơn',
       render: (_, data) => (
         <>
           <Button
@@ -214,31 +248,39 @@ const Order = () => {
     {
       align: 'left',
       key: 'product',
-      title: 'Product',
-      render: (_, data) => <>{concatNameProductsOnOrder(data?.orderDetail, '; ')}</>,
-      width: isMobile() ? '130px' : '19%'
+      title: 'Sản phẩm',
+      render: (_, data) => (
+        <>
+          {data?.created_by === dataUser?.username ? (
+            <Tooltip placement="top" title={'Order của bạn'}>
+              <UserOutlined style={{ marginRight: '2px', color: theme?.palette?.info?.dark }} />
+            </Tooltip>
+          ) : null}
+          {concatNameProductsOnOrder(data?.orderDetail, '; ')}
+        </>
+      ),
+      width: isMobile() ? '130px' : '18%'
     },
 
     {
       key: 'reciever',
-      title: 'Reciever',
+      title: 'Họ tên',
       dataIndex: 'reciever',
       align: 'center',
       render: (_, data) => <>{data?.reciever}</>,
       width: isMobile() ? '100px' : '11%'
     },
     {
-      key: 'address',
-      title: 'deparment',
-      dataIndex: 'address',
+      key: 'department',
+      title: 'Bộ phận',
       align: 'center',
       render: (_, data) => <>{data?.department?.departName}</>,
-      width: isMobile() ? '100px' : '19%'
+      width: isMobile() ? '100px' : '14%'
     },
     {
       align: 'center',
       key: 'total',
-      title: 'Total',
+      title: 'Tổng tiền',
       dataIndex: 'total',
       render: (_, data) => <>{formattingVND(data?.total)}</>,
       sorter: (a, b) => a?.total - b?.total,
@@ -309,10 +351,10 @@ const Order = () => {
           </>
         );
       },
-      width: isMobile() ? '50px' : '5%'
+      width: isMobile() ? '50px' : '4%'
     }
-  ].map((item) => {
-    return { ...item, title: t(item?.title) };
+  ].map((colItem) => {
+    return { ...colItem, title: t(colItem?.title) };
   });
 
   //   const checkRole = async () => {
@@ -340,54 +382,71 @@ const Order = () => {
       {contextHolder}
       <Loading loading={loading} />
       <MainCard contentSX={{ p: isMobile() ? 0.5 : 2, minHeight: '83vh' }}>
-        <Tabs
-          value={valueTab}
-          defaultActiveKey="1"
-          items={[
-            {
-              key: TABS_ORDER.ALL_TAB.ID,
-              label: t(TABS_ORDER.ALL_TAB.title),
-              icon: <UnorderedListOutlined />,
-              hidden: false
-            },
-            {
-              key: TABS_ORDER.NEW_TAB.ID,
-              label: (
-                <Badge
-                  style={{
-                    // backgroundColor: 'hwb(205 6% 9%)'
-                    backgroundColor: 'green'
-                  }}
-                  count={0}
-                  offset={[15, -5]}
-                >
-                  <span>{t(TABS_ORDER.NEW_TAB.title)}</span>
-                </Badge>
-              ),
-              icon: <SolutionOutlined />,
-              hidden: false
-              // children: 'Content of Tab Pane 2'
-            },
-            {
-              key: TABS_ORDER.ACCEPT_TAB.ID,
-              label: <span>{t(TABS_ORDER.ACCEPT_TAB.title)}</span>,
-              icon: <SignatureOutlined />,
-              hidden: false
-              // children: 'Content of Tab Pane 2'
-            },
-            {
-              key: TABS_ORDER.CANCEL_TAB.ID,
-              label: t(TABS_ORDER.CANCEL_TAB.title),
-              icon: <StopOutlined />,
-              hidden: false
-              // children: 'Content of Tab Pane 2'
-            }
-          ].filter((item) => !item.hidden)}
-          onChange={(key) => {
-            console.log('key', key);
-            setValueTab(key);
-          }}
-        />
+        <Row style={{ justifyContent: 'space-between', alignItems: 'center' }} gutter={24}>
+          <Col xs={24} sm={10}>
+            <Tabs
+              className="tab_order"
+              value={valueTab}
+              defaultActiveKey="1"
+              items={[
+                {
+                  key: TABS_ORDER.ALL_TAB.ID,
+                  label: t(TABS_ORDER.ALL_TAB.title),
+                  icon: <UnorderedListOutlined />,
+                  hidden: false
+                },
+                {
+                  key: TABS_ORDER.NEW_TAB.ID,
+                  label: (
+                    <Badge
+                      style={{
+                        // backgroundColor: 'hwb(205 6% 9%)'
+                        backgroundColor: 'green'
+                      }}
+                      count={0}
+                      offset={[15, -5]}
+                    >
+                      <span>{t(TABS_ORDER.NEW_TAB.title)}</span>
+                    </Badge>
+                  ),
+                  icon: <SolutionOutlined />,
+                  hidden: false
+                  // children: 'Content of Tab Pane 2'
+                },
+                {
+                  key: TABS_ORDER.ACCEPT_TAB.ID,
+                  label: <span>{t(TABS_ORDER.ACCEPT_TAB.title)}</span>,
+                  icon: <SignatureOutlined />,
+                  hidden: false
+                  // children: 'Content of Tab Pane 2'
+                },
+                {
+                  key: TABS_ORDER.CANCEL_TAB.ID,
+                  label: t(TABS_ORDER.CANCEL_TAB.title),
+                  icon: <StopOutlined />,
+                  hidden: false
+                  // children: 'Content of Tab Pane 2'
+                }
+              ].filter((item) => !item.hidden)}
+              onChange={(key) => {
+                console.log('key', key);
+                setValueTab(key);
+              }}
+            />
+          </Col>
+          <Col xs={24} sm={6}>
+            <Search
+              placeholder={t('searchByProductName')}
+              allowClear
+              enterButton
+              // style={{ width: isMobile() ? '45%' : '250px', marginLeft: '5px' }}
+              onSearch={(value) => {
+                setSearch(value);
+                setPage(1);
+              }}
+            />
+          </Col>
+        </Row>
         <Row style={{ marginTop: '15px' }}>
           <Col xs={24}>
             <Table
@@ -412,7 +471,7 @@ const Order = () => {
                 current: page,
                 pageSize: rowsPerPage,
                 showSizeChanger: true,
-                pageSizeOptions: config.sizePageOption,
+                pageSizeOptions: config?.sizePageOption,
                 total: total,
                 responsive: true,
                 onChange: (page, pageSize) => {
