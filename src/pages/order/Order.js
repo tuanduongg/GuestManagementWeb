@@ -47,6 +47,7 @@ const Order = () => {
   const [dataUser, setDataUser] = useState({});
   const [api] = notification.useNotification();
   const [itemSteps, setItemSteps] = useState([]);
+  const [roleAccept, setRoleAccept] = useState({ accept: false, cancel: false });
   const theme = useTheme();
 
   useEffect(() => {
@@ -73,6 +74,7 @@ const Order = () => {
         type: 'success',
         content: 'Thay đổi trạng thái thành công!'
       });
+      setOpenModalDetail(false);
       getAllOrder();
     } else {
       messageApi.open({
@@ -99,6 +101,7 @@ const Order = () => {
         type: 'success',
         content: 'Hủy thành công!'
       });
+      setOpenModalDetail(false);
       getAllOrder();
     } else {
       messageApi.open({
@@ -112,7 +115,7 @@ const Order = () => {
       case 'accept':
         Modal.confirm({
           title: t('msg_notification'),
-          content: t('deleteProduct'),
+          content: t('Bạn muốn duyệt đơn này?'),
           okText: t('yes'),
           cancelText: t('close'),
           centered: true,
@@ -125,7 +128,7 @@ const Order = () => {
       case 'cancel':
         Modal.confirm({
           title: t('msg_notification'),
-          content: t('deleteProduct'),
+          content: t('bạn muốn hủy đơn này?'),
           okText: t('yes'),
           cancelText: t('close'),
           centered: true,
@@ -153,63 +156,106 @@ const Order = () => {
     }
   };
 
-  const getStatus = async (departmentID, detailOrderProp) => {
-    const res = await restApi.post(RouterAPI.findStatusByDepartment, { departmentID }); ///
-    if (res?.status === 200) {
-      if (detailOrderProp?.cancel_at) {
-        setItemSteps([
-          {
-            title: 'New',
-            status: 'finish'
-          },
-          {
-            title: detailOrderProp?.cancel_by,
-            status: 'error'
-          },
-          {
-            title: 'Done',
-            status: 'wait'
-          }
-        ]);
-      } else {
-        const levelOrder = detailOrderProp?.status?.level;
-        if (res?.data?.length > 0 && levelOrder) {
-          const newItems = res?.data.map((each) => {
-            if (each?.level >= 0) {
-              if (each?.level <= levelOrder) {
-                return {
-                  title: each?.statusName,
-                  status: 'finish'
-                };
-              } else {
-                return {
-                  title: each?.statusName,
-                  status: 'wait'
-                };
-              }
-            }
-          });
-          setItemSteps(newItems);
-        }
-      }
-    }
+  // const getStatus = async (departmentID, detailOrderProp) => {
+  //   const res = await restApi.post(RouterAPI.findStatusByDepartment, { departmentID }); ///
+  //   if (res?.status === 200) {
+  //     if (detailOrderProp?.cancel_at) {
+  //       setItemSteps([
+  //         {
+  //           title: 'New',
+  //           status: 'finish'
+  //         },
+  //         {
+  //           title: detailOrderProp?.cancel_by,
+  //           status: 'error'
+  //         },
+  //         {
+  //           title: 'Done',
+  //           status: 'wait'
+  //         }
+  //       ]);
+  //     } else {
+  //       const levelOrder = detailOrderProp?.status?.level;
+  //       if (res?.data?.length > 0 && levelOrder) {
+  //         const newItems = res?.data.map((each) => {
+  //           if (each?.level >= 0) {
+  //             if (each?.level <= levelOrder) {
+  //               return {
+  //                 title: each?.statusName,
+  //                 status: 'finish'
+  //               };
+  //             } else {
+  //               return {
+  //                 title: each?.statusName,
+  //                 status: 'wait'
+  //               };
+  //             }
+  //           }
+  //         });
+  //         setItemSteps(newItems);
+  //       }
+  //     }
+  //   } else {
+  //     setItemSteps([]);
+  //   }
+  // };
+  const onClickShowDetail = (data) => {
+    onShowDetail(data);
   };
-
   const onShowDetail = async (data) => {
     setLoading(true);
+    // await getStatus(data?.departmentID, res?.data);
     setCurrentRow(data);
     const orderID = data?.orderID;
     if (orderID) {
-      const res = await restApi.post(RouterAPI.detailOrder, { orderID });
+      const res = await restApi.post(RouterAPI.detailOrderWithAllStatus, { orderID });
+      setLoading(false);
       if (res?.status === 200) {
-        setDetailOrder(res?.data);
-        await getStatus(data?.departmentID, res?.data);
-        setLoading(false);
+        const order = res?.data?.order;
+        const allStatus = res?.data?.allStatus;
+        setRoleAccept(data?.disable);
+        setDetailOrder(order);
+        if (order?.cancel_at) {
+          setItemSteps([
+            {
+              title: 'New',
+              status: 'finish'
+            },
+            {
+              title: order?.cancel_by,
+              status: 'error'
+            },
+            {
+              title: 'Done',
+              status: 'wait'
+            }
+          ]);
+        } else {
+          const levelOrder = order?.status?.level;
+          if (allStatus?.length > 0 && order?.status) {
+            const newItems = allStatus.map((each) => {
+              if (each?.level >= 0) {
+                if (each?.level <= levelOrder) {
+                  return {
+                    title: each?.statusName,
+                    status: 'finish'
+                  };
+                } else {
+                  return {
+                    title: each?.statusName,
+                    status: 'wait'
+                  };
+                }
+              }
+            });
+            setItemSteps(newItems);
+          }
+        }
         setOpenModalDetail(true);
       } else {
         messageApi.open({
           type: 'error',
-          content: res?.data?.message ?? 'Get order fail!'
+          content: res?.data?.message ?? 'Get infomation order fail!'
         });
       }
     }
@@ -229,12 +275,12 @@ const Order = () => {
       align: 'left',
       fixed: 'left',
       key: 'orderNumber',
-      title: 'Số hóa đơn',
+      title: 'order_number_col',
       render: (_, data) => (
         <>
           <Button
             onClick={() => {
-              onShowDetail(data);
+              onClickShowDetail(data);
             }}
             style={{ padding: '0px' }}
             type="link"
@@ -248,7 +294,7 @@ const Order = () => {
     {
       align: 'left',
       key: 'product',
-      title: 'Sản phẩm',
+      title: 'product',
       render: (_, data) => (
         <>
           {data?.created_by === dataUser?.username ? (
@@ -259,12 +305,12 @@ const Order = () => {
           {concatNameProductsOnOrder(data?.orderDetail, '; ')}
         </>
       ),
-      width: isMobile() ? '130px' : '18%'
+      width: isMobile() ? '130px' : '15%'
     },
 
     {
       key: 'reciever',
-      title: 'Họ tên',
+      title: 'name',
       dataIndex: 'reciever',
       align: 'center',
       render: (_, data) => <>{data?.reciever}</>,
@@ -272,7 +318,7 @@ const Order = () => {
     },
     {
       key: 'department',
-      title: 'Bộ phận',
+      title: 'department',
       align: 'center',
       render: (_, data) => <>{data?.department?.departName}</>,
       width: isMobile() ? '100px' : '14%'
@@ -280,7 +326,7 @@ const Order = () => {
     {
       align: 'center',
       key: 'total',
-      title: 'Tổng tiền',
+      title: 'totalCol',
       dataIndex: 'total',
       render: (_, data) => <>{formattingVND(data?.total)}</>,
       sorter: (a, b) => a?.total - b?.total,
@@ -289,7 +335,7 @@ const Order = () => {
     {
       align: 'center',
       key: 'create_at',
-      title: 'Ngày tạo',
+      title: 'createDate',
       dataIndex: 'created_at',
       render: (_, data) => <>{formatDateFromDB(data?.created_at)}</>,
       sorter: (a, b) => {
@@ -305,7 +351,7 @@ const Order = () => {
     {
       align: 'center',
       key: 'status',
-      title: 'Trạng thái',
+      title: 'status_col',
       render: (_, data) => <>{getBadgeStatus(data?.status)}</>,
       width: isMobile() ? '100px' : '10%'
     },
@@ -383,7 +429,7 @@ const Order = () => {
       <Loading loading={loading} />
       <MainCard contentSX={{ p: isMobile() ? 0.5 : 2, minHeight: '83vh' }}>
         <Row style={{ justifyContent: 'space-between', alignItems: 'center' }} gutter={24}>
-          <Col xs={24} sm={10}>
+          <Col xs={24} sm={18}>
             <Tabs
               className="tab_order"
               value={valueTab}
@@ -436,7 +482,7 @@ const Order = () => {
           </Col>
           <Col xs={24} sm={6}>
             <Search
-              placeholder={t('searchByProductName')}
+              placeholder={t('searchByOrderCode')}
               allowClear
               enterButton
               // style={{ width: isMobile() ? '45%' : '250px', marginLeft: '5px' }}
@@ -485,6 +531,8 @@ const Order = () => {
         </Row>
       </MainCard>
       <ModalDetailOrder
+        handleMenuClick={handleMenuClick}
+        roleAccept={roleAccept}
         ItemProp={itemSteps}
         detailOrder={detailOrder}
         open={openModalDetail}

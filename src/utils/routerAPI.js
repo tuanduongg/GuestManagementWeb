@@ -46,6 +46,7 @@ export const RouterAPI = {
 
   getAllOrder: '/order/all',
   detailOrder: '/order/detail',
+  detailOrderWithAllStatus: '/order/detail-with-status',
   addNewOrder: '/order/add',
   cancelOrder: '/order/cancel',
   changeStatusOrder: '/order/change-status',

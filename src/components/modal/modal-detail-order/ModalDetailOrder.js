@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Input, Modal, App, Row, Col, Typography, Card, Flex, Table, message, Steps } from 'antd';
+import { Input, Modal, App, Row, Col, Typography, Card, Flex, Table, message, Steps, Button } from 'antd';
 const { Title, Text } = Typography;
-import { UserOutlined, SolutionOutlined, LoadingOutlined, CheckCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { PrinterOutlined, CloseOutlined, CheckOutlined, StopOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import config from 'config';
 import './modal_detail_order.css';
@@ -9,7 +9,7 @@ import { formatDateFromDB, formattingVND, isMobile } from 'utils/helper';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 
-const ModalDetailOrder = ({ open, handleClose, detailOrder, ItemProp }) => {
+const ModalDetailOrder = ({ open, handleClose, detailOrder, ItemProp, roleAccept, handleMenuClick }) => {
   const [products, setProducts] = useState([]);
   const [status, setStatus] = useState([]);
   const [itemSteps, setItemSteps] = useState([]);
@@ -117,6 +117,38 @@ const ModalDetailOrder = ({ open, handleClose, detailOrder, ItemProp }) => {
             {/* <span style={{ color: '#1677ff', fontSize: '14px ', margin: '0px' }}>#OD-1714107275258</span> */}
           </>
         }
+        footer={[
+          <Button icon={<PrinterOutlined />} key="1">
+            In
+          </Button>,
+          roleAccept?.cancel ? (
+            <Button
+              onClick={() => {
+                handleMenuClick({ key: 'cancel' });
+              }}
+              icon={<StopOutlined />}
+              key="2"
+              danger
+            >
+              Hủy
+            </Button>
+          ) : null,
+          roleAccept?.accept ? (
+            <Button
+              onClick={() => {
+                handleMenuClick({ key: 'accept' });
+              }}
+              icon={<CheckOutlined />}
+              key="3"
+              type="primary"
+            >
+              Duyệt
+            </Button>
+          ) : null,
+          <Button key={'4'} onClick={handleCancel}>
+            Close
+          </Button>
+        ]}
         open={open}
         onOk={handleOk}
         onCancel={handleCancel}

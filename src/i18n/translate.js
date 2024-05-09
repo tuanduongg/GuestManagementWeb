@@ -82,6 +82,7 @@ export const translate = {
       btnMore: 'Khác',
       category: 'Danh mục',
       searchByProductName: 'Tên sản phẩm...',
+      searchByOrderCode: 'Số hóa đơn...',
       product: 'Sản phẩm',
       yourCart: 'Giỏ Hàng',
       quantity: 'Số lượng',
@@ -100,7 +101,13 @@ export const translate = {
       msg_add_to_cart: 'Thêm vào giỏ hành thành công!',
       msg_add_new_order_fail: 'Đặt hàng thất bại!',
       deleteProduct: 'Bạn muốn xóa sản phẩm đã chọn?',
-      listProduct: 'Danh sách sản phẩm'
+      listProduct: 'Danh sách sản phẩm',
+      orderCode: 'Số hóa đơn',
+      totalCol: 'Tổng tiền',
+      print: 'In',
+      product_col: 'Sản phẩm',
+      order_number_col: 'Số hóa đơn',
+      all: 'Tất cả'
     }
   },
   en: {
@@ -186,6 +193,7 @@ export const translate = {
       btnMore: 'More',
       category: 'Category',
       searchByProductName: 'Search by product name...',
+      searchByOrderCode: 'Order No.',
       product: 'Product',
       yourCart: 'Your Cart',
       quantity: 'Quantity',
@@ -204,7 +212,13 @@ export const translate = {
       btn_add_to_cart: 'Add to cart',
       msg_add_new_order: 'Add new order successful!',
       msg_add_to_cart: 'Add to cart successful!',
-      msg_add_new_order_fail: 'Add new order fail!'
+      msg_add_new_order_fail: 'Add new order fail!',
+      orderCode: 'Order code',
+      totalCol: 'Total',
+      print: 'Print',
+      product_col: 'Product',
+      order_number_col: 'Order No.',
+      all: 'All'
     }
   },
   ko: {
@@ -240,7 +254,7 @@ export const translate = {
       msg_logout: '정말로 로그아웃하시겠습니까?',
       today: '오늘',
       regisList: '모두 보기',
-      createDate: 'Create date',
+      createDate: '일자',
       createBTN: '신규',
       canelBTN: '취소',
       nameGuest_col: '방문자 이름',
@@ -252,12 +266,12 @@ export const translate = {
       personSeowon_col: '담당자',
       department_col: '방문 부서',
       department: '부서',
-      status_col: '유형',
+      status_col: '상태',
       action_col: '기능',
       status_accepted: 'Accepted',
       status_comein: 'Arrived',
       status_cancel: 'Cancel',
-      status_new: 'New',
+      status_new: '신규',
       tittle_edit: '정보 편집',
       dateArrived: '날짜',
       msg_add_success: 'Add new successful!',
@@ -290,9 +304,10 @@ export const translate = {
       btnMore: 'More',
       category: 'Category',
       searchByProductName: 'Search by product name...',
-      product: 'Product',
+      searchByOrderCode: '계산서 No.',
+      product: '유형',
       yourCart: 'Your Cart',
-      quantity: 'Quantity',
+      quantity: '수량',
       price: 'Price',
       total: 'Total',
       note: 'Note',
@@ -308,7 +323,13 @@ export const translate = {
       btn_add_to_cart: 'Add to cart',
       msg_add_new_order: 'Add new order successful!',
       msg_add_to_cart: 'Add to cart successful!',
-      msg_add_new_order_fail: 'Add new order fail!'
+      msg_add_new_order_fail: 'Add new order fail!',
+      orderCode: 'Order code',
+      totalCol: '총액',
+      print: '인쇄',
+      product_col: '상품',
+      order_number_col: '계산서 No.',
+      all: '다'
     }
   }
 };

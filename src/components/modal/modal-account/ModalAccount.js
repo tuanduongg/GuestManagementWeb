@@ -167,6 +167,7 @@ const ModalAccount = ({ open, handleClose, typeModal, dataSelect, listRole, afte
       setUsername(dataSelect?.USERNAME);
       setRoleSelect(dataSelect?.role?.ROLE_ID);
       setStatus(dataSelect?.ACTIVE ? true : false);
+      setValueSelectDepart(dataSelect?.department?.departID);
     }
   }, [dataSelect]);
   const handleCancel = (e) => {

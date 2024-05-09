@@ -6,7 +6,7 @@ export const getBadgeStatus = (status) => {
   }
   let color = '';
   switch (status?.statusName.toLowerCase()) {
-    case 'new':
+    case 'done':
       color = '#16a34a'; //success color
       break;
     case 'cancel':
@@ -14,6 +14,9 @@ export const getBadgeStatus = (status) => {
       break;
     case 'wait':
       color = '#d97706'; //wait
+      break;
+    case 'new':
+      color = '#6d28d9'; //done
       break;
 
     default: //Wait
@@ -25,8 +28,8 @@ export const getBadgeStatus = (status) => {
 };
 
 export const TABS_ORDER = {
-  NEW_TAB: { title: 'Mới', ID: 'NEW_TAB' },
+  NEW_TAB: { title: 'status_new', ID: 'NEW_TAB' },
   CANCEL_TAB: { title: 'Đã hủy', ID: 'CANCEL_TAB' },
-  ALL_TAB: { title: 'Tất cả', ID: 'ALL_TAB' },
+  ALL_TAB: { title: 'all', ID: 'ALL_TAB' },
   ACCEPT_TAB: { title: 'Đã duyệt', ID: 'ACCEPT_TAB' }
 };

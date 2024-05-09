@@ -315,7 +315,7 @@ const ModalAddProduct = ({ open, handleClose, categories, typeModal, setLoading,
                 onRemove={onRemoveImage}
                 fileList={fileList}
                 multiple
-                accept=".png,.jpeg,.png,.jpg"
+                accept=".png,.jpeg,.png,.jpg,.PNG,.JPEG,.JPG,.JPG"
                 onPreview={handlePreview}
                 beforeUpload={handleBeforeUpload}
                 onChange={handleChange}
