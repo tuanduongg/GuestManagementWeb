@@ -115,7 +115,7 @@ const Order = () => {
       case 'accept':
         Modal.confirm({
           title: t('msg_notification'),
-          content: t('Bạn muốn duyệt đơn này?'),
+          content: t('msg_accept_order'),
           okText: t('yes'),
           cancelText: t('close'),
           centered: true,
@@ -128,7 +128,7 @@ const Order = () => {
       case 'cancel':
         Modal.confirm({
           title: t('msg_notification'),
-          content: t('bạn muốn hủy đơn này?'),
+          content: t('msg_cancel_order'),
           okText: t('yes'),
           cancelText: t('close'),
           centered: true,
@@ -155,50 +155,6 @@ const Order = () => {
       setTotal(res?.data?.count);
     }
   };
-
-  // const getStatus = async (departmentID, detailOrderProp) => {
-  //   const res = await restApi.post(RouterAPI.findStatusByDepartment, { departmentID }); ///
-  //   if (res?.status === 200) {
-  //     if (detailOrderProp?.cancel_at) {
-  //       setItemSteps([
-  //         {
-  //           title: 'New',
-  //           status: 'finish'
-  //         },
-  //         {
-  //           title: detailOrderProp?.cancel_by,
-  //           status: 'error'
-  //         },
-  //         {
-  //           title: 'Done',
-  //           status: 'wait'
-  //         }
-  //       ]);
-  //     } else {
-  //       const levelOrder = detailOrderProp?.status?.level;
-  //       if (res?.data?.length > 0 && levelOrder) {
-  //         const newItems = res?.data.map((each) => {
-  //           if (each?.level >= 0) {
-  //             if (each?.level <= levelOrder) {
-  //               return {
-  //                 title: each?.statusName,
-  //                 status: 'finish'
-  //               };
-  //             } else {
-  //               return {
-  //                 title: each?.statusName,
-  //                 status: 'wait'
-  //               };
-  //             }
-  //           }
-  //         });
-  //         setItemSteps(newItems);
-  //       }
-  //     }
-  //   } else {
-  //     setItemSteps([]);
-  //   }
-  // };
   const onClickShowDetail = (data) => {
     onShowDetail(data);
   };
@@ -335,7 +291,7 @@ const Order = () => {
     {
       align: 'center',
       key: 'create_at',
-      title: 'createDate',
+      title: 'time',
       dataIndex: 'created_at',
       render: (_, data) => <>{formatDateFromDB(data?.created_at)}</>,
       sorter: (a, b) => {

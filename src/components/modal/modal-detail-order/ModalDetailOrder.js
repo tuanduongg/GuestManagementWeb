@@ -51,7 +51,7 @@ const ModalDetailOrder = ({ open, handleClose, detailOrder, ItemProp, roleAccept
       render: (_, data, index) => index + 1
     },
     {
-      title: 'Sản phẩm',
+      title: 'product',
       align: 'left',
       key: 'product',
       dataIndex: 'product',
@@ -60,24 +60,26 @@ const ModalDetailOrder = ({ open, handleClose, detailOrder, ItemProp, roleAccept
       }
     },
     {
-      title: 'Số lượng',
+      title: 'quantity',
       align: 'center',
       dataIndex: 'quantity',
       key: 'quantity'
     },
     {
-      title: 'Đơn giá',
+      title: 'price',
       align: 'center',
       dataIndex: 'price',
       key: 'price'
     },
     {
-      title: 'Thành tiền',
+      title: 'totalCol',
       align: 'right',
       dataIndex: 'total',
       key: 'total'
     }
-  ];
+  ].map((col) => {
+    return { ...col, title: t(col?.title) };
+  });
   // const data = [
   //   {
   //     key: '1',
@@ -111,15 +113,10 @@ const ModalDetailOrder = ({ open, handleClose, detailOrder, ItemProp, roleAccept
         width={800}
         zIndex={1300}
         maskClosable={false}
-        title={
-          <>
-            Chi tiết hóa đơn
-            {/* <span style={{ color: '#1677ff', fontSize: '14px ', margin: '0px' }}>#OD-1714107275258</span> */}
-          </>
-        }
+        title={<>{t('order_detail')}</>}
         footer={[
           <Button icon={<PrinterOutlined />} key="1">
-            In
+            {t('print')}
           </Button>,
           roleAccept?.cancel ? (
             <Button
@@ -130,7 +127,7 @@ const ModalDetailOrder = ({ open, handleClose, detailOrder, ItemProp, roleAccept
               key="2"
               danger
             >
-              Hủy
+              {t('cancel')}
             </Button>
           ) : null,
           roleAccept?.accept ? (
@@ -142,12 +139,14 @@ const ModalDetailOrder = ({ open, handleClose, detailOrder, ItemProp, roleAccept
               key="3"
               type="primary"
             >
-              Duyệt
+              {t('accept')}
             </Button>
           ) : null,
-          <Button key={'4'} onClick={handleCancel}>
-            Close
-          </Button>
+          !isMobile() && (
+            <Button key={'4'} onClick={handleCancel}>
+              {t('close')}
+            </Button>
+          )
         ]}
         open={open}
         onOk={handleOk}
@@ -156,7 +155,7 @@ const ModalDetailOrder = ({ open, handleClose, detailOrder, ItemProp, roleAccept
         <div style={{ minWidth: '100%', height: 'auto', minHeight: '400px' }}>
           <Row gutter={[10, 10]}>
             <Col xs={24}>
-              <Card size="small" title="Trạng thái">
+              <Card size="small" title={t('status')}>
                 <Steps
                   // progressDot
                   size="small"
@@ -165,12 +164,12 @@ const ModalDetailOrder = ({ open, handleClose, detailOrder, ItemProp, roleAccept
               </Card>
             </Col>
             <Col xs={24}>
-              <Card size="small" title="Thông tin chung">
+              <Card size="small" title={t('general_info')}>
                 <Row gutter={[5, 5]}>
                   <Col xs={24} sm={12}>
                     <Flex>
                       <Text strong style={{ marginRight: '5px' }}>
-                        Mã hoá đơn:
+                        {t('order_number_col')}:
                       </Text>
                       <Text>{detailOrder?.code}</Text>
                     </Flex>
@@ -178,7 +177,7 @@ const ModalDetailOrder = ({ open, handleClose, detailOrder, ItemProp, roleAccept
                   <Col xs={24} sm={12}>
                     <Flex>
                       <Text strong style={{ marginRight: '5px' }}>
-                        Thời gian tạo:
+                        {t('time')}:
                       </Text>
                       <Text>{formatDateFromDB(detailOrder?.created_at)}</Text>
                     </Flex>
@@ -186,7 +185,7 @@ const ModalDetailOrder = ({ open, handleClose, detailOrder, ItemProp, roleAccept
                   <Col xs={24} sm={12}>
                     <Flex>
                       <Text strong style={{ marginRight: '5px' }}>
-                        Tài khoản:
+                        {t('username')}:
                       </Text>
                       <Text>{detailOrder?.created_by}</Text>
                     </Flex>
@@ -194,7 +193,7 @@ const ModalDetailOrder = ({ open, handleClose, detailOrder, ItemProp, roleAccept
                   <Col xs={24} sm={12}>
                     <Flex>
                       <Text strong style={{ marginRight: '5px' }}>
-                        Họ và Tên:
+                        {t('name')}:
                       </Text>
                       <Text>{detailOrder?.reciever}</Text>
                     </Flex>
@@ -202,7 +201,7 @@ const ModalDetailOrder = ({ open, handleClose, detailOrder, ItemProp, roleAccept
                   <Col xs={24} sm={12}>
                     <Flex>
                       <Text strong style={{ marginRight: '5px' }}>
-                        Bộ phận:
+                        {t('department')}:
                       </Text>
                       <Text>{detailOrder?.department?.departName}</Text>
                     </Flex>
@@ -210,7 +209,7 @@ const ModalDetailOrder = ({ open, handleClose, detailOrder, ItemProp, roleAccept
                   <Col xs={24} sm={12}>
                     <Flex>
                       <Text strong style={{ marginRight: '5px' }}>
-                        Ghi chú:
+                        {t('note')}:
                       </Text>
                       <Text>{detailOrder?.note}</Text>
                     </Flex>
@@ -225,7 +224,7 @@ const ModalDetailOrder = ({ open, handleClose, detailOrder, ItemProp, roleAccept
                   size="small"
                   footer={() => (
                     <div style={{ display: 'flex', justifyContent: 'end', fontWeight: 'bold' }}>
-                      Tổng tiền: {formattingVND(detailOrder?.total)}
+                      {t('total')}: {formattingVND(detailOrder?.total)}
                     </div>
                   )}
                   pagination={false}

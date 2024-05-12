@@ -29,7 +29,7 @@ export const getBadgeStatus = (status) => {
 
 export const TABS_ORDER = {
   NEW_TAB: { title: 'status_new', ID: 'NEW_TAB' },
-  CANCEL_TAB: { title: 'Đã hủy', ID: 'CANCEL_TAB' },
+  CANCEL_TAB: { title: 'cancel', ID: 'CANCEL_TAB' },
   ALL_TAB: { title: 'all', ID: 'ALL_TAB' },
-  ACCEPT_TAB: { title: 'Đã duyệt', ID: 'ACCEPT_TAB' }
+  ACCEPT_TAB: { title: 'approved', ID: 'ACCEPT_TAB' }
 };

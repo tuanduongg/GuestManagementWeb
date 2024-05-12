@@ -104,10 +104,16 @@ export const translate = {
       listProduct: 'Danh sách sản phẩm',
       orderCode: 'Số hóa đơn',
       totalCol: 'Tổng tiền',
-      print: 'In',
       product_col: 'Sản phẩm',
       order_number_col: 'Số hóa đơn',
-      all: 'Tất cả'
+      all: 'Tất cả',
+      approved: 'Đã duyệt',
+      cancel: 'Hủy',
+      order_detail: 'Chi tiết đơn hàng',
+      msg_cancel_order: 'Bạn muốn hủy đơn này?',
+      msg_accept_order: 'Bạn chắc chắn muốn duyệt đơn này?',
+      accept: 'Chấp nhận',
+      print: 'In'
     }
   },
   en: {
@@ -215,10 +221,16 @@ export const translate = {
       msg_add_new_order_fail: 'Add new order fail!',
       orderCode: 'Order code',
       totalCol: 'Total',
-      print: 'Print',
       product_col: 'Product',
       order_number_col: 'Order No.',
-      all: 'All'
+      all: 'All',
+      approved: 'Approved',
+      cancel: 'Cancel',
+      order_detail: 'Order detail',
+      msg_cancel_order: 'Are you sure you want to cancel this order?',
+      msg_accept_order: 'Are you sure you want to accept this order?',
+      accept: 'Accept',
+      print: 'Print'
     }
   },
   ko: {
@@ -308,9 +320,9 @@ export const translate = {
       product: '유형',
       yourCart: 'Your Cart',
       quantity: '수량',
-      price: 'Price',
-      total: 'Total',
-      note: 'Note',
+      price: '가격',
+      total: '총액',
+      note: '적요',
       requiredField: 'This field is required',
       btnOrderNow: 'Order now',
       unit: 'Unit',
@@ -326,10 +338,16 @@ export const translate = {
       msg_add_new_order_fail: 'Add new order fail!',
       orderCode: 'Order code',
       totalCol: '총액',
-      print: '인쇄',
       product_col: '상품',
       order_number_col: '계산서 No.',
-      all: '다'
+      all: '다',
+      approved: '인허하다',
+      cancel: '취소',
+      order_detail: '주문내역',
+      msg_cancel_order: 'Are you sure you want to cancel this order?',
+      msg_accept_order: 'Are you sure you want to accept this order?',
+      accept: '수락하다',
+      print: '인쇄'
     }
   }
 };

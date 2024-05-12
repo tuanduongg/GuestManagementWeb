@@ -12,7 +12,7 @@ const HeaderContent = () => {
 
   return (
     <>
-      <Box sx={{ width: '100%', ml: 1 }} />
+      {/* <Box sx={{ width: '100%', ml: 1 }} /> */}
       <Profile />
     </>
   );

@@ -31,7 +31,7 @@ import './profile.style.css';
 
 // assets
 import { IdcardOutlined, LogoutOutlined, CheckOutlined, TranslationOutlined, RedoOutlined } from '@ant-design/icons';
-import { logout } from 'utils/helper';
+import { isMobile, logout } from 'utils/helper';
 import { OPTION_LANGUAGE } from './profile.service';
 import ModalChangePassword from 'components/modal/modal-changepassword/ModalChangePassword';
 import { useTranslation } from 'react-i18next';
@@ -134,7 +134,7 @@ const Profile = () => {
           <Avatar alt="profile user" sx={{ width: 32, height: 32 }}>
             {dataUser?.username ? dataUser?.username[0] : ''}
           </Avatar>
-          <Typography variant="subtitle1">{dataUser?.username}</Typography>
+          {!isMobile() && <Typography variant="subtitle1">{dataUser?.username}</Typography>}
         </Stack>
       </ButtonBase>
       <Popper
