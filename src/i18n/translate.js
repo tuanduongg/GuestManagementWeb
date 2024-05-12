@@ -113,7 +113,9 @@ export const translate = {
       msg_cancel_order: 'Bạn muốn hủy đơn này?',
       msg_accept_order: 'Bạn chắc chắn muốn duyệt đơn này?',
       accept: 'Chấp nhận',
-      print: 'In'
+      print: 'In',
+      from: 'Từ',
+      to: 'Đến'
     }
   },
   en: {
@@ -230,7 +232,9 @@ export const translate = {
       msg_cancel_order: 'Are you sure you want to cancel this order?',
       msg_accept_order: 'Are you sure you want to accept this order?',
       accept: 'Accept',
-      print: 'Print'
+      print: 'Print',
+      from: 'From',
+      to: 'To'
     }
   },
   ko: {
@@ -347,7 +351,9 @@ export const translate = {
       msg_cancel_order: 'Are you sure you want to cancel this order?',
       msg_accept_order: 'Are you sure you want to accept this order?',
       accept: '수락하다',
-      print: '인쇄'
+      print: '인쇄',
+      from: 'From',
+      to: 'To'
     }
   }
 };

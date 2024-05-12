@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Tabs } from 'antd';
-import { Table, Row, Col, Button, message, Input, Dropdown, notification, Badge, Modal, Tooltip, Select } from 'antd';
+import { Table, Row, Col, Button, message, Input, Dropdown, notification, Badge, Modal, Tooltip, DatePicker } from 'antd';
 const { Search } = Input;
 import { concatNameProductsOnOrder, formatDateFromDB, formattingVND, getDataUserFromLocal, isMobile, truncateString } from 'utils/helper';
 import { RouterAPI } from 'utils/routerAPI';
 import restApi from 'utils/restAPI';
 import { useTheme } from '@mui/material/styles';
-
+const { RangePicker } = DatePicker;
 import {
   MoreOutlined,
   CheckOutlined,
@@ -26,7 +26,8 @@ import config from 'config';
 import { TABS_ORDER, getBadgeStatus } from './order.service';
 import './order.css';
 import ModalDetailOrder from 'components/modal/modal-detail-order/ModalDetailOrder';
-
+import dayjs from 'dayjs';
+const today = dayjs();
 const Order = () => {
   const [role, setRole] = useState(null);
   const [openModalDetail, setOpenModalDetail] = useState(false);
@@ -47,6 +48,8 @@ const Order = () => {
   const [dataUser, setDataUser] = useState({});
   const [api] = notification.useNotification();
   const [itemSteps, setItemSteps] = useState([]);
+  const [fromDateValue, setFromDateValue] = useState(today.subtract(30, 'day'));
+  const [toDateValue, setToDateValue] = useState(today);
   const [roleAccept, setRoleAccept] = useState({ accept: false, cancel: false });
   const theme = useTheme();
 
@@ -145,7 +148,7 @@ const Order = () => {
   };
   const getAllOrder = async () => {
     setLoading(true);
-    const obj = { page: +page - 1, rowsPerPage, search, type: valueTab };
+    const obj = { page: +page - 1, rowsPerPage, search, type: valueTab, fromDate: fromDateValue, toDate: toDateValue };
     const url = RouterAPI.getAllOrder;
     const res = await restApi.post(url, obj);
     setLoading(false);
@@ -218,7 +221,7 @@ const Order = () => {
   };
   useEffect(() => {
     getAllOrder();
-  }, [valueTab, page, search, rowsPerPage]);
+  }, [valueTab, page, search, rowsPerPage, fromDateValue, toDateValue]);
   const columns = [
     {
       align: 'center',
@@ -379,13 +382,35 @@ const Order = () => {
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
+  // eslint-disable-next-line arrow-body-style
+  const disabledDate = (current) => {
+    // Can not select days before today and today
+    return current && current < dayjs().endOf('day');
+  };
+  const disabledRangeTime = (_, type) => {
+    if (type === 'start') {
+      return {
+        disabledHours: () => range(0, 60).splice(4, 20)
+      };
+    }
+    return {
+      disabledHours: () => range(0, 60).splice(20, 4)
+    };
+  };
+  const range = (start, end) => {
+    const result = [];
+    for (let i = start; i < end; i++) {
+      result.push(i);
+    }
+    return result;
+  };
   return (
     <>
       {contextHolder}
       <Loading loading={loading} />
       <MainCard contentSX={{ p: isMobile() ? 0.5 : 2, minHeight: '83vh' }}>
-        <Row style={{ justifyContent: 'space-between', alignItems: 'center' }} gutter={24}>
-          <Col xs={24} sm={18}>
+        <Row style={{ justifyContent: 'space-between', alignItems: 'center' }} gutter={8}>
+          <Col xs={24} sm={10} md={12}>
             <Tabs
               className="tab_order"
               value={valueTab}
@@ -431,12 +456,41 @@ const Order = () => {
                 }
               ].filter((item) => !item.hidden)}
               onChange={(key) => {
-                console.log('key', key);
                 setValueTab(key);
               }}
             />
           </Col>
-          <Col xs={24} sm={6}>
+          <Col xs={24} sm={8} md={7}>
+            <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
+              {t('from')}
+              <DatePicker
+                style={{ margin: '5px' }}
+                allowClear={false}
+                value={fromDateValue}
+                onChange={(value, dateString) => {
+                  setFromDateValue(value);
+                }}
+                format={{
+                  format: config.dateFormat,
+                  type: 'mask'
+                }}
+              />
+              {t('to')}
+              <DatePicker
+                style={{ marginLeft: '5px' }}
+                allowClear={false}
+                value={toDateValue}
+                onChange={(value, dateString) => {
+                  setToDateValue(value);
+                }}
+                format={{
+                  format: config.dateFormat,
+                  type: 'mask'
+                }}
+              />
+            </div>
+          </Col>
+          <Col xs={24} sm={6} md={5}>
             <Search
               placeholder={t('searchByOrderCode')}
               allowClear
@@ -462,9 +516,9 @@ const Order = () => {
               scroll={
                 isMobile()
                   ? {
-                      x: '100vh',
-                      y: '65vh'
-                    }
+                    x: '100vh',
+                    y: '65vh'
+                  }
                   : { x: null, y: '58vh' }
               }
               columns={columns}

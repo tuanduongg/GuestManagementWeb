@@ -50,25 +50,28 @@ const Header = ({ open, handleDrawerToggle, showLogo }) => {
   }, [pathname]);
   // common header
   const mainHeader = (
-    <Toolbar>
-      {showLogo ? null : (
-        <IconButton
-          disableRipple
-          aria-label="open drawer"
-          onClick={handleDrawerToggle}
-          edge="start"
-          color="secondary"
-          sx={{ color: 'text.primary', bgcolor: open ? iconBackColorOpen : iconBackColor, ml: { xs: 0, lg: -2 } }}
-        >
-          {!open ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-        </IconButton>
-      )}
-      {showLogo && (
-        <div style={{ width: '300px' }}>
-          <Logo />
-        </div>
-      )}
-      <div style={{ fontSize: '15px', minWidth: '200px', fontWeight: '500',marginLeft:'5px' }}>{t(`${currentPage}`)}</div>
+    <Toolbar style={{justifyContent:'space-between'}}>
+      <div style={{display:'flex',alignItems:'center'}}>
+
+        {showLogo ? null : (
+          <IconButton
+            disableRipple
+            aria-label="open drawer"
+            onClick={handleDrawerToggle}
+            edge="start"
+            color="secondary"
+            sx={{ color: 'text.primary', bgcolor: open ? iconBackColorOpen : iconBackColor, ml: { xs: 0, lg: -2 } }}
+          >
+            {!open ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          </IconButton>
+        )}
+        {showLogo && (
+          <div style={{ width: '300px' }}>
+            <Logo />
+          </div>
+        )}
+        <div style={{ fontSize: '15px', minWidth: '200px', fontWeight: '500', marginLeft: '5px' }}>{t(`${currentPage}`)}</div>
+      </div>
       {/* {(isMdScreen() || isMobile()) && (
         <IconButton
           disableRipple
