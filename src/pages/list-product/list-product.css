@@ -39,12 +39,12 @@
     }
 }
 
-.ant-input-affix-wrapper {
+.search_list_product>.ant-input-wrapper>.ant-input-affix-wrapper {
     border-start-start-radius: 0px !important;
     border-end-start-radius: 0px !important;
 }
 
-.ant-input-search-button {
+.search_list_product>.ant-input-wrapper>.ant-input-group-addon>.ant-input-search-button {
     border-start-end-radius: 0px !important;
     border-end-end-radius: 0px !important;
 }

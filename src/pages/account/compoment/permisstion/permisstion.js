@@ -1,4 +1,4 @@
-import { Collapse, Row, Col, Checkbox, Divider, Button, Flex, message } from 'antd';
+import { Collapse, Row, Col, Checkbox, Divider, Button, Flex, message, Table } from 'antd';
 import { CaretRightOutlined, PlusOutlined, SaveOutlined, DeleteOutlined } from '@ant-design/icons';
 import './permisstion.css';
 import { useEffect, useState } from 'react';
@@ -13,12 +13,150 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [roles, setRoles] = useState([]);
   const [checkChange, setCheckChange] = useState(false);
+  // const [items, setItems] = useState([]);
 
   useEffect(() => {
     if (listRole) {
       setRoles(listRole);
     }
   }, [listRole]);
+  // useEffect(() => {
+  //   if (roles) {
+  //     const itemsTable = roles?.map((roleItem, index) => {
+  //       return {
+  //         key: index,
+  //         label: (
+  //           <Row>
+  //             <Col span={24}>
+  //               <Flex gap="small" wrap="wrap" style={{ width: '100%' }} justify="space-between" algin="center">
+  //                 <div>
+  //                   <strong>{roleItem?.ROLE_NAME}</strong>
+  //                 </div>
+  //               </Flex>
+  //             </Col>
+  //           </Row>
+  //         ),
+  //         children: (
+  //           <Table
+  //             className={index}
+  //             bordered={false}
+  //             pagination={false}
+  //             rowHoverable={false}
+  //             columns={[
+  //               {
+  //                 fixed: 'left',
+  //                 title: 'Screen',
+  //                 key: 'name',
+  //                 render: (data) => data?.SCREEN,
+  //                 width: '100px'
+  //               },
+  //               {
+  //                 title: 'Read',
+  //                 key: 'read',
+  //                 width: '50px',
+  //                 render: (data) => (
+  //                   <Checkbox
+  //                     onChange={(e) => {
+  //                       onChangeCheckbox(e, index, roleItem?.ROLE_ID);
+  //                     }}
+  //                     name="IS_READ"
+  //                     checked={data?.IS_READ}
+  //                   />
+  //                 )
+  //               },
+  //               {
+  //                 title: 'Create',
+  //                 key: 'create',
+  //                 width: '50px',
+  //                 render: (data) => (
+  //                   <Checkbox
+  //                     onChange={(e) => {
+  //                       onChangeCheckbox(e, index, roleItem?.ROLE_ID);
+  //                     }}
+  //                     name="IS_CREATE"
+  //                     checked={data?.IS_CREATE}
+  //                   />
+  //                 )
+  //               },
+  //               {
+  //                 title: 'Update',
+  //                 key: 'update',
+  //                 width: '50px',
+  //                 render: (data) => (
+  //                   <Checkbox
+  //                     onChange={(e) => {
+  //                       onChangeCheckbox(e, index, roleItem?.ROLE_ID);
+  //                     }}
+  //                     name="IS_UPDATE"
+  //                     checked={data?.IS_UPDATE}
+  //                   />
+  //                 )
+  //               },
+  //               {
+  //                 title: 'Delete',
+  //                 key: 'delete',
+  //                 width: '50px',
+  //                 render: (data) => (
+  //                   <Checkbox
+  //                     onChange={(e) => {
+  //                       onChangeCheckbox(e, index, roleItem?.ROLE_ID);
+  //                     }}
+  //                     name="IS_DELETE"
+  //                     checked={data?.IS_DELETE}
+  //                   />
+  //                 )
+  //               },
+  //               {
+  //                 title: 'Import',
+  //                 key: 'import',
+  //                 width: '50px',
+  //                 render: (data) => (
+  //                   <Checkbox
+  //                     onChange={(e) => {
+  //                       onChangeCheckbox(e, index, roleItem?.ROLE_ID);
+  //                     }}
+  //                     name="IS_IMPORT"
+  //                     checked={data?.IS_IMPORT}
+  //                   />
+  //                 )
+  //               },
+  //               {
+  //                 title: 'Export',
+  //                 key: 'export',
+  //                 width: '50px',
+  //                 render: (data) => (
+  //                   <Checkbox
+  //                     onChange={(e) => {
+  //                       onChangeCheckbox(e, index, roleItem?.ROLE_ID);
+  //                     }}
+  //                     name="IS_EXPORT"
+  //                     checked={data?.IS_EXPORT}
+  //                   />
+  //                 )
+  //               },
+  //               {
+  //                 title: 'Accept',
+  //                 key: 'accept',
+  //                 width: '50px',
+  //                 render: (data) => (
+  //                   <Checkbox
+  //                     onChange={(e) => {
+  //                       onChangeCheckbox(e, index, roleItem?.ROLE_ID);
+  //                     }}
+  //                     name="IS_ACCEPT"
+  //                     checked={data?.IS_ACCEPT}
+  //                   />
+  //                 )
+  //               }
+  //             ]}
+  //             dataSource={roleItem?.permisstions}
+  //           />
+  //         )
+  //       };
+  //     });
+  //     setItems(itemsTable);
+  //   }
+  // }, [roles]);
   const onChangeCheckbox = (e, index, ROLE_ID) => {
     const { name, checked } = e.target;
     setCheckChange(true);
@@ -128,6 +266,7 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
     };
   });
 
+
   const onClickSave = async () => {
     const data = roles;
     const res = await restApi.post(RouterAPI.updateRole, { data: data });
@@ -173,7 +312,12 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
           <strong>Accept</strong>
         </Col>
       </Row>
-      <Collapse expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />} items={items} defaultActiveKey={['0']} />
+      <Collapse
+        className="collapse_permission"
+        expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+        items={items}
+        defaultActiveKey={['0']}
+      />
       <Flex gap="small" wrap="wrap" style={{ width: '100%', marginTop: '10px' }} justify="right">
         {role?.IS_UPDATE && (
           <>

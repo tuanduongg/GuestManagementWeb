@@ -8,7 +8,7 @@ import goods from './goods';
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems = {
-  items: [dashboard, pages,goods]
+  items: [dashboard, goods,pages,]
 };
 
 export default menuItems;

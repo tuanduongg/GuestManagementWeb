@@ -622,7 +622,7 @@ const ListGuest = () => {
             }}
           />
           <Row style={{ margin: '5px 0px 10px 0px' }}>
-            {valueTab === HISTORY_TAB && (
+            {valueTab === HISTORY_TAB ? (
               <Col sm={12} xs={24}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: isMobile() ? 'space-between' : '' }}>
                   <span style={{ fontWeight: 'bold', marginRight: '10px' }}>
@@ -647,7 +647,7 @@ const ListGuest = () => {
                   />
                 </div>
               </Col>
-            )}
+            ) : null}
             <Col style={{ margin: isMobile() ? '10px 0px' : '' }} sm={valueTab !== HISTORY_TAB ? 24 : 12} xs={24}>
               <div style={{ display: 'flex', justifyContent: 'end' }}>
                 {role?.IS_CREATE && (

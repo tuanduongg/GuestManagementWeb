@@ -122,6 +122,7 @@ const ListProduct = () => {
           <Col sm={10} md={6} xs={9}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <Search
+                className="search_list_product"
                 onSearch={(value) => {
                   setSearch(value);
                 }}

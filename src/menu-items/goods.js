@@ -1,5 +1,5 @@
 // assets
-import { LoginOutlined, ProductOutlined, UserOutlined, ShoppingCartOutlined } from '@ant-design/icons';
+import { LoginOutlined, ProductOutlined, UserOutlined, ShoppingCartOutlined,InsertRowAboveOutlined } from '@ant-design/icons';
 import { ConfigRouter } from 'config_router';
 
 
@@ -7,20 +7,28 @@ import { ConfigRouter } from 'config_router';
 
 const goods = {
   id: 'guests',
-  title: 'Vật tư tiêu hao',
+  title: 'consumables',
   type: 'group',
   children: [
     {
       id: ConfigRouter.listProduct.url,
-      title: 'Sản phẩm',
+      title: 'listProduct',
       type: 'item',
       url: ConfigRouter.listProduct.url,
       icon: <ProductOutlined />,
       target: false
     },
     {
+      id: ConfigRouter.managementProduct.url,
+      title: 'manageProduct',
+      type: 'item',
+      url: ConfigRouter.managementProduct.url,
+      icon: <InsertRowAboveOutlined />,
+      target: false
+    },
+    {
       id: ConfigRouter.listOrder.url,
-      title: 'Hoá đơn',
+      title: 'order',
       type: 'item',
       url: ConfigRouter.listOrder.url,
       icon: <UserOutlined />,

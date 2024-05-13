@@ -537,7 +537,7 @@ const ManagerProduct = () => {
                       x: '100vh',
                       y: '65vh'
                     }
-                  : { x: null, y: '63vh' }
+                  : { x: null, y: 'calc(100vh - 230px)' }
               }
               columns={columns}
               dataSource={listProduct}

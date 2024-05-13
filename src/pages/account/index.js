@@ -183,20 +183,20 @@ const AccountPage = () => {
       </Row> */}
       <MainCard contentSX={{ p: isMobile() ? 0.5 : 2, minHeight: '83vh' }}>
         <Row>
-          <Col xs={24} sm={6} style={{ marginBottom: '10px' }}>
-            <Segmented
-              block
+          <Col xs={24} sm={6}>
+            <Tabs
+              className="tab_account"
               value={valueTab}
-              onChange={(value) => {
-                setValueTab(value);
-              }}
-              options={[
+              defaultActiveKey="1"
+              items={[
                 {
+                  key: 'account',
                   label: 'sibar_acc',
                   value: 'account',
                   icon: <TeamOutlined />
                 },
                 {
+                  key: 'role',
                   label: 'role',
                   value: 'role',
                   icon: <SafetyOutlined />
@@ -204,9 +204,12 @@ const AccountPage = () => {
               ].map((col) => {
                 return { ...col, label: t(col.label) };
               })}
+              onChange={(key) => {
+                setValueTab(key);
+              }}
             />
           </Col>
-          <Col xs={24} sm={18} style={{ marginBottom: '10px' }}>
+          <Col xs={24} sm={18}>
             <Flex gap="small" wrap="wrap" style={{ width: '100%' }} justify="end">
               {valueTab === 'account' && (
                 <Search

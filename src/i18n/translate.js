@@ -115,7 +115,10 @@ export const translate = {
       accept: 'Chấp nhận',
       print: 'In',
       from: 'Từ',
-      to: 'Đến'
+      to: 'Đến',
+      consumables: 'Vật tư tiêu hao',
+      order: 'Hoá đơn',
+      manageProduct: 'Quản lý sản phẩm'
     }
   },
   en: {
@@ -234,7 +237,10 @@ export const translate = {
       accept: 'Accept',
       print: 'Print',
       from: 'From',
-      to: 'To'
+      to: 'To',
+      consumables: 'Consumables',
+      order: 'Order',
+      manageProduct: 'Manage Product'
     }
   },
   ko: {
@@ -353,7 +359,10 @@ export const translate = {
       accept: '수락하다',
       print: '인쇄',
       from: 'From',
-      to: 'To'
+      to: 'To',
+      consumables: '소모품',
+      order: '주문하다',
+      manageProduct: 'Manage Product'
     }
   }
 };

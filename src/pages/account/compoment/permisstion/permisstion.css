@@ -1,3 +1,7 @@
 .center-text {
   text-align: center;
 }
+.collapse_permission {
+  max-height: calc(100vh - 250px);
+  overflow-y: auto;
+}
