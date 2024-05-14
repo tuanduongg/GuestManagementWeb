@@ -19,14 +19,6 @@ const goods = {
       target: false
     },
     {
-      id: ConfigRouter.managementProduct.url,
-      title: 'manageProduct',
-      type: 'item',
-      url: ConfigRouter.managementProduct.url,
-      icon: <InsertRowAboveOutlined />,
-      target: false
-    },
-    {
       id: ConfigRouter.listOrder.url,
       title: 'order',
       type: 'item',
@@ -34,6 +26,15 @@ const goods = {
       icon: <UserOutlined />,
       target: false
     },
+    {
+      id: ConfigRouter.managementProduct.url,
+      title: 'manageProduct',
+      type: 'item',
+      url: ConfigRouter.managementProduct.url,
+      icon: <InsertRowAboveOutlined />,
+      target: false
+    },
+    
   ]
 };
 

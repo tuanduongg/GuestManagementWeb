@@ -183,7 +183,7 @@ const AccountPage = () => {
       </Row> */}
       <MainCard contentSX={{ p: isMobile() ? 0.5 : 2, minHeight: '83vh' }}>
         <Row>
-          <Col xs={24} sm={6}>
+          <Col xs={24} sm={8}>
             <Tabs
               className="tab_account"
               value={valueTab}
@@ -209,7 +209,7 @@ const AccountPage = () => {
               }}
             />
           </Col>
-          <Col xs={24} sm={18}>
+          <Col xs={24} sm={16}>
             <Flex gap="small" wrap="wrap" style={{ width: '100%' }} justify="end">
               {valueTab === 'account' && (
                 <Search
@@ -223,7 +223,7 @@ const AccountPage = () => {
                   onSearch={onChangeSearch}
                 />
               )}
-              <div>
+              <div style={{ marginBottom: '7px' }}>
                 {role?.IS_CREATE && (
                   <Button shape="round" onClick={onClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
                     {t('btn_new')}

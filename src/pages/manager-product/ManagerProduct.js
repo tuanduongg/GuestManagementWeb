@@ -315,7 +315,13 @@ const ManagerProduct = () => {
               </Col>
             )}
             <Col xs={24} sm={20} lg={20}>
-              <Link onClick={() => {}} style={{ cursor: 'default' }}>
+              <Link
+                onClick={() => {
+                  setCurrentRow(data);
+                  setTypeModal('EDIT');
+                  setOpenModalAdd(true);
+                }}
+              >
                 {data?.productName}
               </Link>
             </Col>
@@ -344,7 +350,13 @@ const ManagerProduct = () => {
     {
       key: 'inventory',
       title: 'inventory',
-      dataIndex: 'inventory',
+      render: (_, data) => (
+        <>
+          <span style={{ color: data?.inventory < 0 ? 'red' : 'rgba(0, 0, 0, 0.88)', fontWeight: data?.inventory < 0 ? 'bold' : '' }}>
+            {data?.inventory}
+          </span>
+        </>
+      ),
       align: 'center',
       sorter: (a, b) => a?.inventory - b?.inventory,
       width: isMobile() ? '100px' : '10%'
@@ -352,7 +364,7 @@ const ManagerProduct = () => {
     {
       align: 'center',
       key: 'category',
-      title: 'category',
+      title: 'categoryProduct',
       filters:
         categories?.length > 0
           ? categories?.map((item) => {
@@ -370,7 +382,7 @@ const ManagerProduct = () => {
     },
     {
       key: 'isShow',
-      title: 'status',
+      title: 'status_col',
       dataIndex: 'isShow',
       align: 'center',
       render: (_, data) => (
@@ -381,8 +393,8 @@ const ManagerProduct = () => {
               onClickSwitch(data);
             }}
             size="small"
-            checkedChildren="On"
-            unCheckedChildren="Off"
+            checkedChildren="Show"
+            unCheckedChildren="Hide"
             checked={data?.isShow}
             onChange={onChangeStatus}
           />

@@ -3,33 +3,35 @@ import { useState } from 'react';
 import copy from 'copy-to-clipboard';
 
 import { message } from 'antd';
-const columns = [
-  {
-    id: 'STT',
-    label: '#',
-    // minWidth: 170,
-    align: 'center'
-  },
-  {
-    id: 'name',
-    label: 'Department',
-    // minWidth: 170,
-    align: 'left'
-  },
-  {
-    id: 'copy',
-    label: '',
-    // minWidth: 170,
-    align: 'center'
-  }
-];
+import { useTranslation } from 'react-i18next';
 
 const TableCategory = ({ listCategory, changeSelectedRow, selectedRow, onClickDelete }) => {
   const [messageApi, contextHolder] = message.useMessage();
+  const { t } = useTranslation();
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
+  const columns = [
+    {
+      id: 'STT',
+      label: '#',
+      // minWidth: 170,
+      align: 'center'
+    },
+    {
+      id: 'name',
+      label: t('category'),
+      // minWidth: 170,
+      align: 'left'
+    },
+    {
+      id: 'copy',
+      label: '',
+      // minWidth: 170,
+      align: 'center'
+    }
+  ];
 
   const handleChangeRowsPerPage = (event) => {
     setPage(0);
@@ -85,7 +87,7 @@ const TableCategory = ({ listCategory, changeSelectedRow, selectedRow, onClickDe
                             }}
                             size="small"
                           >
-                            Copy
+                            Copy Id
                           </Button>
                         )}
                       </TableCell>

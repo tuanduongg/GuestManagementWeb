@@ -98,7 +98,7 @@ export const translate = {
       btnEdit: 'Edit',
       btn_add_to_cart: 'Thêm vào giỏ',
       msg_add_new_order: 'Đặt hàng thành công!',
-      msg_add_to_cart: 'Thêm vào giỏ hành thành công!',
+      msg_add_to_cart: 'Thêm vào giỏ hàng thành công!',
       msg_add_new_order_fail: 'Đặt hàng thất bại!',
       deleteProduct: 'Bạn muốn xóa sản phẩm đã chọn?',
       listProduct: 'Danh sách sản phẩm',
@@ -118,7 +118,8 @@ export const translate = {
       to: 'Đến',
       consumables: 'Vật tư tiêu hao',
       order: 'Hoá đơn',
-      manageProduct: 'Quản lý sản phẩm'
+      manageProduct: 'Quản lý sản phẩm',
+      categoryProduct: 'Danh mục'
     }
   },
   en: {
@@ -218,7 +219,7 @@ export const translate = {
       status: 'Status',
       delete: 'Delete',
       deleteProduct: 'Do you want to delete this product?',
-      listProduct: 'List product',
+      listProduct: 'Product list',
       btnEdit: 'Edit',
       btn_add_to_cart: 'Add to cart',
       msg_add_new_order: 'Add new order successful!',
@@ -240,7 +241,8 @@ export const translate = {
       to: 'To',
       consumables: 'Consumables',
       order: 'Order',
-      manageProduct: 'Manage Product'
+      manageProduct: 'Product management',
+      categoryProduct: 'Category'
     }
   },
   ko: {
@@ -335,12 +337,12 @@ export const translate = {
       note: '적요',
       requiredField: 'This field is required',
       btnOrderNow: 'Order now',
-      unit: 'Unit',
-      inventory: 'Inventory',
+      unit: '단위',
+      inventory: '재고가',
       status: 'Status',
       delete: 'Delete',
       deleteProduct: 'Do you want to delete this product?',
-      listProduct: 'List product',
+      listProduct: '제품 목록',
       btnEdit: 'Edit',
       btn_add_to_cart: 'Add to cart',
       msg_add_new_order: 'Add new order successful!',
@@ -362,7 +364,8 @@ export const translate = {
       to: 'To',
       consumables: '소모품',
       order: '주문하다',
-      manageProduct: 'Manage Product'
+      manageProduct: '제품 관리',
+      categoryProduct: '품목구분'
     }
   }
 };

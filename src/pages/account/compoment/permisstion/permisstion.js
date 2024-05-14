@@ -1,10 +1,11 @@
-import { Collapse, Row, Col, Checkbox, Divider, Button, Flex, message, Table } from 'antd';
+import { Collapse, Row, Col, Checkbox, Divider, Button, Flex, message, Tooltip } from 'antd';
 import { CaretRightOutlined, PlusOutlined, SaveOutlined, DeleteOutlined } from '@ant-design/icons';
 import './permisstion.css';
 import { useEffect, useState } from 'react';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import { useTranslation } from 'react-i18next';
+import { isMobile } from 'utils/helper';
 
 const SPAN = 3;
 
@@ -176,7 +177,7 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
       key: index,
       label: (
         <Row>
-          <Col span={24}>
+          <Col xs={24}>
             <Flex gap="small" wrap="wrap" style={{ width: '100%' }} justify="space-between" algin="center">
               <div>
                 <strong>{roleItem?.ROLE_NAME}</strong>
@@ -191,8 +192,10 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
             return (
               <>
                 <Row key={index}>
-                  <Col span={3}>{roleItem?.permisstions[index]?.SCREEN}</Col>
-                  <Col className="center-text" span={SPAN}>
+                  <Col xs={10} sm={SPAN}>
+                    {roleItem?.permisstions[index]?.SCREEN}
+                  </Col>
+                  <Col className="center-text" xs={SPAN - 1} sm={SPAN}>
                     <Checkbox
                       onChange={(e) => {
                         onChangeCheckbox(e, index, roleItem?.ROLE_ID);
@@ -201,7 +204,7 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
                       checked={roleItem?.permisstions[index]?.IS_READ}
                     />
                   </Col>
-                  <Col className="center-text" span={SPAN}>
+                  <Col className="center-text" xs={SPAN - 1} sm={SPAN}>
                     <Checkbox
                       onChange={(e) => {
                         onChangeCheckbox(e, index, roleItem?.ROLE_ID);
@@ -210,7 +213,7 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
                       checked={roleItem?.permisstions[index]?.IS_CREATE}
                     />
                   </Col>
-                  <Col className="center-text" span={SPAN}>
+                  <Col className="center-text" xs={SPAN - 1} sm={SPAN}>
                     <Checkbox
                       onChange={(e) => {
                         onChangeCheckbox(e, index, roleItem?.ROLE_ID);
@@ -219,7 +222,7 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
                       checked={roleItem?.permisstions[index]?.IS_UPDATE}
                     />
                   </Col>
-                  <Col className="center-text" span={SPAN}>
+                  <Col className="center-text" xs={SPAN - 1} sm={SPAN}>
                     <Checkbox
                       onChange={(e) => {
                         onChangeCheckbox(e, index, roleItem?.ROLE_ID);
@@ -228,7 +231,7 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
                       checked={roleItem?.permisstions[index]?.IS_DELETE}
                     />
                   </Col>
-                  <Col className="center-text" span={SPAN}>
+                  <Col className="center-text" xs={SPAN - 1} sm={SPAN}>
                     <Checkbox
                       onChange={(e) => {
                         onChangeCheckbox(e, index, roleItem?.ROLE_ID);
@@ -237,7 +240,7 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
                       checked={roleItem?.permisstions[index]?.IS_IMPORT}
                     />
                   </Col>
-                  <Col className="center-text" span={SPAN}>
+                  <Col className="center-text" xs={SPAN - 1} sm={SPAN}>
                     <Checkbox
                       onChange={(e) => {
                         onChangeCheckbox(e, index, roleItem?.ROLE_ID);
@@ -246,7 +249,7 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
                       checked={roleItem?.permisstions[index]?.IS_EXPORT}
                     />
                   </Col>
-                  <Col className="center-text" span={SPAN}>
+                  <Col className="center-text" xs={SPAN - 1} sm={SPAN}>
                     <Checkbox
                       onChange={(e) => {
                         onChangeCheckbox(e, index, roleItem?.ROLE_ID);
@@ -265,7 +268,6 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
       )
     };
   });
-
 
   const onClickSave = async () => {
     const data = roles;
@@ -287,29 +289,43 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
     <>
       {contextHolder}
       <Row style={{ marginBottom: '5px' }}>
-        <Col span={SPAN}>
+        <Col xs={10} sm={SPAN}>
           <strong style={{ marginLeft: '10px' }}></strong>
         </Col>
-        <Col className="center-text" span={SPAN}>
-          <strong>Read</strong>
+        <Col className="center-text" xs={SPAN - 1} sm={SPAN}>
+          <Tooltip title={isMobile() ? 'Read' : ''}>
+            <strong>{isMobile() ? 'Rea' : 'Read'}</strong>
+          </Tooltip>
         </Col>
-        <Col className="center-text" span={SPAN}>
-          <strong>Create</strong>
+        <Col className="center-text" xs={SPAN - 1} sm={SPAN}>
+          <Tooltip title={isMobile() ? 'Create' : ''}>
+            <strong>{isMobile() ? 'Cre' : 'Create'}</strong>
+          </Tooltip>
         </Col>
-        <Col className="center-text" span={SPAN}>
-          <strong>Update</strong>
+        <Col className="center-text" xs={SPAN - 1} sm={SPAN}>
+          <Tooltip title={isMobile() ? 'Update' : ''}>
+            <strong>{isMobile() ? 'Up' : 'Update'}</strong>
+          </Tooltip>
         </Col>
-        <Col className="center-text" span={SPAN}>
-          <strong>Delete</strong>
+        <Col className="center-text" xs={SPAN - 1} sm={SPAN}>
+          <Tooltip title={isMobile() ? 'Delete' : ''}>
+            <strong>{isMobile() ? 'Del' : 'Delete'}</strong>
+          </Tooltip>
         </Col>
-        <Col className="center-text" span={SPAN}>
-          <strong>Import</strong>
+        <Col className="center-text" xs={SPAN - 1} sm={SPAN}>
+          <Tooltip title={isMobile() ? 'Import' : ''}>
+            <strong>{isMobile() ? 'Im' : 'Import'}</strong>
+          </Tooltip>
         </Col>
-        <Col className="center-text" span={SPAN}>
-          <strong>Export</strong>
+        <Col className="center-text" xs={SPAN - 1} sm={SPAN}>
+          <Tooltip title={isMobile() ? 'Export' : ''}>
+            <strong>{isMobile() ? 'Ex' : 'Export'}</strong>
+          </Tooltip>
         </Col>
-        <Col className="center-text" span={SPAN}>
-          <strong>Accept</strong>
+        <Col className="center-text" xs={SPAN - 1} sm={SPAN}>
+          <Tooltip title={isMobile() ? 'Accept' : ''}>
+            <strong>{isMobile() ? 'Acc' : 'Accept'}</strong>
+          </Tooltip>
         </Col>
       </Row>
       <Collapse

@@ -132,7 +132,7 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
                   autoFocus
                 // endIcon={selectedRow ? <SaveIcon /> : <AddIcon />}
                 >
-                  {selectedRow ? 'Cập nhật' : `Thêm mới`}
+                  {selectedRow ? t('btnEdit') : t(`btn_new`)}
                 </Button>
               </Grid>
             </Grid>

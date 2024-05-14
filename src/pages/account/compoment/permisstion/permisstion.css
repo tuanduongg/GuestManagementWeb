@@ -2,6 +2,6 @@
   text-align: center;
 }
 .collapse_permission {
-  max-height: calc(100vh - 250px);
+  max-height: calc(100vh - 255px);
   overflow-y: auto;
 }
