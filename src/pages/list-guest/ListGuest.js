@@ -93,7 +93,7 @@ const ListGuest = () => {
   //     setValueTab(HISTORY_TAB);
   //   }
   // }, [dataUser]);
-
+  console.log('valueTab',valueTab);
   const getData = async () => {
     // setLoading(true);
     const data = { date: JSON.stringify(formatArrDate(dateSelect)), status: statusName.NEW };
@@ -123,11 +123,7 @@ const ListGuest = () => {
     checkRole();
   }, []);
 
-  useEffect(() => {
-    if (valueTab === NEW_TAB) {
-      setCounterNew(tableData?.filter((item) => item?.STATUS === statusName.NEW || item?.STATUS === statusName.ACCEPT).length);
-    }
-  }, [tableData]);
+
   useEffect(() => {
     getData();
   }, [valueTab]);
@@ -159,18 +155,18 @@ const ListGuest = () => {
       getData();
     }
   }, [checkChange]);
-  const showCancelBtn = () => {
-    const rs = tableData?.filter((item) => {
-      return selectedRowKeys.includes(item?.GUEST_ID) && item.STATUS === statusName.NEW;
-    });
-    return rs?.length > 0;
-  };
   useEffect(() => {
     if (selectedRowKeys) {
       const result = !showCancelBtn();
       setDisableBtnCancel(result);
     }
   }, [selectedRowKeys]);
+  const showCancelBtn = () => {
+    const rs = tableData?.filter((item) => {
+      return selectedRowKeys.includes(item?.GUEST_ID) && item.STATUS === statusName.NEW;
+    });
+    return rs?.length > 0;
+  };
 
   const onClickEditOnModal = (DATA) => {
     setTypeModalAdd('EDIT');
@@ -565,7 +561,7 @@ const ListGuest = () => {
     },
     {
       type: 'divider',
-      hidden: false
+      hidden: !role?.IS_EXPORT
     },
     {
       label: t('canelBTN'),
@@ -573,7 +569,7 @@ const ListGuest = () => {
       icon: <CloseOutlined />,
       disabled: disabledBtnCancel,
       danger: true,
-      hidden: !role?.IS_DELETE
+      hidden: !role?.IS_UPDATE
     }
   ];
   const menuProps = {
@@ -597,7 +593,7 @@ const ListGuest = () => {
         <MainCard contentSX={{ p: 2, minHeight: '83vh' }}>
           <Tabs
             value={valueTab}
-            defaultActiveKey="1"
+            activeKey={valueTab}
             items={[
               {
                 key: NEW_TAB,

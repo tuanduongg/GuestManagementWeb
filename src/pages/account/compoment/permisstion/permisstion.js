@@ -277,6 +277,7 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
         type: 'success',
         content: t('msg_update_success')
       });
+      setCheckChange(false)
       getAllRole();
     } else {
       messageApi.open({

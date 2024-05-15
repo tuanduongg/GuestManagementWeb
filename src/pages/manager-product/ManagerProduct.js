@@ -15,7 +15,8 @@ import {
   Select,
   Switch,
   Image,
-  notification
+  notification,
+  Checkbox
 } from 'antd';
 const { Search } = Input;
 import { formattingVND, isMobile, truncateString } from 'utils/helper';
@@ -65,6 +66,8 @@ const ManagerProduct = () => {
   const [selectCategory, setSelectCatgory] = useState('');
   const [typeModal, setTypeModal] = useState('');
   const [currentRow, setCurrentRow] = useState(null);
+  const [inventoryNegative, setInventoryNegative] = useState(false);
+  const [filterCategory, setFilterCategory] = useState([]);
   const inputRef = useRef();
   const [api, contextHolder] = notification.useNotification();
 
@@ -230,9 +233,28 @@ const ManagerProduct = () => {
     // getAllProduct();
     getAllCategory();
   }, []);
+
+  useEffect(() => {
+    const arr = [];
+    if (listProduct?.length > 0) {
+      listProduct?.forEach((item) => {
+        const categoryName = item?.category?.categoryName;
+        const categoryID = item?.category?.categoryID;
+        if (!arr.some((entry) => entry.value === categoryID)) {
+          arr.push({
+            text: categoryName,
+            value: categoryID
+          });
+        }
+      });
+    }
+    setFilterCategory(arr);
+  }, [listProduct]);
+
   useEffect(() => {
     getAllProduct();
   }, [page, rowsPerPage, search, selectCategory]);
+
   const ITEMS = [
     {
       label: t('category'),
@@ -352,7 +374,7 @@ const ManagerProduct = () => {
       title: 'inventory',
       render: (_, data) => (
         <>
-          <span style={{ color: data?.inventory < 0 ? 'red' : 'rgba(0, 0, 0, 0.88)', fontWeight: data?.inventory < 0 ? 'bold' : '' }}>
+          <span style={{ color: data?.inventory <= 0 ? 'red' : 'rgba(0, 0, 0, 0.88)', fontWeight: data?.inventory <= 0 ? 'bold' : '' }}>
             {data?.inventory}
           </span>
         </>
@@ -365,15 +387,7 @@ const ManagerProduct = () => {
       align: 'center',
       key: 'category',
       title: 'categoryProduct',
-      filters:
-        categories?.length > 0
-          ? categories?.map((item) => {
-              return {
-                text: item?.categoryName,
-                value: item?.categoryID
-              };
-            })
-          : [],
+      filters: filterCategory,
       filterMode: 'tree',
       filterSearch: true,
       onFilter: (value, record) => record?.category?.categoryID === value,
@@ -427,23 +441,6 @@ const ManagerProduct = () => {
     return { ...item, title: t(item?.title) };
   });
 
-  //   const checkRole = async () => {
-  //     setLoading(true);
-  //     const rest = await restApi.get(RouterAPI.checkRole);
-  //     if (rest?.status === 200) {
-  //       setRole(rest?.data);
-  //     }
-  //     setLoading(false);
-  //   };
-
-  //   useEffect(() => {
-  //     checkRole();
-  //   }, []);
-
-  //   if (!role?.IS_READ) {
-  //     return <ForbidenPage />;
-  //   }
-
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
@@ -465,6 +462,22 @@ const ManagerProduct = () => {
     });
     setListProduct(data);
   };
+  const checkRole = async () => {
+    setLoading(true);
+    const rest = await restApi.get(RouterAPI.checkRole);
+    if (rest?.status === 200) {
+      setRole(rest?.data);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    checkRole();
+  }, []);
+
+  if (!role?.IS_READ) {
+    return <ForbidenPage />;
+  }
   return (
     <>
       <Loading loading={loading} />
@@ -474,6 +487,7 @@ const ManagerProduct = () => {
           <Col xs={24} sm={15} style={{ display: 'flex', alignItems: 'center' }}>
             {!isMobile() && <FunnelPlotOutlined style={{ fontSize: '20px', color: config.colorLogo }} />}
             {<div style={{ fontWeight: 'bold', margin: '0px 5px', minWidth: '71px' }}>{t('category')}:</div>}
+            <Checkbox value={inventoryNegative} onChange={(e)=>{setInventoryNegative(e.target.checked)}}>{`Tồn nhỏ hơn 0`}</Checkbox>
             <Select
               value={selectCategory}
               onChange={(value) => {

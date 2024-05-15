@@ -27,6 +27,7 @@ import { TABS_ORDER, getBadgeStatus } from './order.service';
 import './order.css';
 import ModalDetailOrder from 'components/modal/modal-detail-order/ModalDetailOrder';
 import dayjs from 'dayjs';
+import ForbidenPage from 'components/403/ForbidenPage';
 const today = dayjs();
 const Order = () => {
   const [role, setRole] = useState(null);
@@ -54,11 +55,21 @@ const Order = () => {
   const theme = useTheme();
 
   useEffect(() => {
+    checkRole();
     const data = getDataUserFromLocal();
     if (data) {
       setDataUser(data);
     }
   }, []);
+
+  const checkRole = async () => {
+    setLoading(true);
+    const rest = await restApi.get(RouterAPI.checkRole);
+    if (rest?.status === 200) {
+      setRole(rest?.data);
+    }
+    setLoading(false);
+  };
 
   const handleAccept = async () => {
     if (!currentRow) {
@@ -362,22 +373,7 @@ const Order = () => {
     return { ...colItem, title: t(colItem?.title) };
   });
 
-  //   const checkRole = async () => {
-  //     setLoading(true);
-  //     const rest = await restApi.get(RouterAPI.checkRole);
-  //     if (rest?.status === 200) {
-  //       setRole(rest?.data);
-  //     }
-  //     setLoading(false);
-  //   };
-
-  //   useEffect(() => {
-  //     checkRole();
-  //   }, []);
-
-  //   if (!role?.IS_READ) {
-  //     return <ForbidenPage />;
-  //   }
+  
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -404,6 +400,10 @@ const Order = () => {
     }
     return result;
   };
+
+  if (!role?.IS_READ) {
+    return <ForbidenPage />;
+  }
   return (
     <>
       {contextHolder}
@@ -414,6 +414,7 @@ const Order = () => {
             <Tabs
               className="tab_order"
               value={valueTab}
+              activeKey={valueTab}
               defaultActiveKey="1"
               items={[
                 {
@@ -495,7 +496,6 @@ const Order = () => {
               placeholder={t('searchByOrderCode')}
               allowClear
               enterButton
-              // style={{ width: isMobile() ? '45%' : '250px', marginLeft: '5px' }}
               onSearch={(value) => {
                 setSearch(value);
                 setPage(1);
@@ -516,10 +516,10 @@ const Order = () => {
               scroll={
                 isMobile()
                   ? {
-                    x: '100vh',
-                    y: '65vh'
-                  }
-                  : { x: null, y: '58vh' }
+                      x: '100vh',
+                      y: '62vh'
+                    }
+                  : { x: null, y: 'calc(100vh - 260px)' }
               }
               columns={columns}
               dataSource={totalOrders}

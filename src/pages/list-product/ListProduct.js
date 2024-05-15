@@ -18,6 +18,7 @@ import Loading from 'components/Loading';
 import config from 'config';
 const initialCategory = { key: '', label: 'All' };
 import { useSelector } from 'react-redux';
+import ForbidenPage from 'components/403/ForbidenPage';
 
 const ListProduct = () => {
   const { t } = useTranslation();
@@ -34,11 +35,9 @@ const ListProduct = () => {
   const [categories, setCategories] = useState([]);
   const [currentProduct, setCurrentProduct] = useState(null);
   const [dropdownCategory, setDropdownCategory] = useState([]);
+  const [role, setRole] = useState(null);
   const menu = useSelector((state) => state.menu);
 
-  //   if (!role?.IS_READ) {
-  //     return <ForbidenPage />;
-  //   }
   const getAllCategory = async () => {
     const res = await restApi.get(RouterAPI.getAllCategory);
     if (res?.status === 200) {
@@ -90,6 +89,21 @@ const ListProduct = () => {
     const result = dropdownCategory?.find((item) => item?.key === key)?.label;
     setSelectCatgory({ key, label: result });
   };
+  const checkRole = async () => {
+    setLoading(true);
+    const rest = await restApi.get(RouterAPI.checkRole);
+    if (rest?.status === 200) {
+      setRole(rest?.data);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    checkRole();
+  }, []);
+  if (!role?.IS_READ) {
+    return <ForbidenPage />;
+  }
   return (
     <>
       <Loading loading={loading} />
@@ -147,6 +161,7 @@ const ListProduct = () => {
         {listProduct?.length > 0 && (
           <div className="wrap-pagination">
             <Pagination
+              className="paginate_list_product"
               current={page}
               onChange={(page, size) => {
                 setPage(page);
@@ -157,7 +172,7 @@ const ListProduct = () => {
               pageSize={rowsPerPage}
               showSizeChanger={true}
               pageSizeOptions={config.sizePageOption}
-              responsive={true}
+              // responsive={true}
             />
           </div>
         )}

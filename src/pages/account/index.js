@@ -187,6 +187,7 @@ const AccountPage = () => {
             <Tabs
               className="tab_account"
               value={valueTab}
+              activeKey={valueTab}
               defaultActiveKey="1"
               items={[
                 {

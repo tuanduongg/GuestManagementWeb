@@ -136,7 +136,7 @@ const ModalInfoGuest = ({ open, handleClose, dataSelect, onClickEdit, role, onCl
         <div>
           <Tabs
             value={valueTab}
-            defaultActiveKey="1"
+            activeKey={valueTab}
             items={[
               {
                 key: DETAIL_TAB,
