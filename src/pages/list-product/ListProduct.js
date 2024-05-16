@@ -168,10 +168,10 @@ const ListProduct = () => {
                 setRowsPerPage(size);
               }}
               total={total}
-              showTotal={(total, range) => `${range[0]}-${range[1]}/${total} ${t('product')}`}
+              showTotal={(total, range) => `${range[0]}-${range[1]}/${total}`}
               pageSize={rowsPerPage}
               showSizeChanger={true}
-              pageSizeOptions={config.sizePageOption}
+              pageSizeOptions={config?.sizePageOption}
               // responsive={true}
             />
           </div>

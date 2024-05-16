@@ -339,7 +339,7 @@ const Permisstion = ({ listRole, role, getAllRole }) => {
         {role?.IS_UPDATE && (
           <>
             <Button
-              shape="round"
+              
               disabled={!checkChange}
               onClick={onClickSave}
               className="btn-success-custom"

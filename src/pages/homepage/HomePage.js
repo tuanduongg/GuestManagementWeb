@@ -2,16 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { Card, Row, Col, Flex } from 'antd';
 import './homepage.css';
 import { isMobile } from 'utils/helper';
-import { UsergroupAddOutlined, ShoppingCartOutlined, UnlockOutlined } from '@ant-design/icons';
+import { UsergroupAddOutlined, ShoppingCartOutlined, UnlockOutlined, AlertOutlined } from '@ant-design/icons';
 // import LOGO from '../../assets/images/logo/favilogo.png';
 import Logo from 'components/Logo/Logo';
 import { ConfigRouter } from 'config_router';
 import CardComponent from './component/card';
 const cols = [
   { url: ConfigRouter.listGuest.url, icon: <UsergroupAddOutlined style={{ fontSize: '30px' }} />, content: 'ĐĂNG KÝ KHÁCH', id: '1' },
-  { url: ConfigRouter.listGuest.url, icon: <ShoppingCartOutlined style={{ fontSize: '30px' }} />, content: 'ORDER VẬT TƯ ', id: '2' },
+  { url: ConfigRouter.listProduct.url, icon: <ShoppingCartOutlined style={{ fontSize: '30px' }} />, content: 'ORDER VẬT TƯ ', id: '2' },
   { url: ConfigRouter.user.url, icon: <UnlockOutlined style={{ fontSize: '30px' }} />, content: 'TÀI KHOẢN & PHÂN QUYỀN', id: '3' },
-  //   { url: ConfigRouter.listGuest, icon: <UsergroupAddOutlined style={{ fontSize: '30px' }} />, content: 'ĐĂNG KÝ KHÁCH', id: '4' }
+  { url: ConfigRouter.listGuest, icon: <AlertOutlined style={{ fontSize: '30px' }} />, content: 'DANH SÁCH THIẾT BỊ', id: '4' }
 ];
 
 const HomePage = () => {

@@ -373,8 +373,6 @@ const Order = () => {
     return { ...colItem, title: t(colItem?.title) };
   });
 
-  
-
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
@@ -462,10 +460,8 @@ const Order = () => {
             />
           </Col>
           <Col xs={24} sm={8} md={7}>
-            <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
-              {t('from')}
+            <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center',marginBottom: isMobile() ? '5px' : '0px' }}>
               <DatePicker
-                style={{ margin: '5px' }}
                 allowClear={false}
                 value={fromDateValue}
                 onChange={(value, dateString) => {
@@ -476,9 +472,8 @@ const Order = () => {
                   type: 'mask'
                 }}
               />
-              {t('to')}
+              <span style={{ margin: '5px', fontWeight: 'bold' }}>~</span>
               <DatePicker
-                style={{ marginLeft: '5px' }}
                 allowClear={false}
                 value={toDateValue}
                 onChange={(value, dateString) => {
@@ -492,15 +487,19 @@ const Order = () => {
             </div>
           </Col>
           <Col xs={24} sm={6} md={5}>
-            <Search
-              placeholder={t('searchByOrderCode')}
-              allowClear
-              enterButton
-              onSearch={(value) => {
-                setSearch(value);
-                setPage(1);
-              }}
-            />
+            <div style={{ textAlign: 'end' }}>
+
+              <Search
+                style={{ maxWidth: !isMobile() ? '300px' : 'none' }}
+                placeholder={t('searchByOrderCode')}
+                allowClear
+                enterButton
+                onSearch={(value) => {
+                  setSearch(value);
+                  setPage(1);
+                }}
+              />
+            </div>
           </Col>
         </Row>
         <Row style={{ marginTop: '15px' }}>
@@ -516,9 +515,9 @@ const Order = () => {
               scroll={
                 isMobile()
                   ? {
-                      x: '100vh',
-                      y: '62vh'
-                    }
+                    x: '100vh',
+                    y: '62vh'
+                  }
                   : { x: null, y: 'calc(100vh - 260px)' }
               }
               columns={columns}

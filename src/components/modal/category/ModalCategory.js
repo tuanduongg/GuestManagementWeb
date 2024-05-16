@@ -36,11 +36,14 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
   const [selectedRow, setSelectedRow] = useState(null);
   const [name, setName] = useState('');
   const [validateName, setValidateName] = useState(initValidate);
+  const [type, setType] = useState('');
+  const [validateType, setValidateType] = useState(initValidate);
 
   const onClose = (e, reason) => {
     if (reason != 'backdropClick') {
       setSelectedRow(null);
       setName('');
+      setType('');
       handleClose();
     }
   };
@@ -48,6 +51,7 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
   const onChangeSelectedRow = (row) => {
     setSelectedRow(row);
     setName(row?.categoryName ?? '');
+    setType(row?.categoryType ?? '');
   };
   const handleSave = async () => {
     let data = {};
@@ -55,30 +59,38 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
     let textSucces = '';
     if (selectedRow) {
       textSucces = 'Update category success!';
-      data = { categoryID: selectedRow?.categoryID, categoryName: name };
+      data = { categoryID: selectedRow?.categoryID, categoryName: name, categoryType: type };
       url = RouterAPI.updateCategory;
     } else {
       textSucces = 'Add new category success!';
-      data = { categoryName: name };
+      data = { categoryName: name, categoryType: type };
     }
     const res = await restApi.post(url, data);
     if (res?.status === 200) {
       if (!selectedRow) {
         setName('');
+        setType('');
       }
       afterSave();
     }
     message.success(textSucces);
   };
   const handleClickAdd = () => {
+    let check = false;
+    if (type?.trim() === '') {
+      check = true;
+      setValidateType({ err: true, msg: 'Type is required.' });
+    }
     if (name?.trim() === '') {
+      check = true;
       setValidateName({ err: true, msg: 'Category is required.' });
-    } else {
+    }
+    if (!check) {
       handleSave();
     }
   };
   const handleClickDeleteRow = (row) => {
-    alert(row?.categoryName ?? '');
+    // alert(row?.categoryName ?? '');
   };
 
   return (
@@ -87,7 +99,7 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
         disableEscapeKeyDown={true}
         maxWidth={'sm'}
         sx={{ minHeight: '90vh' }}
-        fullScreen={fullScreen }
+        fullScreen={fullScreen}
         open={open}
         onClose={onClose}
         aria-labelledby="responsive-dialog-title"
@@ -102,9 +114,9 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
         </Box>
         <Divider />
         <DialogContent>
-          <Box sx={{ width: '100%', height: '100%' }}>
+          <Box sx={{ width: '100%', height: '100%', minWidth: isMobile() ? 'auto' : '500px' }}>
             <Grid container spacing={1}>
-              <Grid item xs={8} sm={9}>
+              <Grid item xs={4} sm={6}>
                 <TextField
                   error={validateName?.err}
                   helperText={validateName?.msg}
@@ -123,14 +135,33 @@ const ModalCategory = ({ open, fullScreen, handleClose, afterSave, categories, g
                   variant="outlined"
                 />
               </Grid>
-              <Grid sx={{ display: 'flex', alignItems: 'center', justifyContent: 'right' }} item xs={4} sm={3}>
+              <Grid item xs={4} sm={3.5}>
+                <TextField
+                  error={validateType?.err}
+                  helperText={validateType?.msg}
+                  onChange={(e) => {
+                    if (validateType?.err) {
+                      setValidateType(initValidate);
+                    }
+                    setType(e?.target?.value);
+                  }}
+                  sx={{ height: '100%' }}
+                  fullWidth
+                  placeholder="Typing your type name of category..."
+                  size="small"
+                  value={type}
+                  label="Type"
+                  variant="outlined"
+                />
+              </Grid>
+              <Grid sx={{ display: 'flex', alignItems: 'center', justifyContent: 'right' }} item xs={4} sm={2.5}>
                 <Button
                   size="small"
                   variant="contained"
                   onClick={handleClickAdd}
                   color="primary"
                   autoFocus
-                // endIcon={selectedRow ? <SaveIcon /> : <AddIcon />}
+                  // endIcon={selectedRow ? <SaveIcon /> : <AddIcon />}
                 >
                   {selectedRow ? t('btnEdit') : t(`btn_new`)}
                 </Button>

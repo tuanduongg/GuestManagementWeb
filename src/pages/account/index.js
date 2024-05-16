@@ -226,27 +226,19 @@ const AccountPage = () => {
               )}
               <div style={{ marginBottom: '7px' }}>
                 {role?.IS_CREATE && (
-                  <Button shape="round" onClick={onClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
+                  <Button onClick={onClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
                     {t('btn_new')}
                   </Button>
                 )}
                 {role?.IS_UPDATE && valueTab === 'account' && (
                   <>
                     {typeBtnBlock === 'BLOCK' && (
-                      <Button
-                        shape="round"
-                        disabled={selectedRowKeys?.length === 0}
-                        danger
-                        onClick={onClickBlock}
-                        icon={<StopOutlined />}
-                        type="primary"
-                      >
+                      <Button disabled={selectedRowKeys?.length === 0} danger onClick={onClickBlock} icon={<StopOutlined />} type="primary">
                         {t('btn_lock')}
                       </Button>
                     )}
                     {typeBtnBlock === 'ACTIVE' && (
                       <Button
-                        shape="round"
                         disabled={selectedRowKeys?.length === 0}
                         onClick={onClickBlock}
                         className={selectedRowKeys?.length === 0 ? '' : 'btn-success-custom'}

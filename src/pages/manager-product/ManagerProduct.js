@@ -73,7 +73,7 @@ const ManagerProduct = () => {
 
   const getAllProduct = async () => {
     setLoading(true);
-    const obj = { page: +page - 1, rowsPerPage, search, categoryID: selectCategory };
+    const obj = { page: +page - 1, rowsPerPage, search, categoryID: selectCategory, inventoryNegative };
     const url = RouterAPI.getAllProduct;
     const res = await restApi.post(url, obj);
     if (res?.status === 200) {
@@ -253,7 +253,7 @@ const ManagerProduct = () => {
 
   useEffect(() => {
     getAllProduct();
-  }, [page, rowsPerPage, search, selectCategory]);
+  }, [page, rowsPerPage, search, selectCategory, inventoryNegative]);
 
   const ITEMS = [
     {
@@ -485,20 +485,31 @@ const ManagerProduct = () => {
       <MainCard contentSX={{ p: isMobile() ? 0.5 : 2, minHeight: '83vh' }}>
         <Row>
           <Col xs={24} sm={15} style={{ display: 'flex', alignItems: 'center' }}>
-            {!isMobile() && <FunnelPlotOutlined style={{ fontSize: '20px', color: config.colorLogo }} />}
-            {<div style={{ fontWeight: 'bold', margin: '0px 5px', minWidth: '71px' }}>{t('category')}:</div>}
-            <Checkbox value={inventoryNegative} onChange={(e)=>{setInventoryNegative(e.target.checked)}}>{`Tồn nhỏ hơn 0`}</Checkbox>
+            {!isMobile() && <FunnelPlotOutlined style={{ fontSize: '23px', color: config.colorLogo }} />}
+            {!isMobile() && (
+              <Checkbox
+                style={{ marginLeft: '5px' }}
+                value={inventoryNegative}
+                onChange={(e) => {
+                  setInventoryNegative(e.target.checked);
+                  setPage(1);
+                }}
+              >
+                <span style={{ fontWeight: 'bold' }}>{`Hết hàng`}</span>
+              </Checkbox>
+            )}
+            {/* {<div style={{ fontWeight: 'bold', margin: '0px 5px', minWidth: '71px' }}>{t('category')}:</div>} */}
             <Select
               value={selectCategory}
               onChange={(value) => {
                 setSelectCatgory(value);
               }}
-              style={{ width: isMobile() ? '35%' : '150px' }}
+              style={{ width: isMobile() ? '40%' : '150px' }}
               options={
                 categories?.length > 0
                   ? [
                       {
-                        label: 'All',
+                        label: `---${t('category')}---`,
                         value: ''
                       }
                     ].concat(
@@ -512,11 +523,12 @@ const ManagerProduct = () => {
                   : []
               }
             />
+
             <Search
               placeholder={t('searchByProductName')}
               allowClear
               enterButton
-              style={{ width: isMobile() ? '45%' : '250px', marginLeft: '5px' }}
+              style={{ width: isMobile() ? '60%' : '250px', marginLeft: '5px' }}
               onSearch={(value) => {
                 setPage(1);
                 setSearch(value);
@@ -526,25 +538,43 @@ const ManagerProduct = () => {
           <Col
             xs={24}
             sm={9}
-            style={{ display: 'flex', justifyContent: 'right', alignItems: 'center', marginTop: isMobile() ? '10px' : '0px' }}
+            style={{
+              display: 'flex',
+              justifyContent: isMobile() ? 'space-between' : 'right',
+              alignItems: 'center',
+              marginTop: isMobile() ? '10px' : '0px'
+            }}
           >
-            <Button
-              shape="round"
-              onClick={() => {
-                setTypeModal('ADD');
-                setOpenModalAdd(true);
-              }}
-              style={{ marginRight: '5px' }}
-              icon={<PlusOutlined />}
-              type="primary"
-            >
-              {t('btn_new')}
-            </Button>
-            <Dropdown menu={menuProps}>
-              <Button style={{ marginLeft: '5px' }} shape="round" icon={<DownOutlined />}>
-                {t('btnMore')}
+            {isMobile() && (
+              <Checkbox
+                style={{ marginLeft: '5px' }}
+                value={inventoryNegative}
+                onChange={(e) => {
+                  setInventoryNegative(e.target.checked);
+                  setPage(1);
+                }}
+              >
+                <span style={{ fontWeight: 'bold' }}>{`Hết hàng`}</span>
+              </Checkbox>
+            )}
+            <div>
+              <Button
+                onClick={() => {
+                  setTypeModal('ADD');
+                  setOpenModalAdd(true);
+                }}
+                style={{ marginRight: '5px' }}
+                icon={<PlusOutlined />}
+                type="primary"
+              >
+                {t('btn_new')}
               </Button>
-            </Dropdown>
+              <Dropdown menu={menuProps}>
+                <Button style={{ marginLeft: '5px' }} icon={<DownOutlined />}>
+                  {t('btnMore')}
+                </Button>
+              </Dropdown>
+            </div>
           </Col>
         </Row>
         <Row style={{ marginTop: '15px' }}>
@@ -573,6 +603,7 @@ const ManagerProduct = () => {
                 showSizeChanger: true,
                 pageSizeOptions: config.sizePageOption,
                 total: total,
+                showTotal: (total, range) => `${range[0]}-${range[1]}/${total}`,
                 responsive: true,
                 onChange: (page, pageSize) => {
                   setSelectedRowKeys([]);

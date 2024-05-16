@@ -647,13 +647,13 @@ const ListGuest = () => {
             <Col style={{ margin: isMobile() ? '10px 0px' : '' }} sm={valueTab !== HISTORY_TAB ? 24 : 12} xs={24}>
               <div style={{ display: 'flex', justifyContent: 'end' }}>
                 {role?.IS_CREATE && (
-                  <Button shape="round" onClick={handleClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
+                  <Button onClick={handleClickAdd} style={{ marginRight: '5px' }} icon={<PlusOutlined />} type="primary">
                     {t('createBTN')}
                   </Button>
                 )}
                 {(role?.IS_DELETE || role?.IS_IMPORT || role?.IS_EXPORT) && (
                   <Dropdown menu={menuProps}>
-                    <Button style={{ marginLeft: '5px' }} shape="round" icon={<DownOutlined />}>
+                    <Button style={{ marginLeft: '5px' }} icon={<DownOutlined />}>
                       {t('btnMore')}
                     </Button>
                   </Dropdown>
