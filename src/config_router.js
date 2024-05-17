@@ -7,6 +7,7 @@ export const ConfigRouter = {
   managementProduct: { url: '/management-products', name: 'manageProduct' },
   pwRecovery: { url: 'password-recovery', name: '' },
   listGuest: { url: '/', name: 'sidebar_manager_guest' },
+  manageDevice: { url: '/device', name: 'Manage Device' },
   login: { url: 'login', name: 'Đăng nhập' },
   homePage: { url: 'home', name: 'Trang chủ' }
 };

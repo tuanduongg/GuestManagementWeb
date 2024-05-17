@@ -230,7 +230,6 @@ const ManagerProduct = () => {
   };
 
   useEffect(() => {
-    // getAllProduct();
     getAllCategory();
   }, []);
 
@@ -491,11 +490,11 @@ const ManagerProduct = () => {
                 style={{ marginLeft: '5px' }}
                 value={inventoryNegative}
                 onChange={(e) => {
-                  setInventoryNegative(e.target.checked);
+                  setInventoryNegative(e?.target?.checked);
                   setPage(1);
                 }}
               >
-                <span style={{ fontWeight: 'bold' }}>{`Hết hàng`}</span>
+                <span style={{ fontWeight: 'bold' }}>{`Âm kho`}</span>
               </Checkbox>
             )}
             {/* {<div style={{ fontWeight: 'bold', margin: '0px 5px', minWidth: '71px' }}>{t('category')}:</div>} */}
@@ -550,11 +549,11 @@ const ManagerProduct = () => {
                 style={{ marginLeft: '5px' }}
                 value={inventoryNegative}
                 onChange={(e) => {
-                  setInventoryNegative(e.target.checked);
+                  setInventoryNegative(e?.target?.checked);
                   setPage(1);
                 }}
               >
-                <span style={{ fontWeight: 'bold' }}>{`Hết hàng`}</span>
+                <span style={{ fontWeight: 'bold' }}>{`Âm kho`}</span>
               </Checkbox>
             )}
             <div>
