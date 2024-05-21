@@ -61,6 +61,11 @@ export const RouterAPI = {
   getAllCategory: '/category/all',
   addCategory: '/category/add',
   updateCategory: '/category/update',
+  findByTypeCategory: '/category/findByType',
 
-  deleteImageByID: 'image/delete'
+  deleteImageByID: 'image/delete',
+
+  addDevice: 'device/add',
+  allDevice: 'device/all',
+  changeStatusDevice: 'device/change-status'
 };

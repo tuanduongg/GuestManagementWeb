@@ -137,21 +137,22 @@ export const statusName = {
 export function addZero(num) {
   return (num < 10 ? '0' : '') + num;
 }
-export const formatDateFromDB = (dateString) => {
+export const formatDateFromDB = (dateString, showTime = true) => {
   // Tạo một đối tượng Date từ chuỗi
   var date = new Date(dateString);
-
-  // Lấy các thành phần thời gian
-  var hours = date.getHours();
-  var minutes = date.getMinutes();
-
   // Lấy các thành phần ngày
   var day = date.getDate();
   var month = date.getMonth() + 1; // Lưu ý: Tháng bắt đầu từ 0 nên cần cộng thêm 1
   var year = date.getFullYear();
+  if (!showTime) {
+    return addZero(day) + '/' + addZero(month) + '/' + year;
+  }
+  // Lấy các thành phần thời gian
+  var hours = date.getHours();
+  var minutes = date.getMinutes();
+
 
   // Hàm để thêm số 0 trước các giá trị nhỏ hơn 10
-
   // Tạo chuỗi định dạng
   return addZero(hours) + ':' + addZero(minutes) + ' ' + addZero(day) + '/' + addZero(month) + '/' + year;
 };
@@ -554,3 +555,20 @@ export const concatNameProductsOnOrder = (arrProduct = [], character = ',', more
 
   return text;
 };
+// Function to format number as currency
+export const formatCurrency = (value) => {
+  const numberValue = parseFloat(value.replace(/[^0-9.-]+/g, ''));
+  if (isNaN(numberValue)) return '';
+  return numberValue.toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  });
+};
+export function moneyFormat(price, sign = '$') {
+  const pieces = parseFloat(price).toFixed(2).split('');
+  let ii = pieces.length - 3;
+  while ((ii -= 3) > 0) {
+    pieces.splice(ii, 0, ',');
+  }
+  return sign + pieces.join('');
+}
