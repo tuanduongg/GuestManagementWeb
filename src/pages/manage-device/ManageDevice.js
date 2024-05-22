@@ -36,7 +36,11 @@ import {
   FundViewOutlined,
   PicCenterOutlined,
   CaretDownOutlined,
-  MoreOutlined
+  MoreOutlined,
+  SmileOutlined,
+  ImportOutlined,
+  CloseOutlined,
+  ExportOutlined
 } from '@ant-design/icons';
 import Loading from 'components/Loading';
 import MainCard from 'components/MainCard';
@@ -46,6 +50,57 @@ import './manage_device.css';
 import { FONT_SIZE_ICON_CARD, ITEM_DROPDOWN_STATUS, TYPE_FILTER } from './manage_device.service';
 import ModalAddDevice from 'components/modal/modal-add-device/ModalAddDevice';
 const { Title, Link } = Typography;
+const ITEMROWS = [
+  {
+    label: <span style={{ color: '#15803d' }}>Đang dùng</span>,
+    key: TYPE_FILTER.USING,
+    disabled: false,
+    color: '#15803d'
+  },
+  {
+    label: <span style={{ color: '#818cf8' }}>Rảnh</span>,
+    key: TYPE_FILTER.FREE,
+    disabled: false,
+    color: '#818cf8'
+  },
+  {
+    label: <span style={{ color: '#dc2626' }}>Đang sửa</span>,
+    key: TYPE_FILTER.FIXING,
+    disabled: false,
+    color: '#dc2626'
+  },
+  {
+    label: <span style={{ color: '#f59e0b' }}>Đã hỏng</span>,
+    key: TYPE_FILTER.NONE,
+    disabled: false,
+    color: '#f59e0b'
+  }
+];
+
+const ITEMROWS_MORE = [
+  {
+    label: 'Xuất excel',
+    key: 'EXPORT',
+    icon: <ExportOutlined />
+  },
+  {
+    type: 'divider'
+  },
+  {
+    label: 'Nhập excel',
+    key: 'IMPORT',
+    icon: <ImportOutlined />
+  },
+  {
+    type: 'divider'
+  },
+  {
+    label: 'Xóa',
+    key: 'DELETE',
+    icon: <CloseOutlined />,
+    danger: true
+  }
+];
 
 const ManageDevice = () => {
   const [role, setRole] = useState(null);
@@ -62,46 +117,45 @@ const ManageDevice = () => {
   const [currentDropdown, setCurrentDropdown] = useState('');
   const [api, contextHolder] = notification.useNotification();
 
-  const ITEMROWS = [
+  const ITEM_CELL_ACTION = [
     {
-      label: <span style={{ color: '#15803d' }}>Đang dùng</span>,
-      key: TYPE_FILTER.USING,
-      disabled: false,
-      color: '#15803d'
+      label: t('btnEdit'),
+      key: 'edit',
+      icon: <EditOutlined />,
+      disabled: false
     },
     {
-      label: <span style={{ color: '#818cf8' }}>Rảnh</span>,
-      key: TYPE_FILTER.FREE,
+      label: t('delete'),
+      key: 'delete',
+      icon: <DeleteOutlined />,
       disabled: false,
-      color: '#818cf8'
-    },
-    {
-      label: <span style={{ color: '#dc2626' }}>Đang sửa</span>,
-      key: TYPE_FILTER.FIXING,
-      disabled: false,
-      color: '#dc2626'
-    },
-    {
-      label: <span style={{ color: '#f59e0b' }}>Đã hỏng</span>,
-      key: TYPE_FILTER.NONE,
-      disabled: false,
-      color: '#f59e0b'
+      danger: true
     }
   ];
+  const menuPropsCellAction = {
+    items: ITEM_CELL_ACTION,
+    onClick: () => {}
+  };
   const handleMenuClick = async (e) => {
     setLoading(true);
     const status = e?.key;
     const res = await restApi.post(RouterAPI.changeStatusDevice, { DEVICE_ID: currentDropdown, STATUS: status });
     setLoading(false);
-    console.log('ress', res);
     if (res?.status === 200) {
       message.success('Change status device successful!');
       getAllDevice();
     }
   };
+  const handleMenuClickMore = async (e) => {
+    console.log(e.key);
+  };
   const menuProps = {
     items: ITEMROWS,
     onClick: handleMenuClick
+  };
+  const menuPropsMore = {
+    items: ITEMROWS_MORE,
+    onClick: handleMenuClickMore
   };
 
   const columns = [
@@ -208,7 +262,15 @@ const ManageDevice = () => {
       render: (text, data, index) => {
         return (
           <>
-            <Button icon={<MoreOutlined />} type={'text'}></Button>
+            <Dropdown trigger={['click']} placement="bottom" menu={menuPropsCellAction}>
+              <Button
+                onClick={() => {
+                  setCurrentDropdown(data?.DEVICE_ID);
+                }}
+                icon={<MoreOutlined />}
+                type={'text'}
+              ></Button>
+            </Dropdown>
           </>
         );
       },
@@ -264,8 +326,14 @@ const ManageDevice = () => {
   //     setLoading(false);
   //   };
 
+  const getStatistic = async () => {
+    const res = await restApi.get(RouterAPI.statisticDevice);
+    console.log('res', res);
+  };
+
   useEffect(() => {
     // checkRole();
+    getStatistic();
     getListCategory();
     getAllDevice();
   }, []);
@@ -472,7 +540,7 @@ const ManageDevice = () => {
               >
                 {t('btn_new')}
               </Button>
-              <Dropdown menu={menuProps}>
+              <Dropdown menu={menuPropsMore}>
                 <Button style={{ marginLeft: '5px' }} icon={<DownOutlined />}>
                   {t('btnMore')}
                 </Button>
