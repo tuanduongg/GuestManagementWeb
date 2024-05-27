@@ -58,10 +58,15 @@ const ModalAddProduct = ({ open, handleClose, categories, typeModal, setLoading,
   const handleOk = (e) => {
     form.submit();
   };
-  const handleCancel = () => {
-    form.resetFields(); // Đặt lại trường của form
-    setFileList([]);
-    handleClose();
+  const handleCancel = (e) => {
+    if (e?.keyCode === 27) {
+      console.log();
+    } else {
+
+      form.resetFields(); // Đặt lại trường của form
+      setFileList([]);
+      handleClose();
+    }
   };
   useEffect(() => {
     if (open && currentRow && typeModal === 'EDIT') {
@@ -92,7 +97,7 @@ const ModalAddProduct = ({ open, handleClose, categories, typeModal, setLoading,
     const dataSend = JSON.stringify({
       productID: currentRow?.productID,
       name: data?.name,
-      price: data?.price,
+      price: `${data?.price}`.replace(',', ''),
       description: data?.desciption,
       inventory: data?.inventory,
       category: data?.category,
@@ -209,6 +214,17 @@ const ModalAddProduct = ({ open, handleClose, categories, typeModal, setLoading,
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
             autoComplete="off"
+            onFieldsChange={(changedFields, allFields) => {
+              if (changedFields[0]?.name[0] === 'price') {
+                let inputValue = changedFields[0]?.value;
+                if (inputValue?.length > 3) {
+                  inputValue = inputValue.replace(/,/g, '');
+                  // Thêm dấu phẩy sau mỗi 3 ký tự
+                  const formattedValue = inputValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                  form.setFieldValue('price', formattedValue);
+                }
+              }
+            }}
           >
             <Form.Item
               name="name"

@@ -21,3 +21,9 @@ export const ITEM_DROPDOWN_STATUS = [
     label: '3rd menu item'
   }
 ];
+export const STATUS_DEVICE = [
+  { value: 'USING', title: 'Đang sử dụng' }, //ĐANG SỬ DỤNG
+  { value: 'FREE', title: 'Rảnh' }, // RẢNH
+  { value: 'FIXING', title: 'Đang sửa chữa' }, // ĐANG SỬA CHỮA
+  { value: 'NONE', title: 'Hỏng' } //HỎNG
+];

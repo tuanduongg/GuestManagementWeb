@@ -68,5 +68,6 @@ export const RouterAPI = {
   addDevice: 'device/add',
   allDevice: 'device/all',
   changeStatusDevice: 'device/change-status',
-  statisticDevice: 'device/statistic'
+  statisticDevice: 'device/statistic',
+  detailDevice: 'device/detail',
 };

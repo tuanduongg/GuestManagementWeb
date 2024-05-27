@@ -37,7 +37,7 @@ import {
   PicCenterOutlined,
   CaretDownOutlined,
   MoreOutlined,
-  SmileOutlined,
+  WarningOutlined,
   ImportOutlined,
   CloseOutlined,
   ExportOutlined
@@ -64,16 +64,16 @@ const ITEMROWS = [
     color: '#818cf8'
   },
   {
-    label: <span style={{ color: '#dc2626' }}>Đang sửa</span>,
+    label: <span style={{ color: '#4a044e' }}>Đang sửa</span>,
     key: TYPE_FILTER.FIXING,
     disabled: false,
-    color: '#dc2626'
+    color: '#4a044e'
   },
   {
-    label: <span style={{ color: '#f59e0b' }}>Đã hỏng</span>,
+    label: <span style={{ color: '#dc2626' }}>Đã hỏng</span>,
     key: TYPE_FILTER.NONE,
     disabled: false,
-    color: '#f59e0b'
+    color: '#dc2626'
   }
 ];
 
@@ -111,10 +111,14 @@ const ManageDevice = () => {
   const [page, setPage] = useState(1);
   const [filterValue, setFilterValue] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [openModalAdd, setOPenModalAdd] = useState(false);
+  const [openModalAdd, setOpenModalAdd] = useState(false);
   const [categories, setCategories] = useState([]);
   const [devices, setDevices] = useState([]);
+  const [statistic, setStatistic] = useState({});
   const [currentDropdown, setCurrentDropdown] = useState('');
+  const [currentRow, setCurrentRow] = useState({});
+  const [typeModal, setTypeModal] = useState('ADD');
+  const [detailDevice, setDetailDevice] = useState({});
   const [api, contextHolder] = notification.useNotification();
 
   const ITEM_CELL_ACTION = [
@@ -132,9 +136,32 @@ const ManageDevice = () => {
       danger: true
     }
   ];
+  const getDetailDevice = async () => {
+    setLoading(true);
+    const res = await restApi.post(RouterAPI.detailDevice, { DEVICE_ID: currentRow?.DEVICE_ID });
+    setLoading(false);
+    if (res?.status === 200) {
+      setDetailDevice(res?.data);
+      setOpenModalAdd(true);
+    } else {
+      message.error('Get info device fail!');
+    }
+  };
   const menuPropsCellAction = {
     items: ITEM_CELL_ACTION,
-    onClick: () => {}
+    onClick: (e) => {
+      switch (e?.key) {
+        case 'edit':
+          setTypeModal('EDIT');
+          getDetailDevice();
+          break;
+        case 'delete':
+          break;
+
+        default:
+          break;
+      }
+    }
   };
   const handleMenuClick = async (e) => {
     setLoading(true);
@@ -144,6 +171,7 @@ const ManageDevice = () => {
     if (res?.status === 200) {
       message.success('Change status device successful!');
       getAllDevice();
+      getStatistic();
     }
   };
   const handleMenuClickMore = async (e) => {
@@ -175,7 +203,7 @@ const ManageDevice = () => {
         <>
           <Row style={{ display: 'flex', alignItems: 'center' }} gutter={8}>
             <Col xs={24} sm={20} lg={20}>
-              <Link onClick={() => {}}>{data?.NAME}</Link>
+              <Link onClick={() => { }}>{data?.NAME}</Link>
             </Col>
           </Row>
         </>
@@ -245,7 +273,7 @@ const ManageDevice = () => {
                 onClick={() => {
                   setCurrentDropdown(data?.DEVICE_ID);
                 }}
-                // type="primary"
+              // type="primary"
               >
                 {data?.STATUS ? ITEMROWS.find((item) => item.key === data?.STATUS)?.label : ''}
               </Button>
@@ -265,6 +293,7 @@ const ManageDevice = () => {
             <Dropdown trigger={['click']} placement="bottom" menu={menuPropsCellAction}>
               <Button
                 onClick={() => {
+                  setCurrentRow(data);
                   setCurrentDropdown(data?.DEVICE_ID);
                 }}
                 icon={<MoreOutlined />}
@@ -290,13 +319,15 @@ const ManageDevice = () => {
     setLoading(true);
     const rest = await restApi.post(RouterAPI.allDevice);
     setLoading(false);
-    console.log('rest', rest);
     if (rest?.status === 200) {
       setDevices(rest?.data);
     }
   };
   const handleCloseModalAdd = () => {
-    setOPenModalAdd(false);
+    setTypeModal('ADD');
+    setCurrentDropdown('');
+    setCurrentRow({});
+    setOpenModalAdd(false);
   };
 
   const ITEMS = [
@@ -328,7 +359,9 @@ const ManageDevice = () => {
 
   const getStatistic = async () => {
     const res = await restApi.get(RouterAPI.statisticDevice);
-    console.log('res', res);
+    if (res?.status === 200) {
+      setStatistic(res?.data);
+    }
   };
 
   useEffect(() => {
@@ -349,7 +382,7 @@ const ManageDevice = () => {
       sm: 8,
       md: 4,
       title: 'TỔNG',
-      value: '1200',
+      value: statistic?.total,
       color: '#0284c7',
       icon: <PicCenterOutlined style={{ fontSize: FONT_SIZE_ICON_CARD, color: '#0284c7' }} />,
       onclick: () => {
@@ -360,35 +393,23 @@ const ManageDevice = () => {
       id: TYPE_FILTER?.USING,
       xs: 12,
       sm: 8,
-      md: 5,
+      md: 4,
       title: 'ĐANG SỬ DỤNG',
-      value: '150',
+      value: statistic?.statuses?.USING,
       color: '#15803d',
       icon: <FundProjectionScreenOutlined style={{ fontSize: FONT_SIZE_ICON_CARD, color: '#15803d' }} />,
       onclick: () => {
         setFilterValue('USING');
       }
     },
-    {
-      id: TYPE_FILTER?.FIXING,
-      xs: 12,
-      sm: 8,
-      md: 5,
-      title: 'ĐANG SỬA CHỮA',
-      value: '1420',
-      color: '#dc2626',
-      icon: <ToolOutlined style={{ fontSize: FONT_SIZE_ICON_CARD, color: '#dc2626' }} />,
-      onclick: () => {
-        setFilterValue('FIXING');
-      }
-    },
+
     {
       id: TYPE_FILTER?.FREE,
       xs: 12,
       sm: 8,
-      md: 5,
+      md: 4,
       title: 'RẢNH',
-      value: '1210',
+      value: statistic?.statuses?.FREE,
       color: '#818cf8',
       icon: <FundViewOutlined style={{ fontSize: FONT_SIZE_ICON_CARD, color: '#818cf8' }} />,
       onclick: () => {
@@ -396,11 +417,38 @@ const ManageDevice = () => {
       }
     },
     {
+      id: TYPE_FILTER?.FIXING,
+      xs: 12,
+      sm: 8,
+      md: 4,
+      title: 'ĐANG SỬA CHỮA',
+      value: statistic?.statuses?.FIXING,
+      color: '#4a044e',
+      icon: <ToolOutlined style={{ fontSize: FONT_SIZE_ICON_CARD, color: '#4a044e' }} />,
+      onclick: () => {
+        setFilterValue('FIXING');
+      }
+    },
+    {
+      id: TYPE_FILTER?.FIXING,
+      xs: 12,
+      sm: 8,
+      md: 4,
+      title: 'ĐÃ HỎNG',
+      value: statistic?.statuses?.NONE,
+      color: '#dc2626',
+      icon: <WarningOutlined style={{ fontSize: FONT_SIZE_ICON_CARD, color: '#dc2626' }} />,
+      onclick: () => {
+        setFilterValue('FIXING');
+      }
+    },
+    {
       id: TYPE_FILTER?.EXIPRATION_DATE,
-      xs: 24,
-      sm: 5,
+      xs: 12,
+      sm: 8,
+      md: 4,
       title: 'HẾT BẢO HÀNH 05/2024',
-      value: '10',
+      value: statistic?.expirationCount,
       color: '#f59e0b',
       icon: <HistoryOutlined style={{ fontSize: FONT_SIZE_ICON_CARD, color: '#f59e0b' }} />,
       onclick: () => {
@@ -521,18 +569,19 @@ const ManageDevice = () => {
             />
           </Col>
           <Col xs={0} sm={5} md={6}>
-            <Search style={{ maxWidth: '300px' }} placeholder="Tên thiết bị..." allowClear enterButton="Search" onSearch={() => {}} />
+            <Search style={{ maxWidth: '300px' }} placeholder="Tên thiết bị..." allowClear enterButton="Search" onSearch={() => { }} />
           </Col>
           <Col xs={24} sm={4} md={9}>
             <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
               {isMobile() && (
-                <Button onClick={() => {}} style={{ marginRight: '5px' }} icon={<FilterOutlined />}>
+                <Button onClick={() => { }} style={{ marginRight: '5px' }} icon={<FilterOutlined />}>
                   Bộ lọc
                 </Button>
               )}
               <Button
                 onClick={() => {
-                  setOPenModalAdd(true);
+                  setTypeModal('ADD');
+                  setOpenModalAdd(true);
                 }}
                 style={{ marginRight: '10px' }}
                 icon={<PlusOutlined />}
@@ -561,32 +610,41 @@ const ManageDevice = () => {
               scroll={
                 isMobile()
                   ? {
-                      x: '100vh',
-                      y: '65vh'
-                    }
+                    x: '100vh',
+                    y: '65vh'
+                  }
                   : { x: null, y: 'calc(100vh - 230px)' }
               }
               columns={columns}
               dataSource={devices}
-              //   pagination={{
-              //     current: page,
-              //     pageSize: rowsPerPage,
-              //     showSizeChanger: true,
-              //     pageSizeOptions: config.sizePageOption,
-              //     total: total,
-              //     showTotal: (total, range) => `${range[0]}-${range[1]}/${total}`,
-              //     responsive: true,
-              //     onChange: (page, pageSize) => {
-              //       setSelectedRowKeys([]);
-              //       setPage(page);
-              //       setRowsPerPage(pageSize);
-              //     }
-              //   }}
+            //   pagination={{
+            //     current: page,
+            //     pageSize: rowsPerPage,
+            //     showSizeChanger: true,
+            //     pageSizeOptions: config.sizePageOption,
+            //     total: total,
+            //     showTotal: (total, range) => `${range[0]}-${range[1]}/${total}`,
+            //     responsive: true,
+            //     onChange: (page, pageSize) => {
+            //       setSelectedRowKeys([]);
+            //       setPage(page);
+            //       setRowsPerPage(pageSize);
+            //     }
+            //   }}
             ></Table>
           </Col>
         </Row>
       </MainCard>
-      <ModalAddDevice setLoading={setLoading} open={openModalAdd} categories={categories} handleClose={handleCloseModalAdd} />
+      <ModalAddDevice
+        typeModal={typeModal}
+        currentRow={detailDevice}
+        getAllData={getAllDevice}
+        getStatistic={getStatistic}
+        setLoading={setLoading}
+        open={openModalAdd}
+        categories={categories}
+        handleClose={handleCloseModalAdd}
+      />
     </>
   );
 };
