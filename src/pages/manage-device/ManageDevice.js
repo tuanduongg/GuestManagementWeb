@@ -47,7 +47,7 @@ import MainCard from 'components/MainCard';
 import { useTranslation } from 'react-i18next';
 import config from 'config';
 import './manage_device.css';
-import { FONT_SIZE_ICON_CARD, ITEM_DROPDOWN_STATUS, TYPE_FILTER } from './manage_device.service';
+import { FONT_SIZE_ICON_CARD, ITEM_DROPDOWN_STATUS, STATUS_DEVICE, TYPE_FILTER } from './manage_device.service';
 import ModalAddDevice from 'components/modal/modal-add-device/ModalAddDevice';
 const { Title, Link } = Typography;
 const ITEMROWS = [
@@ -119,6 +119,10 @@ const ManageDevice = () => {
   const [currentRow, setCurrentRow] = useState({});
   const [typeModal, setTypeModal] = useState('ADD');
   const [detailDevice, setDetailDevice] = useState({});
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [expirationFilter, setExpirationFilter] = useState('all');
+  const [search, setSearch] = useState('');
   const [api, contextHolder] = notification.useNotification();
 
   const ITEM_CELL_ACTION = [
@@ -317,7 +321,12 @@ const ManageDevice = () => {
   };
   const getAllDevice = async () => {
     setLoading(true);
-    const rest = await restApi.post(RouterAPI.allDevice);
+    const rest = await restApi.post(RouterAPI.allDevice, {
+      category: categoryFilter,
+      status: statusFilter,
+      expiration: expirationFilter,
+      search
+    });
     setLoading(false);
     if (rest?.status === 200) {
       setDevices(rest?.data);
@@ -363,13 +372,54 @@ const ManageDevice = () => {
       setStatistic(res?.data);
     }
   };
-
   useEffect(() => {
     // checkRole();
     getStatistic();
     getListCategory();
-    getAllDevice();
   }, []);
+
+  useEffect(() => {
+    getAllDevice();
+  }, [categoryFilter, statusFilter, expirationFilter, search]);
+  const onClickCard = (value) => {
+    if (value) {
+      switch (value) {
+        case TYPE_FILTER.SUM:
+          setCategoryFilter('all');
+          setStatusFilter('all');
+          setExpirationFilter('all');
+          break;
+        case TYPE_FILTER.FREE:
+          setCategoryFilter('all');
+          setStatusFilter(TYPE_FILTER.FREE);
+          setExpirationFilter('all');
+          break;
+        case TYPE_FILTER.FIXING:
+          setCategoryFilter('all');
+          setStatusFilter(TYPE_FILTER.FIXING);
+          setExpirationFilter('all');
+          break;
+        case TYPE_FILTER.NONE:
+          setCategoryFilter('all');
+          setStatusFilter(TYPE_FILTER.NONE);
+          setExpirationFilter('all');
+          break;
+        case TYPE_FILTER.EXIPRATION_DATE:
+          setCategoryFilter('all');
+          setStatusFilter('all');
+          setExpirationFilter('month_expiration');
+          break;
+        case TYPE_FILTER.USING:
+          setCategoryFilter('all');
+          setStatusFilter(TYPE_FILTER.USING);
+          setExpirationFilter('all');
+          break;
+
+        default:
+          break;
+      }
+    }
+  }
 
   //   if (!role?.IS_READ) {
   //     return <ForbidenPage />;
@@ -386,7 +436,7 @@ const ManageDevice = () => {
       color: '#0284c7',
       icon: <PicCenterOutlined style={{ fontSize: FONT_SIZE_ICON_CARD, color: '#0284c7' }} />,
       onclick: () => {
-        setFilterValue('SUM');
+        onClickCard(TYPE_FILTER.SUM);
       }
     },
     {
@@ -399,7 +449,7 @@ const ManageDevice = () => {
       color: '#15803d',
       icon: <FundProjectionScreenOutlined style={{ fontSize: FONT_SIZE_ICON_CARD, color: '#15803d' }} />,
       onclick: () => {
-        setFilterValue('USING');
+        onClickCard(TYPE_FILTER.USING);
       }
     },
 
@@ -413,7 +463,7 @@ const ManageDevice = () => {
       color: '#818cf8',
       icon: <FundViewOutlined style={{ fontSize: FONT_SIZE_ICON_CARD, color: '#818cf8' }} />,
       onclick: () => {
-        setFilterValue('FREE');
+        onClickCard(TYPE_FILTER.FREE);
       }
     },
     {
@@ -426,7 +476,7 @@ const ManageDevice = () => {
       color: '#4a044e',
       icon: <ToolOutlined style={{ fontSize: FONT_SIZE_ICON_CARD, color: '#4a044e' }} />,
       onclick: () => {
-        setFilterValue('FIXING');
+        onClickCard(TYPE_FILTER.FIXING);
       }
     },
     {
@@ -439,7 +489,7 @@ const ManageDevice = () => {
       color: '#dc2626',
       icon: <WarningOutlined style={{ fontSize: FONT_SIZE_ICON_CARD, color: '#dc2626' }} />,
       onclick: () => {
-        setFilterValue('FIXING');
+        onClickCard(TYPE_FILTER.NONE);
       }
     },
     {
@@ -452,7 +502,7 @@ const ManageDevice = () => {
       color: '#f59e0b',
       icon: <HistoryOutlined style={{ fontSize: FONT_SIZE_ICON_CARD, color: '#f59e0b' }} />,
       onclick: () => {
-        setFilterValue('EXIPRATION_DATE');
+        onClickCard(TYPE_FILTER.EXIPRATION_DATE);
       }
     }
   ];
@@ -491,71 +541,75 @@ const ManageDevice = () => {
         <Row gutter={8}>
           <Col xs={0} sm={5} md={3}>
             <Select
-              defaultValue="all"
+              name="category"
+              value={categoryFilter}
               style={{ width: '100%' }}
-              onChange={handleChange}
+              onChange={(value) => {
+                setCategoryFilter(value);
+              }}
+              options={
+                categories?.length > 0
+                  ? [
+                    {
+                      label: '-Loại thiết bị-',
+                      value: 'all'
+                    }
+                  ].concat(
+                    categories.map((item) => {
+                      return {
+                        label: item?.categoryName,
+                        value: item?.categoryID
+                      };
+                    })
+                  )
+                  : [
+                    {
+                      label: '-Loại thiết bị-',
+                      value: 'all'
+                    }
+                  ]
+              }
+            />
+          </Col>
+          <Col xs={0} sm={5} md={3}>
+            <Select
+              name="status"
+              value={statusFilter}
+              style={{ width: '100%' }}
+              onChange={(value) => {
+                setStatusFilter(value);
+              }}
               options={[
                 {
-                  label: '-Loại thiết bị-',
+                  label: '-Trạng thái-',
                   value: 'all'
-                },
-                {
-                  value: 'PC',
-                  label: 'PC'
-                },
-                {
-                  value: 'Printer',
-                  label: 'Printer'
-                },
-                {
-                  value: 'Router',
-                  label: 'Router'
                 }
-              ]}
+              ].concat(
+                STATUS_DEVICE.map((status) => {
+                  return {
+                    label: status?.title,
+                    value: status?.value
+                  };
+                })
+              )}
             />
           </Col>
           <Col xs={0} sm={5} md={3}>
             <Select
-              defaultValue="all"
               style={{ width: '100%' }}
-              onChange={handleChange}
-              options={[
-                {
-                  value: 'all',
-                  label: '-Trạng thái-'
-                },
-                {
-                  label: 'Đang sử dụng',
-                  value: 'using'
-                },
-                {
-                  label: 'Rảnh',
-                  value: 'free'
-                },
-                {
-                  label: 'Đang sửa chữa',
-                  value: 'fixing'
-                },
-                {
-                  label: 'Đã hỏng ',
-                  value: 'none'
-                }
-              ]}
-            />
-          </Col>
-          <Col xs={0} sm={5} md={3}>
-            <Select
-              defaultValue="all"
-              style={{ width: '100%' }}
-              onChange={handleChange}
+              name="expiration"
+              value={expirationFilter}
+              onChange={(value) => {
+                setExpirationFilter(value);
+              }}
               options={[
                 {
                   value: 'all',
                   label: '-Bảo hành-'
                 },
                 {
-                  value: 'end_expiration',
-                  label: 'Sắp hết hạn'
+                  value: 'month_expiration',
+                  label: 'Hết hạn tháng này'
                 },
                 {
                   value: 'end_expiration',
@@ -569,7 +623,15 @@ const ManageDevice = () => {
             />
           </Col>
           <Col xs={0} sm={5} md={6}>
-            <Search style={{ maxWidth: '300px' }} placeholder="Tên thiết bị..." allowClear enterButton="Search" onSearch={() => { }} />
+            <Search
+              style={{ maxWidth: '300px' }}
+              placeholder="Tên thiết bị..."
+              allowClear
+              enterButton="Search"
+              onSearch={(value) => {
+                setSearch(value);
+              }}
+            />
           </Col>
           <Col xs={24} sm={4} md={9}>
             <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>

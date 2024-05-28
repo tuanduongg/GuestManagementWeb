@@ -59,6 +59,7 @@ export const RouterAPI = {
   updateDepartment: '/department/update',
 
   getAllCategory: '/category/all',
+  getAllCategoryDevice: '/category/all-device',
   addCategory: '/category/add',
   updateCategory: '/category/update',
   findByTypeCategory: '/category/findByType',
@@ -66,8 +67,11 @@ export const RouterAPI = {
   deleteImageByID: 'image/delete',
 
   addDevice: 'device/add',
+  editDevice: 'device/edit',
   allDevice: 'device/all',
   changeStatusDevice: 'device/change-status',
   statisticDevice: 'device/statistic',
   detailDevice: 'device/detail',
+
+  deleteImageDevice: 'image-device/delete',
 };

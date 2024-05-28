@@ -95,7 +95,7 @@ export const translate = {
       inventory: 'Tồn kho',
       status: 'Trạng thái',
       delete: 'Xóa',
-      btnEdit: 'Edit',
+      btnEdit: 'Sửa',
       btn_add_to_cart: 'Thêm vào giỏ',
       msg_add_new_order: 'Đặt hàng thành công!',
       msg_add_to_cart: 'Thêm vào giỏ hàng thành công!',

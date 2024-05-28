@@ -87,7 +87,6 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
 
   useEffect(() => {
     if (open && currentRow && typeModal === 'EDIT') {
-      console.log('dayjs(currentRow?.BUY_DATE, config.dateFormat)', dayjs(currentRow?.BUY_DATE, config.dateFormat));
       form.setFieldValue('NAME', currentRow?.NAME);
       form.setFieldValue('categoryID', currentRow?.categoryID);
       form.setFieldValue('MODEL', currentRow?.MODEL);
@@ -111,14 +110,13 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
             uid: image?.IMAGE_ID,
             name: image?.TITLE,
             status: 'done',
-            url: config?.urlImageSever +  image?.URL,
-          }
-        })
+            url: config?.urlImageSever + image?.URL
+          };
+        });
         setFileList(dataImages);
       }
     }
-  }, [open])
-
+  }, [open]);
 
   const handleOnSave = async (data) => {
     setLoading(true);
@@ -146,10 +144,12 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
 
     if (fileList && fileList?.length > 0) {
       fileList.map((file) => {
-        formData.append('files', file?.originFileObj);
+        if (file?.originFileObj) {
+          formData.append('files', file?.originFileObj);
+        }
       });
     }
-    const url = RouterAPI.addDevice;
+    const url = typeModal === 'ADD' ? RouterAPI.addDevice : RouterAPI.editDevice;
     const res = await restApi.post(url, formData);
     setLoading(false);
     if (res?.status === 200) {
@@ -179,8 +179,19 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
     if (Array.isArray(e)) {
       return e;
     }
-
     return e?.fileList;
+  };
+  const handleDeleteImage = async (id) => {
+    if (id) {
+      const data = await restApi.post(RouterAPI.deleteImageDevice, { imageID: id });
+      if (data?.status === 200) {
+        message.success('Xóa thành công!');
+        getAllData();
+        return;
+      }
+      message.error(data?.data?.message ?? 'Delete Fail');
+      setFileList(fileList); // xóa fail thì lấy lại ảnh
+    }
   };
   return (
     <>
@@ -364,7 +375,24 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
               <Col xs={24}>
                 <Form.Item label="Hình ảnh" valuePropName="fileList" getValueFromEvent={normFile}>
                   <Upload
-                    onRemove={() => { }}
+                    onRemove={(file) => {
+                      modal.confirm({
+                        centered: true,
+                        title: 'Thông báo',
+                        content: 'Bạn chắc chắn muốn xóa ảnh này',
+                        okText: 'Yes',
+                        okType: 'danger',
+                        cancelText: 'No',
+                        onOk() {
+                          if (!file?.originFileObj) {
+                            handleDeleteImage(file?.uid);
+                          }
+                        },
+                        onCancel() {
+                          setFileList(fileList);
+                        }
+                      });
+                    }}
                     fileList={fileList}
                     multiple
                     accept=".png,.jpeg,.png,.jpg,.PNG,.JPEG,.JPG,.JPG"
