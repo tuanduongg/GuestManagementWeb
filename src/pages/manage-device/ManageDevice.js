@@ -77,30 +77,7 @@ const ITEMROWS = [
   }
 ];
 
-const ITEMROWS_MORE = [
-  {
-    label: 'Xuất excel',
-    key: 'EXPORT',
-    icon: <ExportOutlined />
-  },
-  {
-    type: 'divider'
-  },
-  {
-    label: 'Nhập excel',
-    key: 'IMPORT',
-    icon: <ImportOutlined />
-  },
-  {
-    type: 'divider'
-  },
-  {
-    label: 'Xóa',
-    key: 'DELETE',
-    icon: <CloseOutlined />,
-    danger: true
-  }
-];
+
 
 const ManageDevice = () => {
   const [role, setRole] = useState(null);
@@ -123,7 +100,33 @@ const ManageDevice = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [expirationFilter, setExpirationFilter] = useState('all');
   const [search, setSearch] = useState('');
-  const [api, contextHolder] = notification.useNotification();
+  const [api] = notification.useNotification();
+  const [modal, contextHolder] = Modal.useModal();
+  const ITEMROWS_MORE = [
+    {
+      label: 'Xuất excel',
+      key: 'EXPORT',
+      icon: <ExportOutlined />
+    },
+    {
+      type: 'divider'
+    },
+    {
+      label: 'Nhập excel',
+      key: 'IMPORT',
+      icon: <ImportOutlined />
+    },
+    {
+      type: 'divider'
+    },
+    {
+      label: 'Xóa',
+      key: 'DELETE',
+      icon: <CloseOutlined />,
+      danger: true,
+      disabled: selectedRowKeys?.length === 0
+    }
+  ];
 
   const ITEM_CELL_ACTION = [
     {
@@ -160,6 +163,7 @@ const ManageDevice = () => {
           getDetailDevice();
           break;
         case 'delete':
+          deleteDevice([currentRow?.DEVICE_ID])
           break;
 
         default:
@@ -176,10 +180,52 @@ const ManageDevice = () => {
       message.success('Change status device successful!');
       getAllDevice();
       getStatistic();
+    } else {
+      message.error(res?.data?.message || 'Change status fail!');
+    }
+  };
+
+  const deleteDevice = async (arrDelete) => {
+    if (arrDelete && arrDelete?.length > 0) {
+
+      modal.confirm({
+        centered: true,
+        title: 'Thông báo',
+        content: 'Bạn chắc chắn muốn xoá thiết bị?',
+        okText: 'Yes',
+        cancelText: 'No',
+        async onOk() {
+          setLoading(true);
+          const res = await restApi.post(RouterAPI.deleteDevice, {
+            arrId: arrDelete
+          });
+          setLoading(false);
+          if (res?.status === 200) {
+            message.success('Delete device successful!');
+            getAllDevice();
+            getStatistic();
+          } else {
+            message.error(res?.data?.message || 'Delete fail!');
+          }
+        },
+        onCancel() { }
+      });
     }
   };
   const handleMenuClickMore = async (e) => {
     console.log(e.key);
+    switch (e?.key) {
+      case 'DELETE':
+        deleteDevice(selectedRowKeys);
+        break;
+      case 'IMPORT':
+        break;
+      case 'EXPORT':
+        break;
+
+      default:
+        break;
+    }
   };
   const menuProps = {
     items: ITEMROWS,
@@ -419,7 +465,7 @@ const ManageDevice = () => {
           break;
       }
     }
-  }
+  };
 
   //   if (!role?.IS_READ) {
   //     return <ForbidenPage />;

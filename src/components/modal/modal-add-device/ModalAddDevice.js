@@ -95,8 +95,15 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
       form.setFieldValue('MAC_ADDRESS', currentRow?.MAC_ADDRESS);
       form.setFieldValue('IP_ADDRESS', currentRow?.IP_ADDRESS);
       form.setFieldValue('PRICE', currentRow?.PRICE);
-      form.setFieldValue('BUY_DATE', dayjs(currentRow?.BUY_DATE));
-      form.setFieldValue('EXPIRATION_DATE', dayjs(currentRow?.EXPIRATION_DATE));
+
+      if (currentRow?.BUY_DATE) {
+        form.setFieldValue('BUY_DATE', dayjs(currentRow?.BUY_DATE));
+      }
+
+      if (currentRow?.EXPIRATION_DATE) {
+        form.setFieldValue('EXPIRATION_DATE', dayjs(currentRow?.EXPIRATION_DATE));
+      }
+
       form.setFieldValue('USER_FULLNAME', currentRow?.USER_FULLNAME);
       form.setFieldValue('USER_CODE', currentRow?.USER_CODE);
       form.setFieldValue('USER_DEPARTMENT', currentRow?.USER_DEPARTMENT);
@@ -153,12 +160,12 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
     const res = await restApi.post(url, formData);
     setLoading(false);
     if (res?.status === 200) {
-      message.success('Add new device successful!');
+      message.success(typeModal === 'ADD' ? 'Add new device successful!' : 'Update device successful!');
       handleCancel();
       getStatistic();
       getAllData();
     } else {
-      message.error(res?.data?.message ?? 'Add new device fail!');
+      message.error(res?.data?.message ?? typeModal === 'ADD' ? 'Add new device fail!' : 'Update device fail!');
     }
   };
   const onFinish = (values) => {
