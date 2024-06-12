@@ -20,7 +20,7 @@ import {
   Card
 } from 'antd';
 const { Search } = Input;
-import { formatDateFromDB, formattingVND, isMobile, truncateString } from 'utils/helper';
+import { addCommaToString, formatDateFromDB, formattingVND, isMobile, moneyFormat, truncateString } from 'utils/helper';
 import ForbidenPage from 'components/403/ForbidenPage';
 import { RouterAPI } from 'utils/routerAPI';
 import restApi from 'utils/restAPI';
@@ -76,8 +76,6 @@ const ITEMROWS = [
     color: '#dc2626'
   }
 ];
-
-
 
 const ManageDevice = () => {
   const [role, setRole] = useState(null);
@@ -163,7 +161,7 @@ const ManageDevice = () => {
           getDetailDevice();
           break;
         case 'delete':
-          deleteDevice([currentRow?.DEVICE_ID])
+          deleteDevice([currentRow?.DEVICE_ID]);
           break;
 
         default:
@@ -187,7 +185,6 @@ const ManageDevice = () => {
 
   const deleteDevice = async (arrDelete) => {
     if (arrDelete && arrDelete?.length > 0) {
-
       modal.confirm({
         centered: true,
         title: 'Thông báo',
@@ -208,12 +205,11 @@ const ManageDevice = () => {
             message.error(res?.data?.message || 'Delete fail!');
           }
         },
-        onCancel() { }
+        onCancel() {}
       });
     }
   };
   const handleMenuClickMore = async (e) => {
-    console.log(e.key);
     switch (e?.key) {
       case 'DELETE':
         deleteDevice(selectedRowKeys);
@@ -245,6 +241,13 @@ const ManageDevice = () => {
       width: isMobile() ? '30px' : '5%'
     },
     {
+      align: 'center',
+      key: 'index',
+      title: 'Mã',
+      render: (_, data, index) => <>{data?.DEVICE_CODE}</>,
+      width: isMobile() ? '100px' : '7%'
+    },
+    {
       align: 'left',
       key: 'NAME',
       title: 'Tên thiết bị',
@@ -253,26 +256,26 @@ const ManageDevice = () => {
         <>
           <Row style={{ display: 'flex', alignItems: 'center' }} gutter={8}>
             <Col xs={24} sm={20} lg={20}>
-              <Link onClick={() => { }}>{data?.NAME}</Link>
+              <Link onClick={() => {}}>{data?.NAME}</Link>
             </Col>
           </Row>
         </>
       ),
-      width: isMobile() ? '130px' : '18%'
+      width: isMobile() ? '130px' : '13%'
     },
     {
       align: 'center',
       key: 'categoryID',
       title: 'Loại thiết bị',
       render: (_, data) => <>{data?.category?.categoryName}</>,
-      width: isMobile() ? '100px' : '15%'
+      width: isMobile() ? '100px' : '13%'
     },
     {
       key: 'PRICE',
       title: 'Giá',
       dataIndex: 'PRICE',
       align: 'center',
-      render: (_, data) => <>{data?.PRICE}</>,
+      render: (_, data) => <>{data?.PRICE ? formattingVND(data?.PRICE,'đ') : ''}</>,
       width: isMobile() ? '100px' : '10%'
     },
     {
@@ -286,10 +289,10 @@ const ManageDevice = () => {
     {
       align: 'center',
       key: 'category',
-      title: 'Ngày mua',
+      title: 'Bộ phận',
       filterMode: 'tree',
       filterSearch: true,
-      render: (_, data) => <>{formatDateFromDB(data?.BUY_DATE, false)}</>,
+      render: (_, data) => <>{data?.USER_DEPARTMENT}</>,
       width: isMobile() ? '100px' : '10%'
     },
     {
@@ -323,7 +326,7 @@ const ManageDevice = () => {
                 onClick={() => {
                   setCurrentDropdown(data?.DEVICE_ID);
                 }}
-              // type="primary"
+                // type="primary"
               >
                 {data?.STATUS ? ITEMROWS.find((item) => item.key === data?.STATUS)?.label : ''}
               </Button>
@@ -585,7 +588,32 @@ const ManageDevice = () => {
       </Row>
       <MainCard contentSX={{ p: isMobile() ? 0.5 : 2, minHeight: '83vh' }}>
         <Row gutter={8}>
-          <Col xs={0} sm={5} md={3}>
+          <Col xs={24} sm={24} md={24}>
+            <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
+              {isMobile() && (
+                <Button onClick={() => {}} style={{ marginRight: '5px' }} icon={<FilterOutlined />}>
+                  Bộ lọc
+                </Button>
+              )}
+              <Button
+                onClick={() => {
+                  setTypeModal('ADD');
+                  setOpenModalAdd(true);
+                }}
+                style={{ marginRight: '10px' }}
+                icon={<PlusOutlined />}
+                type="primary"
+              >
+                {t('btn_new')}
+              </Button>
+              <Dropdown menu={menuPropsMore}>
+                <Button style={{ marginLeft: '5px' }} icon={<DownOutlined />}>
+                  {t('btnMore')}
+                </Button>
+              </Dropdown>
+            </div>
+          </Col>
+          <Col xs={0} sm={7} md={4} lg={3}>
             <Select
               name="category"
               value={categoryFilter}
@@ -596,28 +624,28 @@ const ManageDevice = () => {
               options={
                 categories?.length > 0
                   ? [
-                    {
-                      label: '-Loại thiết bị-',
-                      value: 'all'
-                    }
-                  ].concat(
-                    categories.map((item) => {
-                      return {
-                        label: item?.categoryName,
-                        value: item?.categoryID
-                      };
-                    })
-                  )
+                      {
+                        label: '-Loại thiết bị-',
+                        value: 'all'
+                      }
+                    ].concat(
+                      categories.map((item) => {
+                        return {
+                          label: item?.categoryName,
+                          value: item?.categoryID
+                        };
+                      })
+                    )
                   : [
-                    {
-                      label: '-Loại thiết bị-',
-                      value: 'all'
-                    }
-                  ]
+                      {
+                        label: '-Loại thiết bị-',
+                        value: 'all'
+                      }
+                    ]
               }
             />
           </Col>
-          <Col xs={0} sm={5} md={3}>
+          <Col xs={0} sm={5} md={4} lg={3}>
             <Select
               name="status"
               value={statusFilter}
@@ -640,7 +668,7 @@ const ManageDevice = () => {
               )}
             />
           </Col>
-          <Col xs={0} sm={5} md={3}>
+          <Col xs={0} sm={5} md={4} lg={3}>
             <Select
               style={{ width: '100%' }}
               name="expiration"
@@ -671,38 +699,13 @@ const ManageDevice = () => {
           <Col xs={0} sm={5} md={6}>
             <Search
               style={{ maxWidth: '300px' }}
-              placeholder="Tên thiết bị..."
+              placeholder="Tìm kiếm..."
               allowClear
               enterButton="Search"
               onSearch={(value) => {
                 setSearch(value);
               }}
             />
-          </Col>
-          <Col xs={24} sm={4} md={9}>
-            <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
-              {isMobile() && (
-                <Button onClick={() => { }} style={{ marginRight: '5px' }} icon={<FilterOutlined />}>
-                  Bộ lọc
-                </Button>
-              )}
-              <Button
-                onClick={() => {
-                  setTypeModal('ADD');
-                  setOpenModalAdd(true);
-                }}
-                style={{ marginRight: '10px' }}
-                icon={<PlusOutlined />}
-                type="primary"
-              >
-                {t('btn_new')}
-              </Button>
-              <Dropdown menu={menuPropsMore}>
-                <Button style={{ marginLeft: '5px' }} icon={<DownOutlined />}>
-                  {t('btnMore')}
-                </Button>
-              </Dropdown>
-            </div>
           </Col>
         </Row>
         <Row style={{ marginTop: '15px' }}>
@@ -718,27 +721,27 @@ const ManageDevice = () => {
               scroll={
                 isMobile()
                   ? {
-                    x: '100vh',
-                    y: '65vh'
-                  }
+                      x: '100vh',
+                      y: '65vh'
+                    }
                   : { x: null, y: 'calc(100vh - 230px)' }
               }
               columns={columns}
               dataSource={devices}
-            //   pagination={{
-            //     current: page,
-            //     pageSize: rowsPerPage,
-            //     showSizeChanger: true,
-            //     pageSizeOptions: config.sizePageOption,
-            //     total: total,
-            //     showTotal: (total, range) => `${range[0]}-${range[1]}/${total}`,
-            //     responsive: true,
-            //     onChange: (page, pageSize) => {
-            //       setSelectedRowKeys([]);
-            //       setPage(page);
-            //       setRowsPerPage(pageSize);
-            //     }
-            //   }}
+              //   pagination={{
+              //     current: page,
+              //     pageSize: rowsPerPage,
+              //     showSizeChanger: true,
+              //     pageSizeOptions: config.sizePageOption,
+              //     total: total,
+              //     showTotal: (total, range) => `${range[0]}-${range[1]}/${total}`,
+              //     responsive: true,
+              //     onChange: (page, pageSize) => {
+              //       setSelectedRowKeys([]);
+              //       setPage(page);
+              //       setRowsPerPage(pageSize);
+              //     }
+              //   }}
             ></Table>
           </Col>
         </Row>

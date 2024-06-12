@@ -151,7 +151,6 @@ export const formatDateFromDB = (dateString, showTime = true) => {
   var hours = date.getHours();
   var minutes = date.getMinutes();
 
-
   // Hàm để thêm số 0 trước các giá trị nhỏ hơn 10
   // Tạo chuỗi định dạng
   return addZero(hours) + ':' + addZero(minutes) + ' ' + addZero(day) + '/' + addZero(month) + '/' + year;
@@ -571,4 +570,12 @@ export function moneyFormat(price, sign = '$') {
     pieces.splice(ii, 0, ',');
   }
   return sign + pieces.join('');
+}
+export function addCommaToString(inputValue) {
+  if (inputValue?.trim() !== '') {
+    inputValue = inputValue.replace(/,/g, '');
+    // Thêm dấu phẩy sau mỗi 3 ký tự
+    return inputValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+  return '';
 }

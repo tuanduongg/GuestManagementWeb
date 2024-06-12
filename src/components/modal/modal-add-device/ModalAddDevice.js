@@ -4,7 +4,7 @@ const { TextArea } = Input;
 const { Title } = Typography;
 // assets
 import { PlusOutlined, MinusOutlined, ShoppingCartOutlined } from '@ant-design/icons';
-import { ROLE_ACC, STATUS_ACC, formatCurrency, isMobile, moneyFormat } from 'utils/helper';
+import { ROLE_ACC, STATUS_ACC, addCommaToString, formatCurrency, isMobile, moneyFormat } from 'utils/helper';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
 import { useTranslation } from 'react-i18next';
@@ -58,6 +58,7 @@ const initialValuesForm = {
   USER_DEPARTMENT: '',
   INFO: '',
   NOTE: '',
+  DEVICE_CODE: '',
   STATUS: 'USING'
 };
 const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData, getStatistic, currentRow, typeModal }) => {
@@ -94,7 +95,7 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
       form.setFieldValue('SERIAL_NUMBER', currentRow?.SERIAL_NUMBER);
       form.setFieldValue('MAC_ADDRESS', currentRow?.MAC_ADDRESS);
       form.setFieldValue('IP_ADDRESS', currentRow?.IP_ADDRESS);
-      form.setFieldValue('PRICE', currentRow?.PRICE);
+      form.setFieldValue('PRICE', addCommaToString(currentRow?.PRICE));
 
       if (currentRow?.BUY_DATE) {
         form.setFieldValue('BUY_DATE', dayjs(currentRow?.BUY_DATE));
@@ -111,6 +112,7 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
       form.setFieldValue('NOTE', currentRow?.NOTE);
       form.setFieldValue('STATUS', currentRow?.STATUS);
       form.setFieldValue('DEVICE_ID', currentRow?.DEVICE_ID);
+      form.setFieldValue('DEVICE_CODE', currentRow?.DEVICE_CODE);
       if (currentRow?.images?.length > 0) {
         const dataImages = currentRow?.images?.map((image) => {
           return {
@@ -144,6 +146,7 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
       INFO: data?.INFO,
       NOTE: data?.NOTE,
       STATUS: data?.STATUS,
+      DEVICE_CODE: data?.DEVICE_CODE,
       DEVICE_ID: data?.DEVICE_ID ?? ''
     });
     var formData = new FormData();
@@ -178,10 +181,10 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
       onOk() {
         handleOnSave(values);
       },
-      onCancel() { }
+      onCancel() {}
     });
   };
-  const onFinishFailed = (values) => { };
+  const onFinishFailed = (values) => {};
   const normFile = (e) => {
     if (Array.isArray(e)) {
       return e;
@@ -246,7 +249,12 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
               <Form.Item name="DEVICE_ID" style={{ display: 'none' }}>
                 <Input type="text" />
               </Form.Item>
-              <Col xs={24} sm={24}>
+              <Col xs={24} sm={8}>
+                <Form.Item name="DEVICE_CODE" label="Mã thiết bị">
+                  <Input placeholder="Mã thiết bị..." />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={16}>
                 <Form.Item
                   name="NAME"
                   label="Tên thiết bị"
@@ -340,7 +348,7 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
               </Col>
               <Col xs={24} sm={8}>
                 <Form.Item name="PRICE" label="Giá tiền">
-                  <Input onChange={(e) => { }} placeholder="Nhập giá tiền..." />
+                  <Input onChange={(e) => {}} placeholder="Nhập giá tiền..." />
                 </Form.Item>
               </Col>
               <Col xs={12} sm={8}>
@@ -403,7 +411,7 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
                     fileList={fileList}
                     multiple
                     accept=".png,.jpeg,.png,.jpg,.PNG,.JPEG,.JPG,.JPG"
-                    onPreview={() => { }}
+                    onPreview={() => {}}
                     beforeUpload={() => false}
                     onChange={(info) => {
                       setFileList(info.fileList);

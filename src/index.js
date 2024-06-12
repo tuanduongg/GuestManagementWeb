@@ -15,7 +15,6 @@ import 'assets/third-party/apex-chart.css';
 import App from './App';
 import { store } from 'store';
 import reportWebVitals from './reportWebVitals';
-import * as serviceWorkerRegistration from './serviceWorkerRegistration.js';
 
 // ==============================|| MAIN - REACT DOM RENDER  ||============================== //
 

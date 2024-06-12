@@ -1,11 +1,11 @@
 import React from 'react';
-import { Button, Spin } from 'antd';
+import { Spin } from 'antd';
 
-const Loading = ({loading}) => {
+const Loading = ({ loading }) => {
   if (loading) {
     return (
       <>
-        <Spin style={{ zIndex: '2000' }} spinning={true} fullscreen />
+        <Spin percent={'auto'} style={{ zIndex: '2000' }} spinning={true} fullscreen />
       </>
     );
   }
