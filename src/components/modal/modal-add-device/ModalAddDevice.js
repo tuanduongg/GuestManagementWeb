@@ -59,6 +59,7 @@ const initialValuesForm = {
   INFO: '',
   NOTE: '',
   DEVICE_CODE: '',
+  LOCATION: '',
   STATUS: 'USING'
 };
 const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData, getStatistic, currentRow, typeModal }) => {
@@ -113,6 +114,7 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
       form.setFieldValue('STATUS', currentRow?.STATUS);
       form.setFieldValue('DEVICE_ID', currentRow?.DEVICE_ID);
       form.setFieldValue('DEVICE_CODE', currentRow?.DEVICE_CODE);
+      form.setFieldValue('LOCATION', currentRow?.LOCATION);
       if (currentRow?.images?.length > 0) {
         const dataImages = currentRow?.images?.map((image) => {
           return {
@@ -147,6 +149,7 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
       NOTE: data?.NOTE,
       STATUS: data?.STATUS,
       DEVICE_CODE: data?.DEVICE_CODE,
+      LOCATION: data?.LOCATION,
       DEVICE_ID: data?.DEVICE_ID ?? ''
     });
     var formData = new FormData();
@@ -362,19 +365,24 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
                 </Form.Item>
               </Col>
 
-              <Col xs={24} sm={8}>
+              <Col xs={24} sm={12}>
                 <Form.Item name="USER_FULLNAME" label="Tên người sử dụng">
                   <Input placeholder="Nhập họ tên người sử dụng..." />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={8}>
+              <Col xs={24} sm={12}>
                 <Form.Item name="USER_CODE" label="Mã nhân viên">
                   <Input placeholder="Nhập mã nhân viên..." />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={8}>
+              <Col xs={24} sm={12}>
                 <Form.Item name="USER_DEPARTMENT" label="Bộ phận">
                   <Input placeholder="Nhập bộ phận..." />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12}>
+                <Form.Item name="LOCATION" label="Vị trí">
+                  <Input placeholder="Nhập vị trí..." />
                 </Form.Item>
               </Col>
               <Col xs={24}>

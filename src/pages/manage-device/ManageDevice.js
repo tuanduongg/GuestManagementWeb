@@ -241,7 +241,7 @@ const ManageDevice = () => {
       width: isMobile() ? '30px' : '5%'
     },
     {
-      align: 'center',
+      align: 'left',
       key: 'index',
       title: 'Mã',
       render: (_, data, index) => <>{data?.DEVICE_CODE}</>,
@@ -261,21 +261,13 @@ const ManageDevice = () => {
           </Row>
         </>
       ),
-      width: isMobile() ? '130px' : '13%'
+      width: isMobile() ? '130px' : '18%'
     },
     {
       align: 'center',
       key: 'categoryID',
       title: 'Loại thiết bị',
       render: (_, data) => <>{data?.category?.categoryName}</>,
-      width: isMobile() ? '100px' : '13%'
-    },
-    {
-      key: 'PRICE',
-      title: 'Giá',
-      dataIndex: 'PRICE',
-      align: 'center',
-      render: (_, data) => <>{data?.PRICE ? formattingVND(data?.PRICE,'đ') : ''}</>,
       width: isMobile() ? '100px' : '10%'
     },
     {
@@ -297,12 +289,21 @@ const ManageDevice = () => {
     },
     {
       align: 'center',
+      key: 'location',
+      title: 'Vị trí',
+      filterMode: 'tree',
+      filterSearch: true,
+      render: (_, data) => <>{data?.LOCATION}</>,
+      width: isMobile() ? '100px' : '10%'
+    },
+    {
+      align: 'center',
       key: 'expiration_date',
       title: 'Ngày hết bảo hành',
       filterMode: 'tree',
       filterSearch: true,
       render: (_, data) => <>{formatDateFromDB(data?.EXPIRATION_DATE, false)}</>,
-      width: isMobile() ? '100px' : '15%'
+      width: isMobile() ? '100px' : '10%'
     },
     {
       key: 'isShow',
@@ -724,7 +725,7 @@ const ManageDevice = () => {
                       x: '100vh',
                       y: '65vh'
                     }
-                  : { x: null, y: 'calc(100vh - 230px)' }
+                  : { x: null, y: 'calc(100vh - 285px)' }
               }
               columns={columns}
               dataSource={devices}
