@@ -8,6 +8,8 @@ import AuthLogin from 'pages/authentication/auth-forms/AuthLogin';
 import { ConfigRouter } from 'config_router';
 import Loadable from 'components/Loadable';
 import { lazy } from 'react';
+import ForbidenPage from 'components/403/ForbidenPage';
+import NotFoundPage from 'components/404/NotFoundPage';
 
 // import HomePage from 'pages/homepage/HomePage';
 const HomePage = Loadable(lazy(() => import('pages/homepage/HomePage')));
@@ -27,6 +29,10 @@ export default function ThemeRoutes() {
           element: <HomePage />
         }
       ]
+    },
+    {
+      path: '*', // Bất kỳ URL nào không khớp với các route trên
+      element: <NotFoundPage /> // Component hiển thị trang 404
     }
   ]);
 }
