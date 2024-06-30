@@ -1,4 +1,12 @@
 .card_statistic_device > .ant-card-body {
-    padding: 14px;
+    padding: 12px;
     cursor: pointer;
+}
+.card_statistic_device  {
+    border: 1px solid #c3c3c3;
+}
+
+.active-card-device {
+
+    border: 1px solid #1677ff;
 }

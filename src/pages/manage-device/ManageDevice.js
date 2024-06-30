@@ -49,7 +49,9 @@ import config from 'config';
 import './manage_device.css';
 import { FONT_SIZE_ICON_CARD, ITEM_DROPDOWN_STATUS, STATUS_DEVICE, TYPE_FILTER } from './manage_device.service';
 import ModalAddDevice from 'components/modal/modal-add-device/ModalAddDevice';
+import ModalUploadExcelDevice from 'components/modal/modal-upload-excel-device/ModalUploadExcelDevice';
 const { Title, Link } = Typography;
+
 const ITEMROWS = [
   {
     label: <span style={{ color: '#15803d' }}>Đang dùng</span>,
@@ -87,6 +89,7 @@ const ManageDevice = () => {
   const [filterValue, setFilterValue] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openModalAdd, setOpenModalAdd] = useState(false);
+  const [openModalUpload, setOpenModalUpload] = useState(false);
   const [categories, setCategories] = useState([]);
   const [devices, setDevices] = useState([]);
   const [statistic, setStatistic] = useState({});
@@ -215,6 +218,7 @@ const ManageDevice = () => {
         deleteDevice(selectedRowKeys);
         break;
       case 'IMPORT':
+        setOpenModalUpload(true);
         break;
       case 'EXPORT':
         break;
@@ -241,7 +245,7 @@ const ManageDevice = () => {
       width: isMobile() ? '30px' : '5%'
     },
     {
-      align: 'center',
+      align: 'left',
       key: 'index',
       title: 'Mã',
       render: (_, data, index) => <>{data?.DEVICE_CODE}</>,
@@ -261,21 +265,13 @@ const ManageDevice = () => {
           </Row>
         </>
       ),
-      width: isMobile() ? '130px' : '13%'
+      width: isMobile() ? '130px' : '18%'
     },
     {
       align: 'center',
       key: 'categoryID',
       title: 'Loại thiết bị',
       render: (_, data) => <>{data?.category?.categoryName}</>,
-      width: isMobile() ? '100px' : '13%'
-    },
-    {
-      key: 'PRICE',
-      title: 'Giá',
-      dataIndex: 'PRICE',
-      align: 'center',
-      render: (_, data) => <>{data?.PRICE ? formattingVND(data?.PRICE,'đ') : ''}</>,
       width: isMobile() ? '100px' : '10%'
     },
     {
@@ -297,12 +293,21 @@ const ManageDevice = () => {
     },
     {
       align: 'center',
+      key: 'location',
+      title: 'Vị trí',
+      filterMode: 'tree',
+      filterSearch: true,
+      render: (_, data) => <>{data?.LOCATION}</>,
+      width: isMobile() ? '100px' : '10%'
+    },
+    {
+      align: 'center',
       key: 'expiration_date',
       title: 'Ngày hết bảo hành',
       filterMode: 'tree',
       filterSearch: true,
       render: (_, data) => <>{formatDateFromDB(data?.EXPIRATION_DATE, false)}</>,
-      width: isMobile() ? '100px' : '15%'
+      width: isMobile() ? '100px' : '10%'
     },
     {
       key: 'isShow',
@@ -529,7 +534,7 @@ const ManageDevice = () => {
       }
     },
     {
-      id: TYPE_FILTER?.FIXING,
+      id: TYPE_FILTER?.NONE,
       xs: 12,
       sm: 8,
       md: 4,
@@ -569,9 +574,14 @@ const ManageDevice = () => {
               onClick={col?.onclick}
               style={{
                 width: '100%',
-                height: '100px'
+                height: '100px',
+                backGroundColor: col?.id === statusFilter ? '#333 !important' : '#ffff'
               }}
-              className="card_statistic_device"
+              className={
+                col?.id === statusFilter || (col?.id == TYPE_FILTER?.EXIPRATION_DATE && expirationFilter == 'month_expiration')
+                  ? 'card_statistic_device active-card-device'
+                  : 'card_statistic_device'
+              }
             >
               <Row>
                 <Col style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} xs={10}>
@@ -724,7 +734,7 @@ const ManageDevice = () => {
                       x: '100vh',
                       y: '65vh'
                     }
-                  : { x: null, y: 'calc(100vh - 230px)' }
+                  : { x: null, y: 'calc(100vh - 285px)' }
               }
               columns={columns}
               dataSource={devices}
@@ -755,6 +765,15 @@ const ManageDevice = () => {
         open={openModalAdd}
         categories={categories}
         handleClose={handleCloseModalAdd}
+      />
+      <ModalUploadExcelDevice
+        setLoading={setLoading}
+        afterSave={() => {
+          getStatistic();
+          getAllDevice();
+        }}
+        open={openModalUpload}
+        handleClose={() => setOpenModalUpload(false)}
       />
     </>
   );

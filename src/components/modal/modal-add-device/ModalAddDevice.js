@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Input, Modal, App, Row, Col, Typography, message, Flex, Form, Select, Button, Upload, DatePicker } from 'antd';
+import { Input, Modal, Table, Row, Image, Col, Typography, message, Flex, Form, Select, Button, Upload, DatePicker } from 'antd';
 const { TextArea } = Input;
-const { Title } = Typography;
+const { Title, Link, Paragraph } = Typography;
 // assets
-import { PlusOutlined, MinusOutlined, ShoppingCartOutlined } from '@ant-design/icons';
+import { PlusOutlined, MinusOutlined, ShoppingCartOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { ROLE_ACC, STATUS_ACC, addCommaToString, formatCurrency, isMobile, moneyFormat } from 'utils/helper';
 import restApi from 'utils/restAPI';
 import { RouterAPI } from 'utils/routerAPI';
@@ -14,25 +14,8 @@ import 'react-quill/dist/quill.snow.css';
 import dayjs from 'dayjs';
 
 import { STATUS_DEVICE } from 'pages/manage-device/manage_device.service';
+import ModalAddLicense from '../modal-add-license/ModalAddLicense';
 
-const formatPrice = (value) => {
-  // Xóa các ký tự không phải số từ giá trị nhập vào
-  const sanitizedValue = value.replace(/[^0-9]/g, '');
-
-  // Kiểm tra xem giá trị sau khi xóa ký tự có bằng không hay không
-  if (sanitizedValue !== '') {
-    if (value) {
-      const sanitizedValue = value.replace(/[^0-9]/g, '');
-
-      // Chuyển định dạng số thành chuỗi có dấu phẩy ngăn cách hàng nghìn
-      const formattedValue = new Intl.NumberFormat('en-US').format(parseInt(sanitizedValue, 10));
-
-      return formattedValue.replace(',', '.');
-    }
-    return value;
-  }
-  return '';
-};
 const initValidate = { err: false, msg: '' };
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -59,19 +42,24 @@ const initialValuesForm = {
   INFO: '',
   NOTE: '',
   DEVICE_CODE: '',
+  LOCATION: '',
   STATUS: 'USING'
 };
 const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData, getStatistic, currentRow, typeModal }) => {
   const { t } = useTranslation();
   const [name, setName] = useState('');
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [openModalLicense, setOpenModalLicense] = useState(false);
+  const [typeModalLicense, setTypeModalLicense] = useState('');
   const [previewImage, setPreviewImage] = useState('');
   const [initValueForm, setInitValueForm] = useState(initialValuesForm);
   const [fileList, setFileList] = useState([]);
+  const [listLicense, setListLicense] = useState([]);
   const [form] = Form.useForm();
   const [modal, contextHolder] = Modal.useModal();
   const [info, setInfo] = useState('');
   const [note, setNote] = useState('');
+  const [currentRowLicense, setCurrentRowLicense] = useState({});
 
   const handleOk = (e) => {
     form.submit();
@@ -86,6 +74,81 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
     }
   };
 
+  const columns = [
+    {
+      title: '#',
+      width: '5%',
+      key: 'stt',
+      align: 'center',
+      render: (_, data, index) => <>{index + 1}</>
+    },
+    {
+      title: 'Tên',
+      width: '37%',
+      dataIndex: 'LICENSE_NAME',
+      key: 'LICENSE_NAME',
+      render: (_, data) => (
+        <>
+          <Link onClick={() => {}}>{data?.LICENSE_NAME}</Link>
+        </>
+      )
+    },
+    {
+      title: 'Key',
+      width: '48%',
+      dataIndex: 'LICENSE_KEY',
+      key: 'LICENSE_KEY',
+      align: 'center',
+      render: (_, data) => (
+        <>
+          <Paragraph style={{ marginBottom: '0px' }} copyable>
+            {data?.LICENSE_KEY}
+          </Paragraph>
+        </>
+      )
+    },
+    {
+      align: 'center',
+      title: 'Action',
+      width: '10%',
+      key: 'action',
+      render: (_, data, index) => (
+        <>
+          <Flex>
+            <Button
+              type="text"
+              onClick={() => {
+                setCurrentRowLicense({ ...data, index });
+                setTypeModalLicense('EDIT');
+                setOpenModalLicense(true);
+              }}
+              icon={<EditOutlined />}
+            ></Button>
+            <Button
+              onClick={() => {
+                // setCurrentRowLicense({ ...data, index });
+                modal.confirm({
+                  centered: true,
+                  title: 'Thông báo',
+                  content: 'Bạn chắc chắn muốn xoá?',
+                  okText: 'Yes',
+                  cancelText: 'No',
+                  onOk() {
+                    const data = listLicense.splice(index, 1);
+                    setListLicense(data);
+                  },
+                  onCancel() {}
+                });
+              }}
+              danger
+              type="text"
+              icon={<DeleteOutlined />}
+            ></Button>
+          </Flex>
+        </>
+      )
+    }
+  ];
   useEffect(() => {
     if (open && currentRow && typeModal === 'EDIT') {
       form.setFieldValue('NAME', currentRow?.NAME);
@@ -104,7 +167,6 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
       if (currentRow?.EXPIRATION_DATE) {
         form.setFieldValue('EXPIRATION_DATE', dayjs(currentRow?.EXPIRATION_DATE));
       }
-
       form.setFieldValue('USER_FULLNAME', currentRow?.USER_FULLNAME);
       form.setFieldValue('USER_CODE', currentRow?.USER_CODE);
       form.setFieldValue('USER_DEPARTMENT', currentRow?.USER_DEPARTMENT);
@@ -113,6 +175,18 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
       form.setFieldValue('STATUS', currentRow?.STATUS);
       form.setFieldValue('DEVICE_ID', currentRow?.DEVICE_ID);
       form.setFieldValue('DEVICE_CODE', currentRow?.DEVICE_CODE);
+      form.setFieldValue('LOCATION', currentRow?.LOCATION);
+      if (currentRow?.deviceLicense) {
+        const newDeviceLicense = currentRow?.deviceLicense.map((item) => {
+          item.LICENSE_START_DATE = dayjs(item.LICENSE_START_DATE);
+          item.LICENSE_END_DATE = dayjs(item.LICENSE_END_DATE);
+          item.LICENSE_ID = item?.lincense?.LICENSE_ID;
+          item.LICENSE_NAME = item?.lincense?.LICENSE_NAME;
+          delete item.lincense;
+          return item;
+        });
+        setListLicense(newDeviceLicense);
+      }
       if (currentRow?.images?.length > 0) {
         const dataImages = currentRow?.images?.map((image) => {
           return {
@@ -137,7 +211,7 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
       SERIAL_NUMBER: data?.SERIAL_NUMBER,
       MAC_ADDRESS: data?.MAC_ADDRESS,
       IP_ADDRESS: data?.IP_ADDRESS,
-      PRICE: `${data?.PRICE}`.replace(',', ''),
+      PRICE: `${data?.PRICE}`.replaceAll(',', ''),
       BUY_DATE: data?.BUY_DATE,
       EXPIRATION_DATE: data?.EXPIRATION_DATE,
       USER_FULLNAME: data?.USER_FULLNAME,
@@ -147,7 +221,9 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
       NOTE: data?.NOTE,
       STATUS: data?.STATUS,
       DEVICE_CODE: data?.DEVICE_CODE,
-      DEVICE_ID: data?.DEVICE_ID ?? ''
+      LOCATION: data?.LOCATION,
+      DEVICE_ID: data?.DEVICE_ID ?? '',
+      listLicense
     });
     var formData = new FormData();
     formData.append('data', dataSend);
@@ -320,7 +396,6 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
                   </Select>
                 </Form.Item>
               </Col>
-
               <Col xs={24} sm={8}>
                 <Form.Item name="MODEL" label="Model">
                   <Input placeholder="Nhập model..." />
@@ -361,20 +436,24 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
                   <DatePicker format={config.dateFormat} style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
-
-              <Col xs={24} sm={8}>
+              <Col xs={24} sm={12}>
                 <Form.Item name="USER_FULLNAME" label="Tên người sử dụng">
                   <Input placeholder="Nhập họ tên người sử dụng..." />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={8}>
+              <Col xs={24} sm={12}>
                 <Form.Item name="USER_CODE" label="Mã nhân viên">
                   <Input placeholder="Nhập mã nhân viên..." />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={8}>
+              <Col xs={24} sm={12}>
                 <Form.Item name="USER_DEPARTMENT" label="Bộ phận">
                   <Input placeholder="Nhập bộ phận..." />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12}>
+                <Form.Item name="LOCATION" label="Vị trí">
+                  <Input placeholder="Nhập vị trí..." />
                 </Form.Item>
               </Col>
               <Col xs={24}>
@@ -387,6 +466,50 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
                   <ReactQuill theme="snow" value={note} onChange={setNote} />
                 </Form.Item>
               </Col>
+              <div style={{ marginBottom: '10px', marginLeft: '5px' }}>
+                Bản quyền phần mềm{' '}
+                <Button
+                  onClick={() => {
+                    setTypeModalLicense('ADD');
+                    setOpenModalLicense(true);
+                  }}
+                  icon={<EditOutlined />}
+                  type="link"
+                >
+                  Thêm mới
+                </Button>
+              </div>
+              <Col style={{ marginBottom: '10px' }} xs={24}>
+                <Table bordered pagination={false} dataSource={listLicense} columns={columns} />
+              </Col>
+              {/* <Col xs={8}>
+                <Form.Item label="License">
+                  <Select style={{ width: '100%' }}>
+                    {Object.values(STATUS_DEVICE)?.map((status, index) => (
+                      <Select.Option key={index} value={status?.value}>
+                        {status?.title}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={6}>
+                <Form.Item label="Loại">
+                  <Select style={{ width: '100%' }}>
+                    {Object.values(STATUS_DEVICE)?.map((status, index) => (
+                      <Select.Option key={index} value={status?.value}>
+                        {status?.title}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+
+              <Col xs={24} sm={10}>
+                <Form.Item name="" label="Key">
+                  <Input placeholder="Nhập key..." />
+                </Form.Item>
+              </Col> */}
               <Col xs={24}>
                 <Form.Item label="Hình ảnh" valuePropName="fileList" getValueFromEvent={normFile}>
                   <Upload
@@ -411,7 +534,15 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
                     fileList={fileList}
                     multiple
                     accept=".png,.jpeg,.png,.jpg,.PNG,.JPEG,.JPG,.JPG"
-                    onPreview={() => {}}
+                    onPreview={(file) => {
+                      if (file?.thumbUrl) {
+                        setPreviewImage(file?.thumbUrl);
+                        setPreviewOpen(true);
+                      } else if (file?.url) {
+                        setPreviewImage(file?.url);
+                        setPreviewOpen(true);
+                      }
+                    }}
                     beforeUpload={() => false}
                     onChange={(info) => {
                       setFileList(info.fileList);
@@ -435,12 +566,33 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
                       </div>
                     </button>
                   </Upload>
+                  {previewImage && (
+                    <Image
+                      preview={{
+                        visible: previewOpen,
+                        onVisibleChange: (visible) => setPreviewOpen(visible),
+                        afterOpenChange: (visible) => !visible && setPreviewImage('')
+                      }}
+                      src={previewImage}
+                    />
+                  )}
                 </Form.Item>
               </Col>
             </Row>
           </Form>
         </div>
       </Modal>
+      <ModalAddLicense
+        listLicenseProp={listLicense}
+        currentRow={currentRowLicense}
+        setListLicenseProp={setListLicense}
+        typeModal={typeModalLicense}
+        open={openModalLicense}
+        handleClose={() => {
+          setCurrentRowLicense(null);
+          setOpenModalLicense(false);
+        }}
+      />
     </>
   );
 };

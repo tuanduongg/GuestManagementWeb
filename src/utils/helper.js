@@ -138,6 +138,9 @@ export function addZero(num) {
   return (num < 10 ? '0' : '') + num;
 }
 export const formatDateFromDB = (dateString, showTime = true) => {
+  if(!dateString) {
+    return '';
+  }
   // Tạo một đối tượng Date từ chuỗi
   var date = new Date(dateString);
   // Lấy các thành phần ngày
