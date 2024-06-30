@@ -67,6 +67,8 @@ export const RouterAPI = {
   deleteImageByID: 'image/delete',
 
   addDevice: 'device/add',
+  addMultipleDevice: 'device/add-multiple',
+  uploadExcelDevice: 'device/upload-excel',
   editDevice: 'device/edit',
   deleteDevice: 'device/delete',
   allDevice: 'device/all',
@@ -75,4 +77,5 @@ export const RouterAPI = {
   detailDevice: 'device/detail',
 
   deleteImageDevice: 'image-device/delete',
+  licenseGetAll: 'license/all'
 };

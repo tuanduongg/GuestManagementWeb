@@ -49,7 +49,9 @@ import config from 'config';
 import './manage_device.css';
 import { FONT_SIZE_ICON_CARD, ITEM_DROPDOWN_STATUS, STATUS_DEVICE, TYPE_FILTER } from './manage_device.service';
 import ModalAddDevice from 'components/modal/modal-add-device/ModalAddDevice';
+import ModalUploadExcelDevice from 'components/modal/modal-upload-excel-device/ModalUploadExcelDevice';
 const { Title, Link } = Typography;
+
 const ITEMROWS = [
   {
     label: <span style={{ color: '#15803d' }}>Đang dùng</span>,
@@ -87,6 +89,7 @@ const ManageDevice = () => {
   const [filterValue, setFilterValue] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openModalAdd, setOpenModalAdd] = useState(false);
+  const [openModalUpload, setOpenModalUpload] = useState(false);
   const [categories, setCategories] = useState([]);
   const [devices, setDevices] = useState([]);
   const [statistic, setStatistic] = useState({});
@@ -215,6 +218,7 @@ const ManageDevice = () => {
         deleteDevice(selectedRowKeys);
         break;
       case 'IMPORT':
+        setOpenModalUpload(true);
         break;
       case 'EXPORT':
         break;
@@ -530,7 +534,7 @@ const ManageDevice = () => {
       }
     },
     {
-      id: TYPE_FILTER?.FIXING,
+      id: TYPE_FILTER?.NONE,
       xs: 12,
       sm: 8,
       md: 4,
@@ -570,9 +574,14 @@ const ManageDevice = () => {
               onClick={col?.onclick}
               style={{
                 width: '100%',
-                height: '100px'
+                height: '100px',
+                backGroundColor: col?.id === statusFilter ? '#333 !important' : '#ffff'
               }}
-              className="card_statistic_device"
+              className={
+                col?.id === statusFilter || (col?.id == TYPE_FILTER?.EXIPRATION_DATE && expirationFilter == 'month_expiration')
+                  ? 'card_statistic_device active-card-device'
+                  : 'card_statistic_device'
+              }
             >
               <Row>
                 <Col style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} xs={10}>
@@ -756,6 +765,15 @@ const ManageDevice = () => {
         open={openModalAdd}
         categories={categories}
         handleClose={handleCloseModalAdd}
+      />
+      <ModalUploadExcelDevice
+        setLoading={setLoading}
+        afterSave={() => {
+          getStatistic();
+          getAllDevice();
+        }}
+        open={openModalUpload}
+        handleClose={() => setOpenModalUpload(false)}
       />
     </>
   );
