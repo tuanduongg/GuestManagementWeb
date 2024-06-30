@@ -9,6 +9,7 @@ import { createDateWithCurrentDate, formatDate, getAllDatesInRange } from 'utils
 import { useTranslation } from 'react-i18next';
 import SAMPLE_EXCEL_FILE from '../../../assets/excel/FileUploadDevice.xlsx';
 import './modal-upload-excel-device.css';
+import { checkIsExcelFile } from '../modal-upload-excel/modal_upload_excel.service';
 
 const ModalUploadExcelDevice = ({ open, handleClose, afterSave, setLoading }) => {
   const handleCancel = () => {
@@ -29,7 +30,7 @@ const ModalUploadExcelDevice = ({ open, handleClose, afterSave, setLoading }) =>
       </Space>
     );
     api['error']({
-      message: 'Thông báo',
+      message: 'Warning',
       description: description,
       placement: 'bottomRight',
       duration: 0,
@@ -37,87 +38,92 @@ const ModalUploadExcelDevice = ({ open, handleClose, afterSave, setLoading }) =>
     });
   };
 
-  const props = {
-    showUploadList: false,
-    name: 'file',
-    multiple: false,
-    // action: 'https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload',
-    onChange(info) {
-      handleChange(info);
-    },
-    onDrop(e) {
-      console.log('Dropped files', e?.dataTransfer?.files);
-    }
-  };
-  const upload = (fileToUpload) => {
-    readFile(fileToUpload, (data) => readDataFromFile(data));
-  };
+  // const props = {
+  //   showUploadList: false,
+  //   name: 'file',
+  //   multiple: false,
+  //   // action: 'https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload',
+  //   onChange(info) {
+  //     handleChange(info);
+  //   },
+  //   onDrop(e) {
+  //     console.log('Dropped files', e?.dataTransfer?.files);
+  //   }
+  // };
+  // const upload = (fileToUpload) => {
+  //   readFile(fileToUpload, (data) => readDataFromFile(data));
+  // };
 
-  const readFile = (fileToUpload, callback) => {
-    const reader = new FileReader();
-    let data;
-    reader.onload = function () {
-      data = reader.result;
-      callback(data);
-    };
-    reader.readAsArrayBuffer(fileToUpload);
-  };
-  const handleSaveGuest = async (data) => {
-    setLoading(true);
-    let url = RouterAPI.addGuest;
-    const rest = await restApi.post(url, data);
-    setLoading(false);
-    handleClose();
-    if (rest?.status == 200) {
-      afterSave(rest);
-    }
-  };
+  // const readFile = (fileToUpload, callback) => {
+  //   const reader = new FileReader();
+  //   let data;
+  //   reader.onload = function () {
+  //     data = reader.result;
+  //     callback(data);
+  //   };
+  //   reader.readAsArrayBuffer(fileToUpload);
+  // };
 
-  const readDataFromFile = (data) => {
-    setLoading(true);
-    let errFlag = false;
-    var workbook = new ExcelJS.Workbook();
-    const rows = [];
-    workbook.xlsx.load(data).then(async (workbook) => {
-      const worksheet = workbook.getWorksheet(1);
-      for (var i = 1; i <= worksheet?.rowCount; i++) {
-        if (i > 1) {
-          let row = {};
-          for (var j = 1; j <= worksheet?.columnCount; j++) {
-            var header = worksheet.getRow(1).values[j];
-            var value = worksheet.getRow(i).values[j];
-            row[header] = value;
-          }
-          rows[i] = row;
-        }
-      }
-      const res = await restApi.post(RouterAPI.addMultipleDevice, { data: rows });
-      setLoading(false);
-      if (res?.status == 200) {
-        console.log('res', res);
-        message.success('Upload file successful!');
-        handleCancel();
-        if (res?.notSavedRow) {
-          message.error('Cannot import at row:', res?.notSavedRow);
-        }
-        afterSave();
-      }
-    });
-  };
+  // const readDataFromFile = (data) => {
+  //   setLoading(true);
+  //   let errFlag = false;
+  //   var workbook = new ExcelJS.Workbook();
+  //   const rows = [];
+  //   workbook.xlsx.load(data).then(async (workbook) => {
+  //     const worksheet = workbook.getWorksheet(1);
+  //     for (var i = 1; i <= worksheet?.rowCount; i++) {
+  //       if (i > 1) {
+  //         let row = {};
+  //         for (var j = 1; j <= worksheet?.columnCount; j++) {
+  //           var header = worksheet.getRow(1).values[j];
+  //           var value = worksheet.getRow(i).values[j];
+  //           row[header] = value;
+  //         }
+  //         rows[i] = row;
+  //       }
+  //     }
+  //     const res = await restApi.post(RouterAPI.addMultipleDevice, { data: rows });
+  //     setLoading(false);
+  //     if (res?.status == 200) {
+  //       console.log('res', res);
+  //       message.success('Upload file successful!');
+  //       handleCancel();
+  //       if (res?.notSavedRow) {
+  //         message.error('Cannot import at row:', res?.notSavedRow);
+  //       }
+  //       afterSave();
+  //     }
+  //   });
+  // };
   const handleChange = async (info) => {
     if (info.file.status === 'uploading') {
       return;
     }
     if (info.file) {
+      let errMessage = 'Failed to upload file';
       try {
-        // upload(info?.file);
         const formData = new FormData();
-        formData.append('file', info?.file);
+        if (info?.file?.originFileObj) {
+          formData.append('file', info?.file?.originFileObj);
+        } else {
+          formData.append('file', info?.file);
+        }
         const res = await restApi.post(RouterAPI.uploadExcelDevice, formData);
-        console.log('res', res);
+        setLoading(false);
+        if (res?.status == 200) {
+          message.success('Upload file successful!');
+          const notSaved = res?.data?.notSavedRow;
+          if (notSaved) {
+            openNotificationWithIcon('Cannot import at row:' + notSaved);
+          }
+          handleCancel();
+          afterSave();
+        } else {
+          errMessage = res?.data?.message;
+        }
       } catch (error) {
         console.error('Error reading Excel file:', error);
-        message.error('Failed to upload file.');
+        message.error(errMessage);
       }
     }
   };

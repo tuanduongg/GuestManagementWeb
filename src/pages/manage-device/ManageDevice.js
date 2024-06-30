@@ -51,6 +51,7 @@ import { FONT_SIZE_ICON_CARD, ITEM_DROPDOWN_STATUS, STATUS_DEVICE, TYPE_FILTER }
 import ModalAddDevice from 'components/modal/modal-add-device/ModalAddDevice';
 import ModalUploadExcelDevice from 'components/modal/modal-upload-excel-device/ModalUploadExcelDevice';
 const { Title, Link } = Typography;
+import axios, { AxiosRequestConfig } from 'axios';
 
 const ITEMROWS = [
   {
@@ -191,7 +192,7 @@ const ManageDevice = () => {
       modal.confirm({
         centered: true,
         title: 'Thông báo',
-        content: 'Bạn chắc chắn muốn xoá thiết bị?',
+        content: 'Bạn chắc chắn muốn xoá thiết bị đã chọn?',
         okText: 'Yes',
         cancelText: 'No',
         async onOk() {
@@ -201,6 +202,7 @@ const ManageDevice = () => {
           });
           setLoading(false);
           if (res?.status === 200) {
+            setSelectedRowKeys([])
             message.success('Delete device successful!');
             getAllDevice();
             getStatistic();
@@ -208,7 +210,7 @@ const ManageDevice = () => {
             message.error(res?.data?.message || 'Delete fail!');
           }
         },
-        onCancel() {}
+        onCancel() { }
       });
     }
   };
@@ -221,6 +223,7 @@ const ManageDevice = () => {
         setOpenModalUpload(true);
         break;
       case 'EXPORT':
+        exportExcel();
         break;
 
       default:
@@ -260,7 +263,7 @@ const ManageDevice = () => {
         <>
           <Row style={{ display: 'flex', alignItems: 'center' }} gutter={8}>
             <Col xs={24} sm={20} lg={20}>
-              <Link onClick={() => {}}>{data?.NAME}</Link>
+              <Link onClick={() => { }}>{data?.NAME}</Link>
             </Col>
           </Row>
         </>
@@ -331,7 +334,7 @@ const ManageDevice = () => {
                 onClick={() => {
                   setCurrentDropdown(data?.DEVICE_ID);
                 }}
-                // type="primary"
+              // type="primary"
               >
                 {data?.STATUS ? ITEMROWS.find((item) => item.key === data?.STATUS)?.label : ''}
               </Button>
@@ -366,6 +369,50 @@ const ManageDevice = () => {
   ].map((item) => {
     return { ...item, title: t(item?.title) };
   });
+
+  const exportExcel = async () => {
+    modal.confirm({
+      centered: true,
+      title: 'Thông báo',
+      content: 'Bạn chắc chắn tải xuống file excel?',
+      okText: 'Yes',
+      cancelText: 'No',
+      async onOk() {
+        try {
+          setLoading(true);
+          const response = await axios.post(
+            process.env.REACT_APP_URL_API + RouterAPI.exportDevice,
+            {},
+            {
+              responseType: 'blob' // Ensure response is treated as a blob
+            }
+          );
+          setLoading(false);
+          if (response?.data.error) {
+            messageApi.open({
+              type: 'warning',
+              content: response?.data?.error ?? 'Export fail!'
+            });
+          }
+          const date = new Date();
+          const nameFile = `${date.getDate()}${date.getMonth() + 1}${date.getFullYear()}`;
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(response?.data);
+          link.setAttribute('download', `export${nameFile}.xlsx`);
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+        } catch (error) {
+          setLoading(false);
+          messageApi.open({
+            type: 'warning',
+            content: error ?? 'Export fail!'
+          });
+        }
+      },
+      onCancel() { }
+    });
+  }
 
   const getListCategory = async () => {
     const rest = await restApi.post(RouterAPI.findByTypeCategory, { type: 'DEVICE' });
@@ -601,7 +648,7 @@ const ManageDevice = () => {
           <Col xs={24} sm={24} md={24}>
             <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
               {isMobile() && (
-                <Button onClick={() => {}} style={{ marginRight: '5px' }} icon={<FilterOutlined />}>
+                <Button onClick={() => { }} style={{ marginRight: '5px' }} icon={<FilterOutlined />}>
                   Bộ lọc
                 </Button>
               )}
@@ -634,24 +681,24 @@ const ManageDevice = () => {
               options={
                 categories?.length > 0
                   ? [
-                      {
-                        label: '-Loại thiết bị-',
-                        value: 'all'
-                      }
-                    ].concat(
-                      categories.map((item) => {
-                        return {
-                          label: item?.categoryName,
-                          value: item?.categoryID
-                        };
-                      })
-                    )
+                    {
+                      label: '-Loại thiết bị-',
+                      value: 'all'
+                    }
+                  ].concat(
+                    categories.map((item) => {
+                      return {
+                        label: item?.categoryName,
+                        value: item?.categoryID
+                      };
+                    })
+                  )
                   : [
-                      {
-                        label: '-Loại thiết bị-',
-                        value: 'all'
-                      }
-                    ]
+                    {
+                      label: '-Loại thiết bị-',
+                      value: 'all'
+                    }
+                  ]
               }
             />
           </Col>
@@ -731,27 +778,27 @@ const ManageDevice = () => {
               scroll={
                 isMobile()
                   ? {
-                      x: '100vh',
-                      y: '65vh'
-                    }
+                    x: '100vh',
+                    y: '65vh'
+                  }
                   : { x: null, y: 'calc(100vh - 285px)' }
               }
               columns={columns}
               dataSource={devices}
-              //   pagination={{
-              //     current: page,
-              //     pageSize: rowsPerPage,
-              //     showSizeChanger: true,
-              //     pageSizeOptions: config.sizePageOption,
-              //     total: total,
-              //     showTotal: (total, range) => `${range[0]}-${range[1]}/${total}`,
-              //     responsive: true,
-              //     onChange: (page, pageSize) => {
-              //       setSelectedRowKeys([]);
-              //       setPage(page);
-              //       setRowsPerPage(pageSize);
-              //     }
-              //   }}
+            //   pagination={{
+            //     current: page,
+            //     pageSize: rowsPerPage,
+            //     showSizeChanger: true,
+            //     pageSizeOptions: config.sizePageOption,
+            //     total: total,
+            //     showTotal: (total, range) => `${range[0]}-${range[1]}/${total}`,
+            //     responsive: true,
+            //     onChange: (page, pageSize) => {
+            //       setSelectedRowKeys([]);
+            //       setPage(page);
+            //       setRowsPerPage(pageSize);
+            //     }
+            //   }}
             ></Table>
           </Col>
         </Row>

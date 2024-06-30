@@ -64,18 +64,19 @@ export const RouterAPI = {
   updateCategory: '/category/update',
   findByTypeCategory: '/category/findByType',
 
-  deleteImageByID: 'image/delete',
+  deleteImageByID: '/image/delete',
 
-  addDevice: 'device/add',
+  addDevice: '/device/add',
   addMultipleDevice: 'device/add-multiple',
   uploadExcelDevice: 'device/upload-excel',
-  editDevice: 'device/edit',
-  deleteDevice: 'device/delete',
-  allDevice: 'device/all',
-  changeStatusDevice: 'device/change-status',
-  statisticDevice: 'device/statistic',
-  detailDevice: 'device/detail',
+  editDevice: '/device/edit',
+  exportDevice: '/device/export-excel',
+  deleteDevice: '/device/delete',
+  allDevice: '/device/all',
+  changeStatusDevice: '/device/change-status',
+  statisticDevice: '/device/statistic',
+  detailDevice: '/device/detail',
 
-  deleteImageDevice: 'image-device/delete',
-  licenseGetAll: 'license/all'
+  deleteImageDevice: '/image-device/delete',
+  licenseGetAll: '/license/all'
 };

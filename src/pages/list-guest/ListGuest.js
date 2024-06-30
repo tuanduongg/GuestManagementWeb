@@ -485,6 +485,7 @@ const ListGuest = () => {
       link.click();
       link.remove();
     } catch (error) {
+      setLoading(false);
       messageApi.open({
         type: 'warning',
         content: error ?? 'Export fail!'
