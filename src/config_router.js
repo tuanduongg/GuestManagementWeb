@@ -9,5 +9,5 @@ export const ConfigRouter = {
   listGuest: { url: '/', name: 'sidebar_manager_guest' },
   manageDevice: { url: '/device', name: 'Manage Device' },
   login: { url: 'login', name: 'Đăng nhập' },
-  homePage: { url: 'home', name: 'Trang chủ' }
+  homePage: { url: 'home', name: 'Trang chủ' },
 };

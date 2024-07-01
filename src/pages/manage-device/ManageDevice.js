@@ -89,6 +89,7 @@ const ManageDevice = () => {
   const [page, setPage] = useState(1);
   const [filterValue, setFilterValue] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [total, setTotal] = useState(0);
   const [openModalAdd, setOpenModalAdd] = useState(false);
   const [openModalUpload, setOpenModalUpload] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -202,7 +203,7 @@ const ManageDevice = () => {
           });
           setLoading(false);
           if (res?.status === 200) {
-            setSelectedRowKeys([])
+            setSelectedRowKeys([]);
             message.success('Delete device successful!');
             getAllDevice();
             getStatistic();
@@ -382,7 +383,12 @@ const ManageDevice = () => {
           setLoading(true);
           const response = await axios.post(
             process.env.REACT_APP_URL_API + RouterAPI.exportDevice,
-            {},
+            {
+              category: categoryFilter,
+              status: statusFilter,
+              expiration: expirationFilter,
+              search
+            },
             {
               responseType: 'blob' // Ensure response is treated as a blob
             }
@@ -412,7 +418,7 @@ const ManageDevice = () => {
       },
       onCancel() { }
     });
-  }
+  };
 
   const getListCategory = async () => {
     const rest = await restApi.post(RouterAPI.findByTypeCategory, { type: 'DEVICE' });
@@ -426,11 +432,14 @@ const ManageDevice = () => {
       category: categoryFilter,
       status: statusFilter,
       expiration: expirationFilter,
-      search
+      search,
+      rowsPerPage,
+      page: +page - 1
     });
     setLoading(false);
     if (rest?.status === 200) {
-      setDevices(rest?.data);
+      setDevices(rest?.data?.origin);
+      setTotal(rest?.data?.count);
     }
   };
   const handleCloseModalAdd = () => {
@@ -481,36 +490,42 @@ const ManageDevice = () => {
 
   useEffect(() => {
     getAllDevice();
-  }, [categoryFilter, statusFilter, expirationFilter, search]);
+  }, [categoryFilter, statusFilter, expirationFilter, search, page, rowsPerPage]);
   const onClickCard = (value) => {
     if (value) {
       switch (value) {
         case TYPE_FILTER.SUM:
+          setPage(1);
           setCategoryFilter('all');
           setStatusFilter('all');
           setExpirationFilter('all');
           break;
         case TYPE_FILTER.FREE:
+          setPage(1);
           setCategoryFilter('all');
           setStatusFilter(TYPE_FILTER.FREE);
           setExpirationFilter('all');
           break;
         case TYPE_FILTER.FIXING:
+          setPage(1);
           setCategoryFilter('all');
           setStatusFilter(TYPE_FILTER.FIXING);
           setExpirationFilter('all');
           break;
         case TYPE_FILTER.NONE:
+          setPage(1);
           setCategoryFilter('all');
           setStatusFilter(TYPE_FILTER.NONE);
           setExpirationFilter('all');
           break;
         case TYPE_FILTER.EXIPRATION_DATE:
+          setPage(1);
           setCategoryFilter('all');
           setStatusFilter('all');
           setExpirationFilter('month_expiration');
           break;
         case TYPE_FILTER.USING:
+          setPage(1);
           setCategoryFilter('all');
           setStatusFilter(TYPE_FILTER.USING);
           setExpirationFilter('all');
@@ -760,6 +775,7 @@ const ManageDevice = () => {
               allowClear
               enterButton="Search"
               onSearch={(value) => {
+                setPage(1);
                 setSearch(value);
               }}
             />
@@ -785,20 +801,20 @@ const ManageDevice = () => {
               }
               columns={columns}
               dataSource={devices}
-            //   pagination={{
-            //     current: page,
-            //     pageSize: rowsPerPage,
-            //     showSizeChanger: true,
-            //     pageSizeOptions: config.sizePageOption,
-            //     total: total,
-            //     showTotal: (total, range) => `${range[0]}-${range[1]}/${total}`,
-            //     responsive: true,
-            //     onChange: (page, pageSize) => {
-            //       setSelectedRowKeys([]);
-            //       setPage(page);
-            //       setRowsPerPage(pageSize);
-            //     }
-            //   }}
+              pagination={{
+                current: page,
+                pageSize: rowsPerPage,
+                showSizeChanger: true,
+                pageSizeOptions: config.sizePageOption,
+                total: total,
+                showTotal: (total, range) => `${range[0]}-${range[1]}/${total}`,
+                responsive: true,
+                onChange: (page, pageSize) => {
+                  setSelectedRowKeys([]);
+                  setPage(page);
+                  setRowsPerPage(pageSize);
+                }
+              }}
             ></Table>
           </Col>
         </Row>

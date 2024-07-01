@@ -69,6 +69,7 @@ const ModalAddDevice = ({ open, handleClose, setLoading, categories, getAllData,
       console.log();
     } else {
       form.resetFields(); // Đặt lại trường của form
+      setListLicense([])
       setFileList([]);
       handleClose();
     }
