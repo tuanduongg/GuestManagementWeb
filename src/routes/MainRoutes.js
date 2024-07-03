@@ -4,6 +4,7 @@ import { lazy } from 'react';
 import Loadable from 'components/Loadable';
 import MainLayout from 'layout/MainLayout';
 import { ConfigRouter } from 'config_router';
+import Concept from 'pages/concept/Concept';
 
 // render - dashboard
 // render - sample page
@@ -47,6 +48,10 @@ const MainRoutes = {
     {
       path: ConfigRouter.manageDevice.url,
       element: <ManageDevice />
+    },
+    {
+      path: ConfigRouter.concept.url,
+      element: <Concept />
     }
   ]
 };

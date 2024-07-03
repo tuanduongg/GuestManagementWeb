@@ -1,6 +1,5 @@
 // assets
-import { LoginOutlined, ProfileOutlined, UserOutlined,
- } from '@ant-design/icons';
+import { LoginOutlined, ProfileOutlined, UserOutlined } from '@ant-design/icons';
 import { ConfigRouter } from 'config_router';
 // ==============================|| MENU ITEMS - EXTRA PAGES ||============================== //
 

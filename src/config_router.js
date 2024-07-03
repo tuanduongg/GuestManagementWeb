@@ -10,4 +10,5 @@ export const ConfigRouter = {
   manageDevice: { url: '/device', name: 'Manage Device' },
   login: { url: 'login', name: 'Đăng nhập' },
   homePage: { url: 'home', name: 'Trang chủ' },
+  concept: { url: '/concept', name: 'Approval Concept' },
 };
